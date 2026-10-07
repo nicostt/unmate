@@ -2,6 +2,7 @@
 
 import { whatsappLink } from "@/lib/site";
 import type { Product } from "@/lib/types";
+import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
 import { PriceRow } from "./ProductCard";
 import { useShop } from "./ShopProvider";
@@ -34,9 +35,15 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
         <button className="icon-btn" type="button" onClick={onClose} aria-label="Cerrar" autoFocus>
           ×
         </button>
-        <div className="m-art">
-          <ProductArt shape={product.shape} />
-        </div>
+        {product.images.length ? (
+          <div className="m-art has-photos">
+            <Gallery images={product.images} alt={product.name} sizes="(max-width: 700px) 100vw, 390px" />
+          </div>
+        ) : (
+          <div className="m-art">
+            <ProductArt shape={product.shape} />
+          </div>
+        )}
         <div className="m-info">
           <p className="eyebrow">{categoryName}</p>
           <h3 id="m-title">{product.name}</h3>

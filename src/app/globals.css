@@ -14,6 +14,9 @@
   --accent-fg:#220f09;
   --btn-bg:#f6efe9;
   --btn-fg:#220f09;
+  /* qué ícono muestra el botón de tema: el del modo al que se cambia */
+  --icon-sun:block;
+  --icon-moon:none;
   /* --font-outfit y --font-figtree las define next/font en src/app/layout.tsx */
   --f-display:var(--font-outfit),'Avenir Next','Segoe UI',sans-serif;
   --f-body:var(--font-figtree),'Segoe UI',system-ui,sans-serif;
@@ -24,13 +27,13 @@
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
     --bg:#ece5de;--surface:#f7f2ed;--surface-2:#e2d8ce;--line:rgba(34,15,9,.17);--ring:rgba(34,15,9,.5);
-    --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;
+    --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;--icon-sun:none;--icon-moon:block;
     color-scheme:light;
   }
 }
 :root[data-theme="light"]{
   --bg:#ece5de;--surface:#f7f2ed;--surface-2:#e2d8ce;--line:rgba(34,15,9,.17);--ring:rgba(34,15,9,.5);
-  --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;
+  --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;--icon-sun:none;--icon-moon:block;
   color-scheme:light;
 }
 
@@ -59,6 +62,10 @@ section[id]{scroll-margin-top:96px}
 .cart-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600}
 .cart-btn:hover{border-color:var(--fg)}
 .cart-btn svg{width:20px;height:20px}
+.theme-btn{flex:none}
+.theme-btn svg{width:20px;height:20px}
+.theme-btn .sun{display:var(--icon-sun)}
+.theme-btn .moon{display:var(--icon-moon)}
 #cart-count{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--btn-bg);color:var(--btn-fg);font-size:.8rem;display:grid;place-items:center;font-variant-numeric:tabular-nums}
 @media(min-width:760px){.nav{order:0;width:auto}.bar{flex-wrap:nowrap}.brand{margin-right:0}.nav{margin-right:auto;margin-left:28px}}
 
@@ -119,6 +126,25 @@ section[id]{scroll-margin-top:96px}
 .was{color:var(--muted);text-decoration:line-through;font-variant-numeric:tabular-nums;font-size:.95rem}
 .off{background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.76rem;padding:.12rem .45rem;border-radius:4px}
 .empty{padding:36px 0;color:var(--muted)}
+
+/* galería de fotos (tarjeta y ficha de producto) */
+.gallery{position:absolute;inset:0}
+.gallery-track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.gallery-track::-webkit-scrollbar{display:none}
+.gallery-slide{position:relative;flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always}
+.gallery-slide img,.thumb img{object-fit:cover}
+.gallery-arrow{position:absolute;top:50%;translate:0 -50%;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 85%,transparent);color:var(--fg);font-size:1.4rem;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.gallery-arrow:hover{border-color:var(--fg)}
+.gallery-arrow.prev{left:8px}
+.gallery-arrow.next{right:8px}
+/* en pantallas táctiles se desliza con el dedo: las flechas sobran */
+@media(hover:none){.gallery-arrow{display:none}}
+.gallery-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.gallery-dots span{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.5;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.gallery-dots span.on{opacity:1}
+.m-art.has-photos{position:relative;padding:0}
+@media(max-width:700px){.m-art.has-photos{aspect-ratio:1}}
+.thumb{position:relative;overflow:hidden}
 
 /* kit */
 .kit{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,44px)}

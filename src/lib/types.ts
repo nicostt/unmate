@@ -27,6 +27,7 @@ export type Product = {
   price: number; // en pesos, sin centavos
   compareAtPrice: number | null; // precio "antes", si está en oferta
   stock: number | null; // null = no se controla el stock
+  images: string[]; // direcciones de las fotos, en el orden en que se muestran
 };
 
 export type Catalog = {

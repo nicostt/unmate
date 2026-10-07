@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Outfit } from "next/font/google";
+import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 // next/font descarga las fuentes al compilar y las sirve desde nuestro propio
@@ -35,7 +36,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-AR" className={`${outfit.variable} ${figtree.variable}`}>
+    // suppressHydrationWarning: el script de tema cambia <html> antes de que
+    // React arranque, y sin esto React avisaría de esa diferencia.
+    <html lang="es-AR" className={`${outfit.variable} ${figtree.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

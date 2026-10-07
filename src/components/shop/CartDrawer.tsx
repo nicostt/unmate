@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { money } from "@/lib/format";
 import { orderMessage, whatsappLink } from "@/lib/site";
@@ -40,7 +41,11 @@ export function CartDrawer() {
           {lines.map(({ product, qty }) => (
             <div className="line" key={product.slug}>
               <div className="thumb">
-                <ProductArt shape={product.shape} />
+                {product.images.length ? (
+                  <Image src={product.images[0]} alt="" fill sizes="64px" />
+                ) : (
+                  <ProductArt shape={product.shape} />
+                )}
               </div>
               <div className="line-info">
                 <strong>{product.name}</strong>

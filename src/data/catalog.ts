@@ -11,7 +11,8 @@ export const categories: Category[] = [
   { slug: "termos", name: "Termos" },
 ];
 
-export const products: Product[] = [
+// Las fotos no se listan acá: salen de public/productos/<slug>/ (ver src/lib/catalog.ts).
+export const products: Omit<Product, "images">[] = [
   {
     slug: "camionero-premium",
     name: "Camionero Premium",

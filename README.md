@@ -46,12 +46,14 @@ src/
     types.ts         Qué campos tiene un producto y una categoría
   data/catalog.ts    Los productos (provisorio, hasta conectar la base)
 public/logo.webp     El logo
+public/productos/    Una carpeta de fotos por producto
 supabase/            SQL para crear la base: tablas, seguridad y carga inicial
 referencia/          El diseño original en un solo HTML (solo para consultar)
 ```
 
 ## Cambios frecuentes
 
+- **Fotos de un producto:** copiá las imágenes (JPG, PNG o WebP) a `public/productos/<producto>/`. Se muestran todas, en orden de nombre: llamalas `1.jpg`, `2.jpg`, `3.jpg`... y la `1` es la principal. Con más de una, la foto se desliza. Sin fotos, se ve la ilustración.
 - **Precio, nombre o producto nuevo:** `src/data/catalog.ts` (hasta que exista el panel de administración).
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
 - **Textos de la portada o de la guía:** `src/components/site/`.

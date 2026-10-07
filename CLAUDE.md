@@ -19,6 +19,7 @@ Tienda online de mates, bombillas y termos. Hoy es un catálogo con carrito que 
 
 ## Estado (actualizar al avanzar)
 - 7/10/2026: proyecto Next.js 16 creado (App Router, TypeScript, CSS plano, sin Tailwind). Diseño migrado y verificado. El catálogo se lee de `src/data/catalog.ts` a través de `getCatalog()` en `src/lib/catalog.ts`.
+- Fotos: `getCatalog()` lista las imágenes de `public/productos/<slug>/` (provisorio hasta Storage); `Gallery.tsx` las muestra deslizables en tarjeta y ficha. Botón de modo claro/oscuro en el header (`ThemeToggle.tsx`, `src/lib/theme.ts`).
 - `supabase/migrations/0001_catalogo.sql` y `supabase/seed.sql` están escritos pero nunca se ejecutaron: revisarlos contra el proyecto real al conectarlo.
 - Falta de la etapa 1: primer commit y GitHub, proyecto Supabase, catálogo desde la base, panel admin con login, Storage.
 - Next 16 cambió APIs: consultar `node_modules/next/dist/docs/` antes de escribir código (ver `AGENTS.md`).

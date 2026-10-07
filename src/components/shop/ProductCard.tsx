@@ -2,6 +2,7 @@
 
 import { discountPercent, money } from "@/lib/format";
 import type { Product } from "@/lib/types";
+import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 
@@ -26,9 +27,21 @@ export function ProductCard({ product, onOpen }: { product: Product; onOpen: () 
 
   return (
     <article className="card">
-      <button className="card-art" type="button" onClick={onOpen} aria-label={`Ver ${product.name}`}>
-        <ProductArt shape={product.shape} />
-      </button>
+      {product.images.length ? (
+        <div className="card-art">
+          <Gallery
+            images={product.images}
+            alt={product.name}
+            sizes="(max-width: 560px) 100vw, 320px"
+            onOpen={onOpen}
+          />
+        </div>
+      ) : (
+        // sin fotos todavía: se muestra la ilustración
+        <button className="card-art" type="button" onClick={onOpen} aria-label={`Ver ${product.name}`}>
+          <ProductArt shape={product.shape} />
+        </button>
+      )}
       <div className="card-body">
         <div className="tags">
           <span className="tag">{product.material ?? categoryName}</span>

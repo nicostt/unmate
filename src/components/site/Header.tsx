@@ -1,4 +1,5 @@
 import { CartButton } from "@/components/shop/CartButton";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -14,6 +15,7 @@ export function Header() {
           <a href="#guia">Guía del mate</a>
           <a href="#contacto">Contacto</a>
         </nav>
+        <ThemeToggle />
         <CartButton />
       </div>
     </header>
