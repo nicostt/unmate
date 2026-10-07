@@ -1,0 +1,599 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>unmate.es</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{
+  /* Layout: sticky bar, left-aligned hero beside the real logo, filterable catalog, kit builder, buying guide, contact */
+  --bg:#220f09;
+  --surface:#2d1810;
+  --surface-2:#3a2018;
+  --line:rgba(246,239,233,.17);
+  --ring:rgba(246,239,233,.55);
+  --fg:#f6efe9;
+  --muted:#c0afa3;
+  --accent:#aac56b;
+  --accent-fg:#220f09;
+  --btn-bg:#f6efe9;
+  --btn-fg:#220f09;
+  --f-display:'Outfit','Avenir Next','Segoe UI',sans-serif;
+  --f-body:'Figtree','Segoe UI',system-ui,sans-serif;
+  --logo-img:url("data:image/webp;base64,UklGRhguAABXRUJQVlA4IAwuAAAQvgCdASowAjACPj0ejUUiIaEQyPR4IAPEtLdwu08mjOVADcA3y9n5cHLPHwiYQOffO/L6j9xNzqb6d/X/7J/bfSN32fUfyG/tvqD+KfNv0/8gf7H/8v917TnjL6f/z/4u+5H8V+t32T+0/4j/Vf3X93fvd/D/5r8hfyA9n/if/S+oL+J/yH+5f2T9rv8D+3nG26//wPQF93fqX+N/wn7lf3H0rP5r0O+wP+E+3b7AP55/Qv8f/Z/3A/u3/697D/SeOH94/4H+d/tfwA/zD+m/6r+2/5b9mfpq/j/+L/jP8/+1vto/P/7r/wf8F/nv23+w7+Wf1T/T/3b/Jf97/M////vfdf///cx+2H//91f9pf/+HauLVcNMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2b26oYKDuFxarhpgObhl8gqc2taC92krDK//xCoFfPAqqvLXHS27zt3LjJCY8/Bg6cyPSwm4ZfIKnNrt5TAVy/XySLfqEWEhf6plcWoAjcecgpMgCO+pm83DL5BU5tdvJ7rdtMM+m9zYy1QVOCAUPt7OSstBZV4bRYDHOOia1RaQvKYDm4ZfIKnB5+l4jbs5v4s82uwO1YYSeu3DOfKKmIPQyua6w8n78+O8nmeBSyMvkFTm128Slpgi3vxfby4tVwoc7ZAHpojb22ta78apxLxuHh8gqc2u3k/x/JxgxSiaVhewnQkqg5sMT3mT1lLPom9pn105b/71jJdSJfIKnNnODcRHb7sJ8RcY8x0gXsvvbfcxDNtoumBKo4Poq/76YSmal0G71f1ovyFWl11w1drv/tJZe9BQFGdaufWkipdcgSRdkqCpza6/RdOIbr9+GMdpNnm11YfT3/c9pEI6q2mFlcFjYNVtPSpOQpXwfivbvbJ2pWrdSHXdEsuOVxarholk3bMdqfL5+Qohpb6qUE95x9E8XDLQJXmSFk3aM7YO8zolFVqkCdKq09zxarhpgK6e5IBofb2lu3VfexOZd+yUHIsBRm0bnD8kGqtrPmXJ6e34fxOc0b38xhpIx+jcMvkFTg+LGFOPVbppwGLn71hLqVk5fzFdV8GDvauCEoLwXSZQ22eQbhiNz60OiR1WF127wtv2GtJ5Nq5/OC8ZKosiOUFTm12EJIBFArmaNcc865yltNjdcdyzjPfsoVKut+oHiOlc7ubEqnkkS+QVODXwoEKf2asuJnD8eMZC9JuRbJQhoDq+IlqOKO2abRbgNP6AOPxGIDygimA5txtvbnB+J8DSEuRAmVFVEVX9GPWk6asldM2Q6mrEYcBqV2SF216S/Nwy+QVJjhqTNtQQm9a2bIStf9rPk11r49xWiP5DsHfMmqS60T/CTl05ZZ5Ss02OwOcxvqF8gqc2c3rP649Su3iU6Aaj7vVkygdKdUVnPDMav1NhJIN9Rxj0ULTqLBDqZ8E0iNaFsQ056xy1XDTAc20o2oGC242tetTOkXE8bfDAtukRmDtvoEps/qiJIfqc2u3lMBxRxNQX9vkxgSm71JmsrL+Q9QHyRt2pjleh2zjXnObbE/5ToGjRyHxfKYDm4ZfIKItV46F15iSV2ay8xUXqbqVF/1gtPZCTseRwgaP2L8lsKPC15IAMY9h9sEGqWCL4w2brqeCIcgseNrUPgLy77uMctAxbDtUFTm128pgObhFmhXtsCirHEj7THpNg4VmK8X2xxXkuojOGyYbBrDXcjbZQe1r/kpz0QU/K8IPlO+nR+2hdzoHouG9U1Lh1Z1YAtTQ6QVObXbymA5uGXyfri1XGLgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFTm128pgObhl8gqc2u3lMBzcMvkFSQAD+/sU1/pWtdQf+4FTo0MAAAAAAAAAAAAAAAaPpKmJha/HVnIwUlBSHPYWdGq5MdvDQCECx9EII27fafaNfQBSeR8WMq0qa7FtVE2nbEFYOjNdJBiDiM4d+yslt/hxarXbArAXSlzKIULm86vfyrMfXfW6P4Cen/jdNNqfxZCjYZ5ZeRSVixxar2yfH+68RoRNJLTIM0k5GraZ1v/rbN/MrxL5L5ybxp4SdAkJngMvqNj7A6OWq1kiTW5qrx+zOK9yiJCEAAbrzEkIHz2Vd0Q8RAlImBf67Dvo1H9gBPrIMY49shYVuOqkveH5P2r3Bp5GnkM3EuiFL1vCGzcFt2sEwvcZMyEbTUlikLu1k9dfcKGaBBOT86I3Y+C9JAb2ppPOEmeNF8t72lit344plNiVH/L67v5IS1UJtj/AEWbZuYqniWMXOsStvAilGm47jFgmFuR/cRP5ql7Upe8l4zZHXSS96mlcdFSzM88LcS/LSujiqY6mop6WWO/yCjP+8x5fkHAUFfeo4bRf72C0H8NzwOJKrbobXujIvJC9LCnd/a3K/8/pyn86YkkmEKMBQTeeiWSFtyRgsDfUruZHFUOclKq8bDAP3iuMn40wo3nwIyQ/SoYmmdrJI4ftmmEDtdCrMTJqdhmsHYGMFnxPpkPul2lmqbVnLuNp5SohvCy28kXGL41rkDjHtUklmbetG+4XGXT28ccUYqQfu0c3ojXlFSElY6mzCYmLIJrYZVEyoL87VIMwiQVlOsBwVr15XQfLDZv/O+nkA1IdlSMZyeuB73yiWxdUHpIs27gHLatdN/jv4Bf9f/aXUzJOKWCDfh94tG4VNk6nIiNEDSn6ywWrrudceRcv9WrU1NHuijEsK+zmHEcMTDDSR5nKCxSOABWvSnHLGPXC64gDGFndSO057QFuBsXqJ9rD4FUOAoqFKX/j0tymEP6ymS+fANQ2IAvjmobsFKxYSEIslpVohdlOxCiBuj2gSno0GPP/WMBl9UGfc2oguCbG5yUugB3g12/45Y6+lOHt1wAAAWE7ha8BDTyoQZKiPpzVY/4n1Y93iIpJwnEN1/ABHn93wRv8QoRz57luZ6oMXrlzSw1SXxRNWy7OSU0a1AR1o5g+hxZWdzZ66iCYKcxmQTO6cGKFzUbrZynIWWwsXkD6eAsnYVFwmc4ojuN4IyX/L9UPGlcfElnK54iOzAs6CRpGfJ/pSBmJDoACkT7v4KzmWM0b/ZzaQ1/5F/EKMlOJnSc7Vh3WGL3PH8QfvF2aBcowYMfZQoO6vN8jVVsnOQwALPMKgVCnTm8YjgOE6J4ITi7bteF/VkQvokKqXuPocAoL3Rh/tK8UXQC33UnYBfkat6diJK5mGfsuYne0wLOJb2U7uUnTfZA7gT90Ho8XdMPqhRzm5JAAQfvFcgDbaCF+PLMUpZ1fTaRkxJ1omCJoYg0+aCNrbzV+A5PQGAjNkiV6TIQsMn4oEC9rJ21AAFvhxw6uRKFoJImP0QYDQ6W4UUzBH9+Ct7Hb4pR6FjHWR4HCaT59JrD5cmuwds6v2L8Th2y68ipxa52ZTT8H1IEuRPU1RWmvdAMCF4RR0gEBaI2O8SvZmF0P+2/ZmKVnTbXfzdisfP92118aPq19KVzstFeeXwhzcVYTAYBzz1O0CJzIjwyQF9Z7URqnV9tsZ2jPl3cAv8CTjnJ7jyQ+zoNnlM1BpOnZJy3KGOPJZ3cZALMuxWhGvv/IIgpki6MFkxY6u1xNVtYfPu7JmHR6F7icCY8JBW9Xd4oe5hxZF/Wl12LpBLpheLP+IngJzazj3yCGB7Ngsoyn+2pNY3cygPJvk5HafDcPiMaDXZ+dX4GXr4jXAHRpY+GnSp3NX2qttlWEAAG+119q79hPNpVWQApH62oG1mA3zNwFzhD9+bjMHqFxAifZCSa0TFI6xt6wIpkZ75X+vMT/QRMxkU6vOglyzAB/jF/SFuRGRm04HXidiq1IRxX1xuBw1T+fD+cu1X+hoX4vrfHpeeP7I/ViAMTaU0iWex7riKG07MKq5dyHQBY+4Kt7lHYYJraTrSujGTgTS7Wtgy+pwsNlFEftYVlqyVsAjErnaQohvT5KnLZpLoHNG6dTPlVhY7+WoFSQhT0d7498yz+fxVdh7jwu/f8Jnx3xzJXBg+zfiBQEcwdVjGy/sgUgUgP45Uc/4LqHYXBzqbdYkIuZXndGkd5f8zx4srHvxr4LwvBQ68/up1h8JTlUp8hupKdpS16/yEAmmhcXaA83mOkBW/GMFLFeOSLtgICd0Xrhj0PM7ix5NBa9VhoZKqOwjxSxQrEl79hGdun0Smvd6BddDPmsp2qakblA9gA2x+mU3HnAxA/+ZoUNyus7+eZdXqjzyT9ue76YQjO/G4vAxizQUpUgDSs/wpUxeBe8JvTGGLOfF/uuSnPR0csfmg4Pp17ZRqzo9NAsEqLEtmWLnrXObi732YgplRxSSKvjPppVrQXsMpeRyJucu02wjw8sW9l4gwf0ECwnFAOVK9it4NVEbsHnjg0C0lhBzVfvsBITz0emBDnFnE57gupkYewxvCFCfpKRZUmaTroT1FnpWv1B1wpAceiMRzKWN8AA9c9FO5wcXMRdt4GYuNjk7sviD0a5CXpdcO8t9Ci5XfA4t04iU3g/Gyn4ordDec7Qkqsa2ToIg+cYLCvr93wDGo0p32nYAEH8comnJES0/DFrE4Dv9E0wZXJo4a50NtHNZ8YL9Jr+mOClujQ9JiWjjAhxYHJepNz5zn7LhXosS/6+Vec9d4s0d4HoHKxIOjhyH9vGIGDukWfGxtbp+cvxJWzMzr7+/D7lr6axcCldnKqTd7WRO9IX6a5a8ijkU12DVI8TY2Malovx5TGelm3IwvByO/7+iQBgK+OBjIIUnVT/0X1U41XC1P0cQs9b4jdsJIqtinfM+B/iCKFGHRvU+AcxSMiCdAoATlJ2qgzN/hxZFvzChPVtYDNdFS6I34vsq24gzx6jF8djp3PFo2A/CO+nPx1Y4sSHx9s3lkzw0Bk6WdXtl3L3nqKwdM/K1BUeM5WRV+kKqSpDyRL6kCNm1yA+JiiMsbPlZp1iLaFbyOwlr/5VRPO+NEcgjEVzZS4i6W2jZM45G0pG8/flCybQ8JpFChK2AMSbBiFOOtjzblLppfDrSFrt9VaxHdaUv5FTI/19pq0bPjkRhrvHb6e+jqoyYhnKVTtvfxbWW/Grh43UrtioaJVCu/xvf/3PBf8PIOplMYj6OxxzQdyehukdlCEkDT63tvbqFdNGNUZE8xUB4lH8MkCBm5wjAj7a4bPJRM28JmSQJUpHXRp+SBDC0Jf89y8knT9RLOMCL+IGyaVu7JaXuyRH9zi1mLXPnRB0TOSLGOb8zZg0EWVWwzOHF2FIcoxdmImHUb6I6mzql4gOXwZLWorUAPW4LCvs9ABqYolQT0Mhj/ZOsjZg2LMqFRbiDoGVFVJb2zd0qExMM4kn7rC+Rl/kK/gctnltWnGt1Yg1zkUcgrw+S5u634/V8QnuNz7S6MexPWbtJQ0l715RdmfyST9Tlyjlr4Ugykz3NqAeKIwBhYDaRLuYfGKiqfwPOz/rQ93nRVFfXyl56+AeKPee3Cm1qjjuitNZWfgzaBui3pQdGPo6/rxuq0l0bYcRV5yZYMox4sbYShxnUo3/VjUCv1qup+b3dwfcxvlZTLR3NSSdSztPP/bV6ISeKuuETERZ9m9a2IiZzR3Cwhn4LB163L/3Qu1v6WueQvvK2pgxS+gAddx++tDX4kSGpVZ01ZT5J9OQuNon8SHS61QaoXxiofJ5HTioiWiWV0AA7Sl8mHeCf+fkErppDblu3HKEmgaQw7IMBSLqzysW68M3MsPrijbjhDMy0rOltYct0D/4P7fvAEZ490BIcsD3F0liqia4HJWn3CJsfJkOYzGPuVuJPKdiNU3IaCLQ/lgMrqhxp6DPRQkO/2TZRJ0iB292G/eEmDGQdJtZoRsal/KPRFi04F/+7Q05EbnL22ejpXVarlOF+G7/dCy7guHTqvwx0yfVyu0+NZLjmg3eX+tnyRdPt/8nVG0O88LiP3BH8x8tz/w871hrxKfKB4EQcTqYthzRroPOB8+GDoeZFVy2AXHt7yhI+8HcaRen0Iea3JXnOzQUvk75n1BJfLBW2D1xpHk3Ia3DlpsddH+6PFQnxmhyiVngxd3tWZTk+71FOoYzffW+HG3BdDsQnzK0oFK4/vUhogbdjNpmQDvWCYUxa/LyXX1g7C+vdpHBPqct6xus2dZoQIoEQNURfHWBMzosl27a04DRyrQlBEcrdgbcZbxBMaQq9F8BnpWaLWp3kZcW1xHoIxBQRHojoqigO5zzCmifwkLnGRoyoBd3pTM8sODz3+c/CGB9oYbwPyO/T4gromAUkCKMdmD2eKHxkdqmWOHsl6pkdVV3mwdNaFvCqNLt+S3NluDJ2F3td8BE65hEuVPa05RL406aeCMZd4LFkySVxUWVKV78+KCl83lyx82grzfkErShyNZWSE6s2tqP+RgCDO/XbLRRTbjrgm3Tq4MaqezzU566gyP9jK3K5AyrsKapxTsZhD0OkLMi8VeAZ6Apy37Wrqdey9kcNIyed90L2uTFyYKp2yv7SJZhfImq5Zb99nqFXYCVAHy6u7txOV2Vw+KxdCCrxF5tG30sFw300aqP4X3wBIQEXWkNwz/rHyIsuM8KoaiPym2ApE3SlJACwJSdOfqDNlUVmAuLkh/fRDGnnNiB6Vu3GUOaKMsjED103a0msKNxI1yuGfGQhqmjvI0C63vpnaGo/ggI/+h9AIDgoHVL17nOVQG6I8b4N4JeSJAfkZIAoSX7sPe/8GYApWc0ifnXvBgXRJEbtef3if6oI55jjkFEgQNE+Ir5ctD87Oe5+EmPlcHUoJidmMEhd42OiPHphMa9fJJCfWxcZ8k0wMRM1E9nUq3J2fsOkT+PMAOQvsROGluHLyry85OzLfZqRtsQh4mvkqX2jQKfYQ4fA2tQnccsdei1ggQKisUIn0SCksJxS3KRJxG5qn4P/WCbbjSJ1LgNjQE0sgGr1K5agDiTTEmNM3ly0m0ncrOr+10JBhdlu3x9Fq90ZNg3tkJlk7yuUOvIAqggrCXeXQKZoyLXXB8uRA9AuB+YBGh0xdPnQTEUXwuxqA6OxVK4yCTW1c6yeQqCBmjfkK/YOFNGcd6Pgyey8IWuU1RRxGJt1bg2InP4nfKsV5aJghbw+8nawxRur7QDiKJZ4gog/M40FpzZ1nMl4EB0VzccrEX/g36m7Id+wGFLfhPEEdofvuLy6CvV/VnwYilqLL5r+o8xoDkKikzM0ddJ3lA9H+h5GHditj+pkvTe1E8scpLRH7FR2xpMR/0QYYRJJNgI5uQPYIQHQo6e8m8keY2dupCg5Fv2NHW1WWeQuRuzxGHZrq625L9xcVDfSXVlBGKnxfdM89SScDA7tBAVsUcWhgFRua7yr4UGLSFCOPy5H2pcME/Q7b3Tr4a1/d4biYx/08qWQyaWTYRzvh04K2Oe+y10TA8s3UNmLKwDa5PXbaj8kDHU/vIDHKWc4PfCVI3uAc4mIbQsvTvKiZxcYkcWJrjC3w9yogOEaiP6ijczglkFBgA966G1lzuMKCZSR94khq6jCuqRi/7vDTixbi/4GQHkaht08xyXTtbrmZXw1VfWpiKEv07T64FiWd/MiIQspXC5rCIDMVMq8+AeMQgIT1bvZisUOjJ87fjj78S9rFRo6cAvAQ9RolI8VJT4q49Elu6oc61C8N9nBKTSZqkJxBO+MyDIBjP0mWJU79jdZ1AcsV1BD7gWnGaDtwFZossW4tkkvwhgWzzjYMIUFwOW4diGBvO/zqTes9cTRYHkuTo37+FfAaZPkdpXgdUyBWnk9neXY+NfGAPuw5xTBDh91DKi5c2IEzynjN5xZn3qHDiILo3m1vJCYmI5GELlKEyTHGEYfSek+LkmyPdHDdvei3LdBnxDzLF0+RVC8cqxCaovqK1bG3QD6RYBk4gjXds7gPshzYEf5jL1+Wk1XWrtM9jHLatmW4uXzzXBn2TZHKvtmfW+5sACONSBbDuyi06turaSj/dyfnS8fXVLjMCodPPmWYSnLEIL9ojo4n8bifgGnaNq+yDHCvg6wmt+B4Afs24FFLVhaLzzuZlxKeDXMZsKzbGlpxaxdaS3cYbK0gCbSiJ0j4stb9GTjfxVurVgfNjSyAHzmiPUz43klnK0EaN5DYkWpEbnU5LwP17iypJYevIftuM/GaxIrq7myA6MM0S3BiCkgqqkQ6Zr/PX4Vu4PklyPjMzj+QLj7xqPAXlmF+sMC9LjdKdDBioJRX+u+/R7s3UCSo59Qke7Hj+puzaXiSJjV5MYAALYFbihVQi8dG63ews7XfQv3QxoPogQHRh+W8uWhpVaHjI4ano3f+tuVpIl19aSv6+JlP/ULmBCuyNWlYb965r3A3zoaHL1VYnJzjhkoFB4BxQSwhjhYX6RGOVzacqdQ+TwPCvINwxch2VCUDzIMko8GDD+h+LIyzYjEmKY9b2kEOLpNonYe7GMnjkekoOvnSyh8M/i3ag05BqjDwkwndJmbxI0a0WMmRIq3nTdTLeoMMYHqAoaQcS7m9KRV006iveD6tcWANFHTGjxIjigfwUFymyngiPH/ZbzJa7id8PWHY7Jd5H8TkDTGCUMMqPVhfMhgQYDiNx+m1HIvgHToHRal6LvpGjdaBCxS0x4ySzZeW6HhyBy36BS5hiNmKCwb1RMHFggE8/lid/6aJKBUjJ+78qq81fAI0xqk5f1mpyfarEB8CbhJS9JPLW4cubaUyc5C0maUIfXosHyeZBwBhcf/kATiZDNhdEzldSEM43Q4dPPajHRebzEV/eCA+geY72DpeCyoDRXAzUEebvwhaYyDd4uFXV4BmfPVyKnNHBRa7v7UuV3JzxVbpaqGcouL1XzzmLUS5Zjo0BA8hwz6gBzZtg8iR97PHjKplYKn9oZn3MvZUBPMRs/RjFewPpt8AhUE1dyMNrw5NjFEtA1qvDsek5Nl+oRAF7tPQ6b8he+Fk06VJBw1GN5YRXgdsLj8xY/31HaZQ3is/T8CemyttehNdgLJ7dhx8R5ja6/8uI6zB7R3NcsCTxN32chUdzpzj5Wn5G+jZhxd9VR8RbknhpjFN9/GDYggyG5jlYRUMFd8vk5Vpghebi63EsaL4Vj6RJ5vInDxBU3QFGIazhcAItbQfHBElFbJggJVzJwtCDg2aUXiCPdHVcsK2x/V/mTf2lc9nt7uBKVXbldEjSZFOJIHkYBpMZxpSWHRXcGZR1MbPIjU6TRUMXzDW9tHSNOAs7XYsUHsg1N+bi3OH4fVhDJXWKU1f7GlBHAYri3UfALQvzLPU/o/LClWBLJ0FK24tp71u3gDJRl4CsTVKacLKoj54WnHegdbxeZuZAgyk8r7DqQCy7dh8rzUkP1av1n1BoUk554sKTP/RMXYXRPTYtDpMHG/DFAivut++eFIRuJNumIUurZdJb19RoP3melkJzntD0ZpdjbBK4dhAot+Nzw8yVBuvsk4dCSEpUX8aarqGZZlLtx6kOy3qJYDK5tpdanEzHKcImDp6Ha2HmgUdTdQ/pMgUbRhwXYmfVgT8tVrj7gVuJsXSu3EpsmtkO0p1+YIxO66QPeMNHZY+lv2iArK6NOcOOPhJmFgFA3UbR8XvLeOiWR8+r8hnGyoQiGwJkz5OLnToWFdSyh2ZmDb2rk7UJrB0DP7CVlG0PXPMIkkAohlPZeiTNmoGPgtTaTCMLSA7tsvrCvkmFrsp7LedG9lPn3pBSsBV6xMDiO9pO4Dw8NM8tk97eRjlIbbu+wPolTBna/S9sUFdJ60naUlA47PuVOCx5o/yoaBjlEJKJLTJS/tRo+/pRR+WfHkHgbnlD66D+H/TEbmELZCeikw75mIjLVuBWKUjtdOSX4jAwarFZbvSNrYmwXodyGJD+n7wGydIh98y4P2/dFd601M1P749Nrfyi49epjqvkj7FqP/djLgCqluYxC+glekf83RkBpxk9UN/CvdSy/nfcvPkdlsn4CvYDrX010lZdG3ar9MBgnebzB90AA3QmvwfS5szc2ZZ8bxu/3FdJ7Bz1hp4oBk/grwMCeXLyLEz/rwnXOHAvotM6OTHMAJ1KEYamEjFnHhH28jHdNLgE+un4sziaqAcNSzI+6x+gXgRz14K5Zsu0fSNz4/UbPCTvCjlf9buRlgWocmvZr2N/MRi8n0Qgu7Fxavqu8IuOPrWh1NuH5keZ2hJZFg71vanFcyGye1idtviiFsFarmH9FrREe8IhEQUjJlrije1D1nfKsyGguiinwDoUPwsk2lpBw7VCrnbA6mBVg0fF6rIY8PpO+n0EQf2Min7aETjNzU4MlZACi/OYQPOdvHzNLhbPKfnJoW/SirzMh3bdLWcIXdPoDDcZXENOgoFa1ZRgtOCDDTOklkiq1f0UAuzrRqDmH2iHouKTVVvEIeQX5DFeWzpa+Kiexk30x1jhg6qT0WjV7LtaC7CgM26gmVheF1um+L6L7mup3vbkaejPFQWNHztpmoZDPAYrd1LZ99f6U1ZZ4JP9Nx4vS7FQm5ZPckkH5Yn0m9ENsOoNCaRt/EN9THmzKSePzrbGVAdugMlw4ceSkFYDhXUPrEOgnFSy0zQDz+/Gx+GagfCirhefhqDyYNNUL0Oc+LVSHZbERpucuTSTNzuZZ4JGAPFy1fXGeq/w5zPgOg5g+xP6hdY6i9wsUmbSfxFp6LJvje/GixEEorLz6VrllS50OAUYuNu52Pog8+WylFAeKOVfkUQLydyMfMpCyiHXYHhbYRRskw2DZY8+55gXJGT5lVbkV50UZ9TH+DZf5F203xIn3APaHiZ/MZrFzjooRN9ddrFRhiCq7NXlX8uMZEI027U3+EY9KYwIvYpJuS/oAK/wPaFL68LeETlxeTbkQJfvNM6vYXw6m/geHccAD1GDo9hlwMiJEiv4KniWfzagu2xA/pYvmzGnriKtWHxdyDlYO0tBWUDi/iNVvxoRC2SS58IKNHiChuMDRV4pBxNZ++z4RK22m8QyLInYO3OgkvvTpzs3oJa+NjA2pW0enSjdvCavSMVaWWu9u8nWBXsoTWmO81vIHRL6h64oydcYbcs9V8Ji0cfEF4oBqmXQpAg/HPsM+aMGmWWO/vX5RfVWF79Nt6bz98i8SkWfQUr7mUvdUQkNMLfL6Z+ehaOtiou45mgS9EUtP4opBCn4RBJ8ntx1uu7c+JzkU62KckS8jmzKjo2gb+kJ7L6Hla9m5nZVFOkmUQbk931VUdtp51is1YEZ358KQj+JeuEsksfT5XfB1zulqg0qXu2G6IaMoSngn3IcWFn2iaG3jsvvx6pS/446E4cXaBD3/L7XgM6HeDM4xjBpspiRkrNeN61C1jdfyWutcnSLy/4qsnNFsuUgCGLxJI0uR2EB7557r30v5j4VXJTvTkPrz+FNJhVCYMNvB0MlhKBD+KSbCJfQ50jPUspcNPjDiprscUCr+n5PGFx9yj8KqjLZuYgRjnqfbsxq9SzTjgwCxTFmHXuGpSWWsm7S1jOnnzhY0w+bN+o0CegmWfPnIbGqQvI5HguqryaWiIhJnNKTAShAps7cuiyu2kHmnLRuEFdA4HszbQ0Vg2Dfuvakdv8bREBY06JY+K3NNQuq1aE6exPBZrd1mMr7jB84+qEt63a5Ahz3Rt00ghLEz100mwHR1Kty+dDk/NKf8VhMBEnNonkPfROmibAsprdsz5SM3cNS3pd+4Sopr1Q0O7q+2gm1EL7bk1k+cPbo88LbVdgUzIT6c68aOez4b4zFOjWN7Sc6fbnPRrKm1kOYFP41WQS5CDvAzDzgz7q4iJdyEEnF+ZP358+T+bUjjzyedHd8s9EqpeJBmTaNFaZGU+sNb46ldgfLFhGUovBHdqHobsX41XRhsvZOL9thrldUqI5Q49q/b/ffjMnSXnMnqjOJ3aHXAXJlyxa6AB6xJQj8+kmKIo9vOcGxc0WngDHb0b31/PwBCWxEfZzzoT6a8hXoerCKeM1YoFxdauDupUswNSHR50rz8al7m9gGBhoVG8ctmcWpQkpXMn5q4YCXvDKULJSVvTgzsaQXkYIW05D+HwbbU3sUrlfcIsjw2xe7rvH+fme2JLMbEDlQMvAf9Yeffxxl4Rf1SWQJ9JsC6JTGoAfXj6YrrpD7kShlS3hV/ePp1sk3CtF86vqKGWSY0md8UqzE4wFs9Ahz2PlJi7DqqMZT1jB2Nmkv57yLBgOXIg8CvyI74Xe2LmcIKh0aRdFObtDUUQ4Qtoti4q9lw+sDzTDrvlMLbVXEaY8kACvNCKtdGQulD/n1/tGX8MJACEI7q9p6sPzfpQ83eWuRLF/jC5qS4y71leaRTubnf/qqiMXIDNu+usU9J/hj4R9cAravd3YgyCDaSy2enxGbkDph+RJn6q5Yr3mW+NDWjS4Qo+4KAk81BEMxtu1ecXSJ5hgcuWD2pk1bDayLenPNfx6woVWqyd4rw8gwcJ66+xo12i4phZ7Wq3Lkig2KfHbtWpWkenVrie38dBiWz7Um8QdWgHCHI/+LhFTAkLPPYnJww3KGRygIDeMY+8A0bZKq73yquKwxOtAgb2qFjpwZF5dCT9Z+yMLiG8PyYu4kUygmGDxsGt07wUnLoC6NkvXCobQ9sOOD88eSuOLDnlW53e6uKDx9EjLRH7fJDuhGQbEQNMvMlFZkW3O1z5HzprGA0cF6VRZY2IQRL2tksAQS4ugwTOIrXK4o8yY59Sr/+M0IRNM5hbuKlNAz8vvd+Ib7UUayRygWMYgDnhmilntzMZtK65tFvqn8G2xrqZgSYO+7XJqmlwqbfnS8O21zaA4HZjwA/A08heerd7xauibHjQA91uDUJ7ulS3DvKk52SJrhGlmzQwAYMYSHfo4Y2GCynELS7rfBogLNCRKypQbUeHouG+r1i/rgYWxLKvEVocf27GaeXZshrI2ZkmckW1RiZSHFvnH3Q2p3CSldDETHQ5dxycvkTd8Erejt31EnkMlKikGEchQy/8VbRlkpkWnR0rAtrLy4hwcXNCn5c2axZ6pB7JwusbLsbTbR1IWDpkLg3iy+F4o0rXNRIK18lWtVBAukvhe84G2O94jeSkJDEis5IsB2PcG9Tg9q2wjjG8YNr+/jOuElABLyXewf2XVlIBpHOeqnc2p1FK2qD9QwQHiY/ado++mpE/tQE0G7rO2QsBgiM/1HCvxVzNJ8Sx6a5/tn2ZtE/RPGrzON0mtAP9qRSvNW+5CxsLxhtOhwFvzZdhvo+OH895FrrLh+Ci+PcGN+zH639urfKtYll0b0S76qoDPHpGlWAJfE030HNJKRkIgpLXeoTyPIaWjvwKSqav4yQf6Hc6rKj8n7lxNBWt5j6Az293bSQAzgNBOMhLpo4AISza/vgE7ccSMpWBMHFeFkl70QUSwXDTwJfKtx99uHN/5CZ/rCT1yTPs8LIGJKTS/ju+UFV6OCFgbD9XEjOiNSZuGk7QNh4D9i+bxv3Gnj4F++j+pTt2GFVkoEsvxdkSt3R0AbxppvoW9jU5aSCNETAD2jlaeE1iLCzj9T36kGKIrNt1eI/clAvG+zXOQfomg7yHSvzrIT2syV1Id9Zb8x8Jyw7+XRbaihsEH6YC8FtEPbfJhCE9uhXeQlzmxranggVQEI+BQXFV8g8WefxFHDxvEHwr+JfnRAIs5r2hhOtTQnfF14PnQ/ou8DjadwDULD245SfOmbaHaZOXJIViTt80JJnlKcFKm24wGbttM3+FeHNgS+5b40fruONsFAEAJNPze6AlrymZ1ybGojUZwG8dN6dU1i1DMvvS0540jEs5wCacVI48wtocLePFa6oZjw7aglqtIVawG+rJq8GGft+TogNZQ0cgIdWOxQ48daAGJM1VHimK32lL5FpDn+n+WcUv+NK3KCYUQkcjFzeZNQdUUTsADX2OIGgndbZ4pB/GsXDh5j5phS+QDpTmzPZc3uFY1vNTiZc8PK7YFkyUR53HUdslwu+2gUYoPzQt+9vqVQ26bgj5r9P6mVN3sDdMl/LD6exea1ZmhJC7hXC+y2r6RsOwz8tsuQ3VeDzbalV/4KqwSPshQYAKAe/TAmtyMjMCZz/rSu/Lbw18N5oZ6MmHFGkvGtcB7RLy5Ea/FgCAqR+BehJhZAfo5BgHlBCaBaNezULcOSztviSom0lbhnlIJGt1Wgq2/cPO3MxS0gIjUtveALqjphKSH/NednhpSqzvdaRm57nNOsN8o4QOoGx5EYAYy7uzOfr/4A/CzKLw8KXWjMnf7VcHzIxL4DEyJrLSOOpAKlgwY9iOSqmIQuxCJ8m7Ly2rx5RdvcOrYMONn+lTsm+uiFtoj0drJCxmA4B4f41rAt0t36FbARYcgBxGxGDB/a3JIiEUx/ljfdzEbAS+03VBCLyAhXhf21lnyK7RyFUH5DXaS2DWf8sCfu4iTHnFcR8fhfJLlZZymiciJrG1WV0dKQjxHND4deutbEcN5VykyM3VdbpJil6u329U1UxP4qNqVcyJP6DvcjOtlHlUQaeAvMth+j6LSLlGDZk3Fqe5OXX+XY+3S8YWKjDNfKta7nW2Zce/n3gOcDdeNgHN1GYRip4CNiPkQJAmsjXusbj734TZ/+MrUw34dsvYU5Hdf2AfmpofAKixs+kip/36R/4E6HQnmljqnD1LdFYDuUpMIOIMknX7d5qYfu0voCT84AdhUrEW22pD88s3DbxHICxrXzY5xXZm6PurGDixV7ceS4aTXjU3SBRrfqJboFaIO/CYYcMZlspw9qwi++UZEFUq9MHTKJ8Vohj4M7qsTsSqrhyQi9BA3npmVaK2m4kOFMdVyVvhoWPzZ8tUkQVmS2F/FGIFtmeuc2SFP1asrX/dBQ42PgyNWDhzuOR+OZ06kgPB3pEVxeGOIjY5RwWo57TTtXMuCKvhe9zfyrGDBMw2hFF1UJDe+2HLrHciqqw+JaJEFup+CTM0W/fXPMNcXsS6Gsy/1rZqg2hoLfzcOYs6Rn6aYVkWC6ENwfP6hQ3X8+fjPhXHWQsdq0veJUmzQXuTPae+qJ0uIuQ3E48xhHdZRb/BhInhWfwYeq68DVEYHeOpdFW8mtOn098j3efiClRbdeVApLnp+4xHbU2za+fxIfYyBQXKfonIMkhWm6duRbdk0AK1yPhLx68n50UbdRU0X6c2XVS2x1ys6Plop4qGrKa1ZiWW0cYMCA7Pg6IT2QnHfRDQtfddk2ZwnLcCMpOrr3WV+bXPQY3LnOEipP7drjRR68ATuA02LhHrvRR9zfXW8/BQfftgr/4HHShzsKhF5F4MdvXkiLRCxqzicRU4khhUzPjZR4gbvL4ArSTf2xap/Juv/JOC9Ee/Mw55NknPXVyBNNC58BaMYrcpAdkjs8d0YzceTkg7hx3GFQjt/fROdIOfitK/cxTEpmeYlz0F4/zF3nwUbnTCF5ampSy/Yq5/ArkMQn77wD0MCK/ChoGNOJZVW6081uT8PFbRQv38yzYtUnUxlkbRS1NecgbgqWROvWmJotubxSTS3BhLwf1kIu0CApOl34zVTsusFh3Ovwzq8hoicB5FQ/vP9peQXCa8UZM3DH6UfFa1YljBwAnL5NFYkcznAMyrAAAT0AAAAAAAAAAAAAAAAAAA");
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#ece5de;--surface:#f7f2ed;--surface-2:#e2d8ce;--line:rgba(34,15,9,.17);--ring:rgba(34,15,9,.5);
+    --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#ece5de;--surface:#f7f2ed;--surface-2:#e2d8ce;--line:rgba(34,15,9,.17);--ring:rgba(34,15,9,.5);
+  --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1160px;margin-inline:auto;padding-inline:clamp(16px,4vw,32px)}
+.muted{color:var(--muted)}
+section[id]{scroll-margin-top:96px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-right:auto}
+.badge{width:42px;height:42px;border-radius:50%;background:var(--logo-img) center/cover;border:1px solid var(--line);flex:none}
+.brand-name{font:600 1.25rem var(--f-display);letter-spacing:.01em}
+.nav{display:flex;gap:4px 22px;order:3;width:100%;overflow-x:auto;padding-bottom:2px}
+.nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:500;padding-block:6px}
+.nav a:hover{color:var(--fg)}
+.cart-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600}
+.cart-btn:hover{border-color:var(--fg)}
+.cart-btn svg{width:20px;height:20px}
+#cart-count{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--btn-bg);color:var(--btn-fg);font-size:.8rem;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+@media(min-width:760px){.nav{order:0;width:auto}.bar{flex-wrap:nowrap}.brand{margin-right:0}.nav{margin-right:auto;margin-left:28px}}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,5vw,64px);align-items:center;padding-block:clamp(36px,7vw,84px) clamp(28px,5vw,56px)}
+.eyebrow{font:500 .78rem var(--f-display);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.hero h1{font-size:clamp(2.5rem,6.4vw,4.6rem);font-weight:700;line-height:1.02;letter-spacing:-.025em;margin-block:14px 18px}
+.lead{max-width:34rem;font-size:1.12rem;color:var(--muted)}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.hero-art{position:relative;display:grid;place-items:center;padding:clamp(14px,3vw,34px)}
+.ring{position:absolute;inset:0;border:1.5px solid var(--ring);border-radius:50%;clip-path:inset(0 0 24% 0);pointer-events:none}
+.logo-card{position:relative;width:100%;max-width:400px;aspect-ratio:1;border-radius:26px;background:var(--logo-img) center/cover;border:1px solid var(--line)}
+@media(max-width:820px){.hero{grid-template-columns:1fr}.hero-art{max-width:320px;justify-self:start;padding:18px}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:.65rem 1.4rem;border-radius:999px;border:1px solid transparent;font-weight:600;font-size:.97rem;cursor:pointer;text-decoration:none;transition:transform .15s,background .15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--btn-bg);color:var(--btn-fg)}
+.btn.primary:hover{background:color-mix(in srgb,var(--btn-bg) 86%,var(--accent))}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--fg)}
+.btn.ghost:hover{border-color:var(--fg)}
+.btn.wide{width:100%}
+.btn.small{min-height:40px;padding:.45rem 1rem;font-size:.9rem}
+
+/* steps */
+.steps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px 28px;counter-reset:s}
+.steps li{counter-increment:s;border-top:1px solid var(--line);padding-top:16px;display:grid;gap:4px}
+.steps li::before{content:counter(s);width:28px;height:28px;border:1px solid var(--ring);border-radius:50%;display:grid;place-items:center;font:600 .85rem var(--f-display);margin-bottom:8px}
+.steps strong{font:600 1.05rem var(--f-display)}
+.steps span{color:var(--muted);font-size:.95rem}
+
+/* catalog */
+.block{padding-block:clamp(44px,7vw,84px) 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:20px}
+.sec-head h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:700}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:.4rem 1rem;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer;font-weight:500}
+.chip:hover{border-color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg);border-color:transparent}
+.field-in,.toolbar input,.toolbar select,.kit select,.drawer input,.drawer textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.6rem .85rem;min-height:44px;width:100%}
+.toolbar input::placeholder,.drawer input::placeholder,.drawer textarea::placeholder{color:var(--muted)}
+.search{flex:1 1 220px;min-width:0}
+.sort{flex:0 1 210px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:22px 18px}
+.card{display:flex;flex-direction:column;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card-art{display:grid;place-items:center;aspect-ratio:1/.88;background:var(--surface-2);border:0;cursor:pointer;color:var(--fg);padding:0;width:100%;position:relative}
+.card-art svg{width:72%;height:auto;transition:transform .25s}
+.card-art:hover svg{transform:scale(1.04)}
+.card-body{display:flex;flex-direction:column;gap:8px;padding:16px;flex:1}
+.tags{display:flex;gap:6px 12px;flex-wrap:wrap;min-height:1.2em}
+.tag{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tag.hot{color:var(--accent);font-weight:600}
+.card h3{font-size:1.12rem;font-weight:600;line-height:1.25}
+.card h3 button{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;letter-spacing:inherit}
+.card h3 button:hover{text-decoration:underline;text-underline-offset:3px}
+.price-row{display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.price{font:700 1.65rem var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.was{color:var(--muted);text-decoration:line-through;font-variant-numeric:tabular-nums;font-size:.95rem}
+.off{background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.76rem;padding:.12rem .45rem;border-radius:4px}
+.empty{padding:36px 0;color:var(--muted)}
+
+/* kit */
+.kit{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,44px)}
+.kit h2{font-size:clamp(1.7rem,3.2vw,2.3rem);font-weight:700;margin-block:10px 12px}
+.kit-form{display:grid;gap:14px;align-content:start;min-width:0}
+.kit-form label{display:grid;gap:6px;font-weight:500;font-size:.92rem;color:var(--muted);min-width:0}
+.kit-total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:2px}
+.kit-total strong{font:700 1.9rem var(--f-display);font-variant-numeric:tabular-nums}
+@media(max-width:820px){.kit{grid-template-columns:1fr}}
+
+/* guide */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px)}
+.guide h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;margin-bottom:18px}
+.guide h3{font-size:1.05rem;font-weight:600;margin-bottom:8px}
+.def{display:grid;gap:0;margin:0}
+.def div{display:grid;grid-template-columns:110px 1fr;gap:12px;padding-block:14px;border-top:1px solid var(--line)}
+.def dt{font:600 1rem var(--f-display)}
+.def dd{margin:0;color:var(--muted)}
+.cure{display:grid;gap:20px}
+.cure article{border-top:1px solid var(--line);padding-top:16px}
+.cure ol{margin:0;padding-left:1.2rem;display:grid;gap:6px;color:var(--muted)}
+.cure ol li::marker{color:var(--fg);font-weight:600}
+.note{margin-top:14px;font-size:.92rem;color:var(--muted);border-left:2px solid var(--accent);padding-left:12px}
+@media(max-width:820px){.guide{grid-template-columns:1fr}.def div{grid-template-columns:96px 1fr}}
+
+/* contact */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);align-items:center;border-top:1px solid var(--line);padding-top:clamp(32px,5vw,56px)}
+.contact h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:700;margin-bottom:10px}
+.numbox{display:grid;gap:12px;justify-items:start}
+.num{font:700 clamp(1.5rem,4vw,2.2rem) var(--f-display);letter-spacing:.01em;user-select:all}
+.numbox .cta-row{margin-top:4px}
+@media(max-width:820px){.contact{grid-template-columns:1fr}}
+
+footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px))}
+.foot{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:center;justify-content:space-between}
+.foot .brand{margin:0}
+.foot nav{display:flex;gap:8px 22px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.foot nav a{text-decoration:none}
+.foot nav a:hover{color:var(--fg);text-decoration:underline}
+.fine{font-size:.85rem;color:var(--muted)}
+
+/* drawer + modal */
+.scrim{position:fixed;inset:0;background:rgba(10,4,2,.6);z-index:50}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);z-index:60;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);animation:slide .22s ease-out}
+@keyframes slide{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.drawer-head h2{font-size:1.3rem;font-weight:600}
+.icon-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:1.4rem;line-height:1;display:grid;place-items:center}
+.icon-btn:hover{border-color:var(--fg)}
+.drawer-body{flex:1;overflow-y:auto;padding:8px 20px}
+.drawer-foot{padding:16px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:12px}
+.drawer-foot label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px}
+.drawer textarea{resize:vertical;min-height:64px}
+.total-row{display:flex;justify-content:space-between;align-items:baseline}
+.total-row strong{font:700 1.7rem var(--f-display);font-variant-numeric:tabular-nums}
+.line{display:grid;grid-template-columns:64px 1fr;gap:14px;padding-block:16px;border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.thumb{width:64px;height:64px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center}
+.thumb svg{width:80%;height:auto}
+.line-info{display:grid;gap:6px;min-width:0}
+.line-info strong{font-weight:600;line-height:1.3}
+.line-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px}
+.qty button{width:36px;height:36px;border:0;background:none;cursor:pointer;font-size:1.1rem;border-radius:50%}
+.qty button:hover{background:var(--surface-2)}
+.qty span{min-width:24px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.line-price{font-weight:600;font-variant-numeric:tabular-nums}
+.rm{background:none;border:0;padding:0;color:var(--muted);cursor:pointer;font-size:.85rem;text-decoration:underline;text-underline-offset:3px;justify-self:start}
+.rm:hover{color:var(--fg)}
+.empty-cart{display:grid;gap:14px;justify-items:start;padding-block:32px;color:var(--muted)}
+.modal{position:fixed;inset:0;z-index:70;background:rgba(10,4,2,.65);display:grid;place-items:center;padding:16px;overflow-y:auto}
+.modal-card{position:relative;width:min(780px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;animation:slide .2s ease-out}
+.m-art{background:var(--surface-2);display:grid;place-items:center;padding:28px;min-height:260px}
+.m-art svg{width:84%;height:auto}
+.m-info{padding:clamp(20px,3vw,32px);display:grid;gap:12px;align-content:start;min-width:0}
+.m-info h3{font-size:1.6rem;font-weight:700;line-height:1.15}
+.m-info dl{margin:0;display:grid;gap:6px}
+.m-info dl div{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:6px;font-size:.93rem}
+.m-info dt{color:var(--muted)}
+.m-info dd{margin:0;font-weight:500;text-align:right}
+.m-actions{display:grid;gap:10px;margin-top:6px}
+.modal .icon-btn{position:absolute;top:10px;right:10px;background:var(--surface);z-index:2}
+@media(max-width:700px){.modal-card{grid-template-columns:1fr}.m-art{min-height:200px}}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--btn-bg);color:var(--btn-fg);padding:.65rem 1.2rem;border-radius:999px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#inicio" aria-label="unmate.es, inicio">
+      <span class="badge" role="img" aria-label="Logo de unmate.es"></span>
+      <span class="brand-name">unmate.es</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#equipo">Armá tu equipo</a>
+      <a href="#guia">Guía del mate</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button class="cart-btn" type="button" data-act="open-cart" aria-label="Abrir carrito">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+      Carrito <span id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" id="inicio">
+    <div class="hero-copy">
+      <p class="eyebrow">Mates · Bombillas · Termos</p>
+      <h1>Todo para tu mate de cada día.</h1>
+      <p class="lead">Calabaza y algarrobo, bombillas de acero, alpaca y bronce. Elegí lo que te gusta, armá tu pedido y cerralo por WhatsApp.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#catalogo">Ver catálogo</a>
+        <a class="btn ghost" href="https://wa.me/5493364348318?text=Hola%20unmate.es%21%20Quiero%20hacer%20una%20consulta." target="_blank" rel="noopener">Consultar por WhatsApp</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="ring"></div>
+      <div class="logo-card" role="img" aria-label="Logo de unmate.es: un mate con bombilla dentro de un arco"></div>
+    </div>
+  </section>
+
+  <section class="wrap steps" aria-label="Cómo comprar">
+    <ol>
+      <li><strong>Elegí tus productos</strong><span>Mirá el catálogo con precios claros y sumá lo que quieras.</span></li>
+      <li><strong>Armá tu carrito</strong><span>Ajustá cantidades y revisá el total antes de pedir.</span></li>
+      <li><strong>Mandá el pedido por WhatsApp</strong><span>Se abre el chat con todo escrito. Coordinamos envío y pago ahí.</span></li>
+    </ol>
+  </section>
+
+  <section class="wrap block" id="catalogo">
+    <div class="sec-head">
+      <h2>Catálogo</h2>
+      <p class="muted" id="count" aria-live="polite"></p>
+    </div>
+    <div class="toolbar">
+      <div class="chips" role="group" aria-label="Categorías">
+        <button class="chip" type="button" data-act="cat" data-cat="todos" aria-pressed="true">Todo</button>
+        <button class="chip" type="button" data-act="cat" data-cat="mates" aria-pressed="false">Mates</button>
+        <button class="chip" type="button" data-act="cat" data-cat="bombillas" aria-pressed="false">Bombillas y bombillones</button>
+        <button class="chip" type="button" data-act="cat" data-cat="termos" aria-pressed="false">Termos</button>
+      </div>
+      <label class="search"><span class="sr">Buscar productos</span><input id="q" type="search" placeholder="Buscar: camionero, pico loro, algarrobo…" autocomplete="off"></label>
+      <label class="sort"><span class="sr">Ordenar</span>
+        <select id="sort">
+          <option value="rel">Orden sugerido</option>
+          <option value="asc">Menor precio</option>
+          <option value="desc">Mayor precio</option>
+          <option value="az">Nombre A–Z</option>
+        </select>
+      </label>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="wrap block" id="equipo">
+    <div class="kit">
+      <div>
+        <p class="eyebrow">Combo a tu medida</p>
+        <h2>Armá tu equipo</h2>
+        <p class="muted">Elegí mate, bombilla y termo, mirá cuánto sale todo junto y sumalo al carrito de una vez.</p>
+      </div>
+      <div class="kit-form">
+        <label for="k-mate">Mate<select id="k-mate"></select></label>
+        <label for="k-bomb">Bombilla o bombillón<select id="k-bomb"></select></label>
+        <label for="k-termo">Termo<select id="k-termo"></select></label>
+        <div class="kit-total"><span class="muted">Total del equipo</span><strong id="k-total">$ 0</strong></div>
+        <button class="btn primary" type="button" data-act="kit-add">Agregar equipo al carrito</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap block" id="guia">
+    <div class="guide">
+      <div>
+        <p class="eyebrow">Guía del mate</p>
+        <h2>Cómo elegir el tuyo</h2>
+        <dl class="def">
+          <div><dt>Camionero</dt><dd>De forma robusta y práctica, pensado para el uso de todos los días y para llevar.</dd></div>
+          <div><dt>Torpedo</dt><dd>De forma alargada y más angosta hacia la base.</dd></div>
+          <div><dt>Calabaza</dt><dd>Material natural. Antes de usarlo hay que curarlo.</dd></div>
+          <div><dt>Algarrobo</dt><dd>Madera. También se cura antes del primer mate.</dd></div>
+          <div><dt>Bombillón</dt><dd>Versión más grande de la bombilla, para acompañar mates de más volumen.</dd></div>
+        </dl>
+      </div>
+      <div>
+        <p class="eyebrow">Antes del primer mate</p>
+        <h2>Cómo curarlo</h2>
+        <div class="cure">
+          <article>
+            <h3>Mate de calabaza</h3>
+            <ol>
+              <li>Con el mate limpio, llenalo con yerba usada y agua caliente.</li>
+              <li>Dejalo reposar unas 12 horas.</li>
+              <li>Raspá el interior con una cuchara para sacar la membrana, enjuagá y dejá secar.</li>
+            </ol>
+          </article>
+          <article>
+            <h3>Mate de algarrobo</h3>
+            <ol>
+              <li>Revisá que esté limpio y seco por dentro.</li>
+              <li>Untá el interior con aceite o manteca.</li>
+              <li>Dejalo reposar entre 12 y 24 horas. Si es grande, más tiempo.</li>
+            </ol>
+          </article>
+        </div>
+        <p class="note">Hay varios métodos y cada artesano tiene el suyo. Los mates de acero no necesitan curado. Para limpiar la bombilla, usá agua caliente con bicarbonato y secala sobre un paño.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap block" id="contacto">
+    <div class="contact">
+      <div>
+        <p class="eyebrow">Contacto</p>
+        <h2>¿Dudas antes de pedir?</h2>
+        <p class="muted">Escribinos por WhatsApp o por Instagram. Podés pedir fotos, medidas o confirmar si hay stock.</p>
+      </div>
+      <div class="numbox">
+        <span class="muted">WhatsApp</span>
+        <span class="num">+54 9 3364 34-8318</span>
+        <div class="cta-row">
+          <a class="btn primary" href="https://wa.me/5493364348318?text=Hola%20unmate.es%21%20Quiero%20hacer%20una%20consulta." target="_blank" rel="noopener">Abrir WhatsApp</a>
+          <a class="btn ghost" href="https://instagram.com/unmate.es" target="_blank" rel="noopener">@unmate.es</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="#inicio"><span class="badge" role="img" aria-label="Logo de unmate.es"></span><span class="brand-name">unmate.es</span></a>
+    <nav aria-label="Pie de página">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#guia">Guía del mate</a>
+      <a href="https://instagram.com/unmate.es" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario" target="_blank" rel="noopener">Defensa del consumidor</a>
+    </nav>
+    <p class="fine">© 2026 unmate.es. Los precios están en pesos argentinos.</p>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" hidden data-act="close"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+  <div class="drawer-head">
+    <h2 id="drawer-title">Tu carrito</h2>
+    <button class="icon-btn" type="button" data-act="close" aria-label="Cerrar carrito">×</button>
+  </div>
+  <div class="drawer-body" id="cart-body"></div>
+  <div class="drawer-foot" id="cart-foot">
+    <div><label for="c-name">Tu nombre</label><input id="c-name" type="text" placeholder="Para saber a quién responderle" autocomplete="name"></div>
+    <div><label for="c-note">Aclaraciones (opcional)</label><textarea id="c-note" rows="2" placeholder="Localidad, color, algo que quieras consultar…"></textarea></div>
+    <div class="total-row"><span class="muted">Total</span><strong id="cart-total">$ 0</strong></div>
+    <a class="btn primary wide" id="wa-send" href="#" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a>
+    <p class="fine">Se abre WhatsApp con tu pedido ya escrito. El envío y el pago los coordinamos por ahí.</p>
+  </div>
+</aside>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="modal-card">
+    <button class="icon-btn" type="button" data-act="close-modal" aria-label="Cerrar">×</button>
+    <div class="m-art" id="m-art"></div>
+    <div class="m-info" id="m-info"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var WA='5493364348318';
+  function money(n){return '$ '+String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.')}
+  function $(s){return document.querySelector(s)}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
+
+  var CATS={mates:'Mates',bombillas:'Bombillas y bombillones',termos:'Termos'};
+
+  /* Precios y nombres tomados de la tienda actual (unmatees.mitiendanube.com). */
+  var P=[
+    {id:'camionero-premium',name:'Camionero Premium',cat:'mates',shape:'camionero',mat:'Calabaza',price:34900,was:41900,stock:1,desc:'Calabaza con cuero labrado, cincelado en alpaca y base de bronce.'},
+    {id:'torpedo-criollo-base-regulable',name:'Torpedo Criollo con base regulable',cat:'mates',shape:'torpedo',mat:'Calabaza',price:24000,was:26500,desc:'Mate torpedo criollo de calabaza con base regulable.'},
+    {id:'ranchero-vaquita',name:'Ranchero vaquita',cat:'mates',shape:'ranchero',mat:'Algarrobo',price:25900},
+    {id:'criollo-coquito',name:'Criollo coquito',cat:'mates',shape:'criollo',price:22900},
+    {id:'imperial-algarrobo',name:'Imperial de algarrobo',cat:'mates',shape:'imperial',mat:'Algarrobo',price:20900,desc:'Mate imperial de madera de algarrobo.'},
+    {id:'camionero-criollo-calabaza',name:'Camionero criollo de calabaza',cat:'mates',shape:'camionero',mat:'Calabaza',price:19900,desc:'Mate camionero criollo de calabaza.'},
+    {id:'camionero-algarrobo',name:'Camionero de algarrobo',cat:'mates',shape:'camionero',mat:'Algarrobo',price:18900,desc:'Mate camionero de madera de algarrobo.'},
+    {id:'bombillon-semicurvo-premium',name:'Bombillón semicurvo premium',cat:'bombillas',shape:'bombillon',price:23800},
+    {id:'bombillon-recto',name:'Bombillón recto',cat:'bombillas',shape:'bombillon',price:20800},
+    {id:'bombilla-pico-loro-bronce',name:'Bombilla pico loro en bronce',cat:'bombillas',shape:'loro',mat:'Bronce',price:7000},
+    {id:'bombilla-pico-loro',name:'Bombilla pico loro',cat:'bombillas',shape:'loro',price:7000},
+    {id:'termo-1-2l',name:'Termo 1,2 L',cat:'termos',shape:'termo',price:35000}
+  ];
+  var byId={};P.forEach(function(p){byId[p.id]=p});
+
+  /* ---------- ilustraciones de línea (mientras no hay fotos) ---------- */
+  var G={
+    camionero:{tw:76,mw:86,bw:48,ty:46,by:102},
+    imperial:{tw:60,mw:82,bw:34,ty:42,by:102},
+    torpedo:{tw:44,mw:52,bw:20,ty:32,by:104},
+    ranchero:{tw:66,mw:78,bw:42,ty:44,by:102},
+    criollo:{tw:58,mw:72,bw:36,ty:46,by:102}
+  };
+  function open(inner){return '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 92A50 50 0 1 1 106 92" opacity=".32"/>'+inner+'</svg>'}
+  function art(p){
+    var cx=60,s=G[p.shape];
+    if(s){
+      var l1=cx-s.tw/2,r1=cx+s.tw/2,lm=cx-s.mw/2,rm=cx+s.mw/2,lb=cx-s.bw/2,rb=cx+s.bw/2,ty=s.ty,by=s.by,my=ty+(by-ty)*.42,k=(by-my)*.7;
+      var body='M'+l1+' '+ty+' C'+(lm-3)+' '+(ty+8)+' '+lm+' '+(my-12)+' '+lm+' '+my+' C'+lm+' '+(my+k)+' '+(lb-2)+' '+(by-6)+' '+lb+' '+by+' L'+rb+' '+by+' C'+(rb+2)+' '+(by-6)+' '+rm+' '+(my+k)+' '+rm+' '+my+' C'+rm+' '+(my-12)+' '+(r1+3)+' '+(ty+8)+' '+r1+' '+ty;
+      var rim='M'+l1+' '+ty+' Q'+cx+' '+(ty-7)+' '+r1+' '+ty+' M'+l1+' '+ty+' Q'+cx+' '+(ty+7)+' '+r1+' '+ty;
+      var straw='M'+(cx+10)+' '+(ty+3)+' L'+(cx+30)+' '+(ty-26)+' M'+(cx+30)+' '+(ty-26)+' L'+(cx+35)+' '+(ty-29);
+      return open('<path d="'+body+'"/><path d="'+rim+'"/><path d="M'+(lb-5)+' '+(by+7)+' L'+(rb+5)+' '+(by+7)+'" opacity=".6"/><path d="'+straw+'"/>');
+    }
+    if(p.shape==='termo'){
+      return open('<rect x="42" y="30" width="36" height="76" rx="9"/><rect x="42" y="20" width="36" height="13" rx="4"/><path d="M78 48h6a8 8 0 0 1 8 8v16a8 8 0 0 1-8 8h-6"/><path d="M42 58h36M42 66h36" opacity=".4"/>');
+    }
+    var bulbW=p.shape==='bombillon'?13:9;
+    var top=p.shape==='loro'?'M44 98 L68 36 Q72 24 88 20 L93 24':'M44 98 L80 24 L86 26';
+    if(p.shape==='bombillon'&&p.id.indexOf('semicurvo')>-1){top='M44 98 L66 40 Q70 26 86 22 L90 26'}
+    return open('<path d="'+top+'"/><ellipse cx="42" cy="99" rx="'+bulbW+'" ry="'+(bulbW+5)+'" transform="rotate(22 42 99)"/><path d="M38 92l8 14M34 98l9 11" opacity=".4"/>');
+  }
+
+  /* ---------- estado ---------- */
+  var cat='todos',q='',sort='rel',cart={},lastFocus=null,toastT;
+  try{cart=JSON.parse(localStorage.getItem('unmate-cart')||'{}')||{}}catch(e){cart={}}
+  Object.keys(cart).forEach(function(k){if(!byId[k]||!(cart[k]>0))delete cart[k]});
+  function save(){try{localStorage.setItem('unmate-cart',JSON.stringify(cart))}catch(e){}}
+  function total(){return Object.keys(cart).reduce(function(a,id){return a+byId[id].price*cart[id]},0)}
+  function count(){return Object.keys(cart).reduce(function(a,id){return a+cart[id]},0)}
+  function pct(p){return Math.round((1-p.price/p.was)*100)}
+
+  function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show')},2200)}
+
+  function add(id){
+    var p=byId[id],max=p.stock||99,cur=cart[id]||0;
+    if(cur>=max){toast('De "'+p.name+'" queda una sola unidad');return false}
+    cart[id]=cur+1;save();renderCart();toast('Agregado: '+p.name);return true;
+  }
+
+  /* ---------- catálogo ---------- */
+  function visible(){
+    var qq=norm(q.trim());
+    var r=P.filter(function(p){
+      if(cat!=='todos'&&p.cat!==cat)return false;
+      if(!qq)return true;
+      return norm(p.name+' '+(p.mat||'')+' '+CATS[p.cat]).indexOf(qq)>-1;
+    });
+    if(sort==='asc')r=r.slice().sort(function(a,b){return a.price-b.price});
+    if(sort==='desc')r=r.slice().sort(function(a,b){return b.price-a.price});
+    if(sort==='az')r=r.slice().sort(function(a,b){return a.name.localeCompare(b.name,'es')});
+    return r;
+  }
+  function card(p){
+    var tags='<span class="tag">'+(p.mat?esc(p.mat):esc(CATS[p.cat]))+'</span>';
+    if(p.stock===1)tags+='<span class="tag hot">Última unidad</span>';
+    var price='<span class="price">'+money(p.price)+'</span>';
+    if(p.was)price+='<s class="was">'+money(p.was)+'</s><span class="off">−'+pct(p)+'%</span>';
+    return '<article class="card"><button class="card-art" type="button" data-act="open" data-id="'+p.id+'" aria-label="Ver '+esc(p.name)+'">'+art(p)+'</button>'+
+      '<div class="card-body"><div class="tags">'+tags+'</div><h3><button type="button" data-act="open" data-id="'+p.id+'">'+esc(p.name)+'</button></h3>'+
+      '<div class="price-row">'+price+'</div>'+
+      '<button class="btn primary small" type="button" data-act="add" data-id="'+p.id+'">Agregar al carrito</button></div></article>';
+  }
+  function renderGrid(){
+    var r=visible();
+    $('#grid').innerHTML=r.length?r.map(card).join(''):'<p class="empty">No encontramos productos con esa búsqueda. Probá con otra palabra o escribinos por WhatsApp.</p>';
+    $('#count').textContent=r.length+(r.length===1?' producto':' productos');
+    document.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',String(c.dataset.cat===cat))});
+  }
+
+  /* ---------- carrito ---------- */
+  function waText(){
+    var name=($('#c-name').value||'').trim(),note=($('#c-note').value||'').trim();
+    var t='Hola unmate.es! Quiero hacer este pedido:\n\n';
+    Object.keys(cart).forEach(function(id){var p=byId[id],n=cart[id];t+='• '+n+' × '+p.name+' — '+money(p.price*n)+'\n'});
+    t+='\nTotal: '+money(total())+'\n';
+    if(name)t+='\nNombre: '+name;
+    if(note)t+='\nAclaraciones: '+note;
+    t+='\n\n¿Me confirmás disponibilidad y costo de envío?';
+    return t;
+  }
+  function updateWa(){$('#wa-send').href='https://wa.me/'+WA+'?text='+encodeURIComponent(waText())}
+  function renderCart(){
+    var ids=Object.keys(cart),n=count();
+    $('#cart-count').textContent=n;
+    $('#cart-total').textContent=money(total());
+    $('#cart-foot').hidden=!ids.length;
+    $('#cart-body').innerHTML=ids.length?ids.map(function(id){
+      var p=byId[id],c=cart[id];
+      return '<div class="line"><div class="thumb">'+art(p)+'</div><div class="line-info"><strong>'+esc(p.name)+'</strong>'+
+        '<div class="line-row"><div class="qty"><button type="button" data-act="dec" data-id="'+id+'" aria-label="Quitar una unidad">−</button><span>'+c+'</span><button type="button" data-act="inc" data-id="'+id+'" aria-label="Sumar una unidad">+</button></div>'+
+        '<span class="line-price">'+money(p.price*c)+'</span></div>'+
+        '<button class="rm" type="button" data-act="rm" data-id="'+id+'">Quitar</button></div></div>';
+    }).join(''):'<div class="empty-cart"><p>Tu carrito está vacío. Sumá productos del catálogo y armamos el pedido.</p><button class="btn ghost small" type="button" data-act="close-go">Ver catálogo</button></div>';
+    if(ids.length)updateWa();
+  }
+  function openDrawer(){
+    lastFocus=document.activeElement;
+    $('#scrim').hidden=false;$('#drawer').hidden=false;document.body.style.overflow='hidden';
+    $('#drawer .icon-btn').focus();
+  }
+  function closeAll(){
+    $('#scrim').hidden=true;$('#drawer').hidden=true;$('#modal').hidden=true;document.body.style.overflow='';
+    if(lastFocus&&lastFocus.focus){try{lastFocus.focus()}catch(e){}}
+  }
+
+  /* ---------- ficha de producto ---------- */
+  function openProduct(id){
+    var p=byId[id];lastFocus=document.activeElement;
+    $('#m-art').innerHTML=art(p);
+    var price='<span class="price">'+money(p.price)+'</span>';
+    if(p.was)price+='<s class="was">'+money(p.was)+'</s><span class="off">−'+pct(p)+'%</span>';
+    var specs='<div><dt>Categoría</dt><dd>'+esc(CATS[p.cat])+'</dd></div>';
+    if(p.mat)specs+='<div><dt>Material</dt><dd>'+esc(p.mat)+'</dd></div>';
+    if(p.stock===1)specs+='<div><dt>Disponibilidad</dt><dd>Última unidad</dd></div>';
+    var desc=p.desc?esc(p.desc):'Escribinos y te pasamos fotos, medidas y detalles de este producto.';
+    var photoMsg=encodeURIComponent('Hola unmate.es! Quiero ver más fotos de: '+p.name);
+    $('#m-info').innerHTML='<p class="eyebrow">'+esc(CATS[p.cat])+'</p><h3 id="m-title">'+esc(p.name)+'</h3>'+
+      '<div class="price-row">'+price+'</div><p class="muted">'+desc+'</p><dl>'+specs+'</dl>'+
+      '<div class="m-actions"><button class="btn primary" type="button" data-act="add-close" data-id="'+id+'">Agregar al carrito</button>'+
+      '<a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/'+WA+'?text='+photoMsg+'">Pedir fotos por WhatsApp</a></div>';
+    $('#modal').hidden=false;document.body.style.overflow='hidden';
+    $('#modal .icon-btn').focus();
+  }
+
+  /* ---------- armá tu equipo ---------- */
+  function fillKit(){
+    function opts(cat,none){
+      var h=none?'<option value="">'+none+'</option>':'';
+      P.filter(function(p){return p.cat===cat}).forEach(function(p){h+='<option value="'+p.id+'">'+esc(p.name)+' · '+money(p.price)+'</option>'});
+      return h;
+    }
+    $('#k-mate').innerHTML=opts('mates');
+    $('#k-bomb').innerHTML=opts('bombillas','Sin bombilla');
+    $('#k-termo').innerHTML=opts('termos','Sin termo');
+    $('#k-mate').value='camionero-criollo-calabaza';
+    $('#k-bomb').value='bombilla-pico-loro';
+    kitTotal();
+  }
+  function kitIds(){return [$('#k-mate').value,$('#k-bomb').value,$('#k-termo').value].filter(Boolean)}
+  function kitTotal(){$('#k-total').textContent=money(kitIds().reduce(function(a,id){return a+byId[id].price},0))}
+
+  /* ---------- eventos ---------- */
+  document.addEventListener('click',function(e){
+    if(e.target.id==='modal'){closeAll();return}
+    var b=e.target.closest('[data-act]');if(!b)return;
+    var a=b.dataset.act,id=b.dataset.id;
+    if(a==='add')add(id);
+    else if(a==='add-close'){if(add(id)){closeAll();openDrawer()}}
+    else if(a==='inc')add(id);
+    else if(a==='dec'){cart[id]=(cart[id]||0)-1;if(cart[id]<=0)delete cart[id];save();renderCart()}
+    else if(a==='rm'){delete cart[id];save();renderCart()}
+    else if(a==='open')openProduct(id);
+    else if(a==='open-cart')openDrawer();
+    else if(a==='close'||a==='close-modal')closeAll();
+    else if(a==='close-go'){closeAll();location.hash='catalogo'}
+    else if(a==='cat'){cat=b.dataset.cat;renderGrid()}
+    else if(a==='kit-add'){
+      var ids=kitIds(),n=0;
+      ids.forEach(function(i){var p=byId[i],cur=cart[i]||0;if(cur<(p.stock||99)){cart[i]=cur+1;n++}});
+      save();renderCart();
+      if(n){toast('Equipo agregado al carrito');openDrawer()}else toast('Esos productos ya están en tu carrito');
+    }
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&(!$('#drawer').hidden||!$('#modal').hidden))closeAll()});
+  $('#q').addEventListener('input',function(e){q=e.target.value;renderGrid()});
+  $('#sort').addEventListener('change',function(e){sort=e.target.value;renderGrid()});
+  ['#k-mate','#k-bomb','#k-termo'].forEach(function(s){$(s).addEventListener('change',kitTotal)});
+  ['#c-name','#c-note'].forEach(function(s){$(s).addEventListener('input',updateWa)});
+
+  fillKit();renderGrid();renderCart();
+})();
+</script>
+
+</body></html>
