@@ -523,7 +523,7 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .review-avatar img{object-fit:cover}
 .review blockquote{margin:0;line-height:1.5}
 .review-photos{display:flex;gap:6px;flex-wrap:wrap}
-.review-photos a{position:relative;width:104px;height:104px;border-radius:10px;overflow:hidden;background:var(--surface-2);transition:transform .2s}
+.review-photos a{position:relative;width:150px;height:150px;border-radius:10px;overflow:hidden;background:var(--surface-2);transition:transform .2s}
 .review-photos a:hover{transform:scale(1.05)}
 .review-photos img{object-fit:cover}
 .reviews-more{margin:8px auto 0;display:flex}
@@ -578,3 +578,7 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 /* en tema claro el verde de borde necesita más contraste */
 @media(prefers-color-scheme:light){:root:not([data-theme="dark"]) .btn.wa.outline{color:#0d7a3b;border-color:#0d7a3b}}
 :root[data-theme="light"] .btn.wa.outline{color:#0d7a3b;border-color:#0d7a3b}
+
+/* panel: opciones de la pestaña Estadísticas */
+.stat-tools{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:12px 14px;border:1px dashed var(--line);border-radius:12px}
+.stat-tools .admin-check{margin-right:auto;font-size:.92rem}

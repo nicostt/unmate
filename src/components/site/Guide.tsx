@@ -1,8 +1,8 @@
 import { MateTypes } from "./MateTypes";
 
 // Las dos secciones de ayuda de la tienda. Van separadas porque sirven en
-// momentos distintos: "Elegí tu mate" antes de comprar (arriba del catálogo)
-// y "Cómo curarlo" después (más abajo). El orden se decide en src/app/page.tsx.
+// momentos distintos: los tipos de mate ayudan a decidir (van justo después
+// del catálogo) y "Cómo curarlo" sirve después de comprar (más abajo). El orden se decide en src/app/page.tsx.
 
 // Qué tipo de mate conviene. La lista interactiva está en MateTypes.tsx.
 export function ChooseGuide() {
@@ -17,7 +17,7 @@ export function ChooseGuide() {
           </p>
           <div className="cta-row">
             <a className="btn primary" href="#catalogo">
-              Ver el catálogo
+              Volver al catálogo
             </a>
             <a className="btn accent" href="#curado">
               ¿Querés saber cómo curarlos? →

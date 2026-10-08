@@ -21,8 +21,8 @@ export default async function Home() {
       <main>
         {/* El orden de la página se decide acá: cada línea es una sección. */}
         <Hero />
-        <ChooseGuide />
         <Catalog />
+        <ChooseGuide />
         <KitBuilder />
         <CureGuide />
         <Reviews reviews={catalog.reviews} />

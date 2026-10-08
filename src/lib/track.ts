@@ -9,11 +9,21 @@
 const VISITOR_KEY = "unmate-visitor";
 const SESSION_KEY = "unmate-session";
 
-// No se cuenta el movimiento del propio administrador ni el de desarrollo.
+// Si el administrador activa "contar mi actividad" en el panel (pestaña
+// Estadísticas), se guarda esta marca en su navegador.
+export const COUNT_ME_KEY = "unmate-count-me";
+
+// ¿Este navegador tiene iniciada la sesión del panel?
+// supabase-js la guarda en una clave "sb-...-auth-token".
+export function hasAdminSession(): boolean {
+  return Object.keys(localStorage).some((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
+}
+
+// No se cuenta el movimiento de desarrollo (localhost). El del administrador
+// tampoco, salvo que él mismo lo haya activado para hacer pruebas.
 function shouldSkip(): boolean {
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return true;
-  // supabase-js guarda la sesión del panel en una clave "sb-...-auth-token"
-  return Object.keys(localStorage).some((k) => k.startsWith("sb-") && k.endsWith("-auth-token"));
+  return hasAdminSession() && localStorage.getItem(COUNT_ME_KEY) !== "1";
 }
 
 // Código anónimo de este navegador. Se crea la primera vez y se reutiliza.

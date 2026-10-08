@@ -12,8 +12,8 @@ export function Header() {
           </span>
         </a>
         <nav className="nav" aria-label="Principal">
-          <a href="#elegir">Elegí tu mate</a>
           <a href="#catalogo">Catálogo</a>
+          <a href="#elegir">Elegí tu mate</a>
           <a href="#equipo">Armá tu equipo</a>
           <a href="#curado">Curado</a>
           <a href="#contacto">Contacto</a>

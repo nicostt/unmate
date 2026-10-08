@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
+import { supabase } from "@/lib/supabase";
+import { COUNT_ME_KEY } from "@/lib/track";
 import { compute, fetchRaw, type Bar, type Computed, type Raw } from "./stats-data";
 import type { AdminProduct } from "./types";
 
@@ -19,6 +21,25 @@ export function Stats({ products }: { products: AdminProduct[] }) {
   const [days, setDays] = useState<number>(30);
   const [loaded, setLoaded] = useState<{ days: number; raw: Raw }>();
   const [error, setError] = useState("");
+  const [reload, setReload] = useState(0); // cambia para volver a pedir los datos
+  // ¿se cuenta lo que hace el admin en este navegador? (ver src/lib/track.ts)
+  const [countMe, setCountMe] = useState(() => localStorage.getItem(COUNT_ME_KEY) === "1");
+
+  function toggleCountMe(on: boolean) {
+    if (on) localStorage.setItem(COUNT_ME_KEY, "1");
+    else localStorage.removeItem(COUNT_ME_KEY);
+    setCountMe(on);
+  }
+
+  // Borra todo lo juntado (eventos y carritos). No toca pedidos ni ventas.
+  async function reset() {
+    if (!confirm("¿Borrar todas las estadísticas juntadas hasta ahora? Los pedidos y las ventas no se tocan.")) return;
+    const events = await supabase.from("events").delete().gte("id", 0);
+    const carts = await supabase.from("carts").delete().neq("visitor", "");
+    const failed = events.error ?? carts.error;
+    if (failed) setError(failed.message);
+    setReload((n) => n + 1);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +50,7 @@ export function Stats({ products }: { products: AdminProduct[] }) {
     return () => {
       cancelled = true;
     };
-  }, [days]);
+  }, [days, reload]);
 
   return (
     <section className="stats">
@@ -39,6 +60,21 @@ export function Stats({ products }: { products: AdminProduct[] }) {
             Últimos {label}
           </button>
         ))}
+      </div>
+      <div className="stat-tools">
+        <label className="admin-check">
+          <input type="checkbox" checked={countMe} onChange={(e) => toggleCountMe(e.target.checked)} />
+          <span>
+            Contar también lo que hago yo en este navegador{" "}
+            <small>(para hacer pruebas; apagalo después, así no se mezcla con los clientes)</small>
+          </span>
+        </label>
+        <button className="btn ghost small" type="button" onClick={() => setReload((n) => n + 1)}>
+          Actualizar
+        </button>
+        <button className="btn ghost small danger" type="button" onClick={reset}>
+          Borrar estadísticas
+        </button>
       </div>
       {error ? (
         <p className="admin-error">{error}</p>
@@ -59,7 +95,7 @@ export function StatsView({ s, days }: { s: Computed; days: number }) {
     return (
       <p className="muted">
         Todavía no hay datos en este período. Empiezan a juntarse solos a medida que la gente entra a la tienda
-        publicada. Tus propias visitas (con la sesión del panel iniciada) no se cuentan.
+        publicada. Lo que hacés vos en este navegador no se cuenta, salvo que lo actives arriba.
       </p>
     );
   }
