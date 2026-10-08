@@ -119,7 +119,7 @@ export function ReviewsAdmin({ onChanged }: { onChanged: () => Promise<void> }) 
       <form className="admin-form" onSubmit={publish}>
         <label>
           Nombre del cliente
-          <input className="field-in" placeholder="Martina" value={name} onChange={(e) => setName(e.target.value)} />
+          <input className="field-in" placeholder="Valen" value={name} onChange={(e) => setName(e.target.value)} />
         </label>
         <div className="admin-avatar">
           <span className="review-avatar">{avatar && <Image src={photoUrl(avatar)} alt="" fill sizes="56px" />}</span>
