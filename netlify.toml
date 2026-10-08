@@ -1,0 +1,7 @@
+# Configuración de Netlify (el hosting). Lo que está acá manda sobre lo que
+# se haya cargado a mano en la página de Netlify.
+
+[build]
+  # Cómo se construye la web y en qué carpeta queda el resultado.
+  command = "npm run build"
+  publish = ".next"
