@@ -510,8 +510,9 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .kit-picker .kit-options{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
 
 /* ---------- reseñas: tarjetas chicas, tipo comentario ---------- */
-.reviews{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;align-items:start}
-.review{margin:0;display:grid;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .25s,border-color .25s}
+/* las tarjetas se reparten el ancho entre todas: la última fila también se estira, así nunca queda un hueco */
+.reviews{display:flex;flex-wrap:wrap;gap:14px}
+.review{flex:1 1 240px;margin:0;display:grid;gap:10px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .25s,border-color .25s}
 @media(hover:hover){.review:hover{transform:translateY(-4px);border-color:var(--accent)}}
 .review figcaption{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
 .review-avatar{position:relative;overflow:hidden;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:700 .95rem var(--f-display);flex:none}
