@@ -5,3 +5,9 @@
   # Cómo se construye la web y en qué carpeta queda el resultado.
   command = "npm run build"
   publish = ".next"
+
+# Adaptador de Next.js: convierte el resultado de la construcción en una web
+# que Netlify sabe servir. Sin esto Netlify publica la carpeta .next "cruda"
+# y toda la web responde "Page not found".
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
