@@ -5,9 +5,17 @@ import { useEffect, useState } from "react";
 import { refreshCatalog } from "@/lib/admin-actions";
 import { money } from "@/lib/format";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
+import { WEIGHT_CATEGORY } from "@/lib/types";
 import { CategoryManager } from "./CategoryManager";
 import { ProductForm } from "./ProductForm";
-import { photosOf, variantsOf, type AdminCategory, type AdminProduct } from "./types";
+import {
+  gramsToKilos,
+  kilosToGrams,
+  photosOf,
+  toInt,
+  type AdminCategory,
+  type AdminProduct,
+} from "./types";
 
 // Trae de la base todo lo que el panel necesita. Con la sesión de admin
 // iniciada llegan también los productos ocultos.
@@ -16,7 +24,7 @@ async function fetchAll() {
     supabase.from("categories").select("id, slug, name, sort_order").order("sort_order"),
     supabase
       .from("products")
-      .select("*, product_media(id, kind, path, sort_order), product_variants(*)")
+      .select("*, product_media(id, kind, path, sort_order)")
       .order("sort_order"),
   ]);
   const error = categories.error ?? products.error;
@@ -24,11 +32,17 @@ async function fetchAll() {
   return { categories: categories.data as AdminCategory[], products: products.data as AdminProduct[] };
 }
 
-// Pantalla principal del panel: la lista de productos, el formulario cuando
-// se está creando o editando uno, o la pantalla de categorías.
+// Qué se está mostrando: la lista, las categorías, o el formulario de un
+// producto o de una yerba (nuevo, o el que tiene ese id).
+type View =
+  | { screen: "list" }
+  | { screen: "categories" }
+  | { screen: "form"; kind: "product" | "yerba"; id: number | null };
+
+// Pantalla principal del panel.
 export function Panel({ accessToken, email }: { accessToken: string; email: string }) {
   const [data, setData] = useState<{ categories: AdminCategory[]; products: AdminProduct[] }>();
-  const [editing, setEditing] = useState<number | "new" | "categories" | null>(null);
+  const [view, setView] = useState<View>({ screen: "list" });
   const [error, setError] = useState("");
 
   const fail = (e: unknown) => setError(e instanceof Error ? e.message : String(e));
@@ -60,8 +74,36 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
     await run(supabase.from("products").delete().eq("id", product.id));
   }
 
+  // La yerba vive en su propia categoría. Si todavía no existe, se crea sola
+  // la primera vez que se va a cargar una yerba.
+  async function newYerba() {
+    if (!data?.categories.some((c) => c.slug === WEIGHT_CATEGORY)) {
+      const sort_order = Math.max(0, ...(data?.categories.map((c) => c.sort_order) ?? [])) + 1;
+      await run(supabase.from("categories").insert({ slug: WEIGHT_CATEGORY, name: "Yerba", sort_order }));
+    }
+    setView({ screen: "form", kind: "yerba", id: null });
+  }
+
   if (!data) return <p className="admin-msg">{error || "Cargando productos…"}</p>;
   const { categories, products } = data;
+
+  const yerbaCategory = categories.find((c) => c.slug === WEIGHT_CATEGORY);
+  const yerbas = products.filter((p) => p.category_id === yerbaCategory?.id);
+  const others = products.filter((p) => p.category_id !== yerbaCategory?.id);
+
+  const rows = (list: AdminProduct[], kind: "product" | "yerba") =>
+    list.map((p) => (
+      <Row
+        key={p.id}
+        product={p}
+        byWeight={kind === "yerba"}
+        category={categories.find((c) => c.id === p.category_id)?.name ?? ""}
+        onEdit={() => setView({ screen: "form", kind, id: p.id })}
+        onDelete={() => removeProduct(p)}
+        onToggle={() => run(supabase.from("products").update({ is_active: !p.is_active }).eq("id", p.id))}
+        onStock={(stock) => run(supabase.from("products").update({ stock }).eq("id", p.id))}
+      />
+    ));
 
   return (
     <div className="wrap admin">
@@ -78,50 +120,68 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
 
       {error && <p className="admin-error">{error}</p>}
 
-      {editing === "categories" ? (
-        <CategoryManager categories={categories} products={products} onBack={() => setEditing(null)} onChanged={changed} />
-      ) : editing !== null ? (
+      {view.screen === "categories" && (
+        <CategoryManager
+          categories={categories}
+          products={products}
+          onBack={() => setView({ screen: "list" })}
+          onChanged={changed}
+        />
+      )}
+
+      {view.screen === "form" && (
         <ProductForm
           // key: al pasar de "nuevo" al producto recién creado, el formulario arranca de cero
-          key={editing}
-          product={products.find((p) => p.id === editing) ?? null}
-          categories={categories}
+          key={`${view.kind}-${view.id}`}
+          kind={view.kind}
+          product={products.find((p) => p.id === view.id) ?? null}
+          // la yerba tiene su propia sección: no se ofrece como categoría de un producto común
+          categories={view.kind === "yerba" ? categories : categories.filter((c) => c.id !== yerbaCategory?.id)}
+          yerbaCategoryId={yerbaCategory?.id}
           nextSortOrder={Math.max(0, ...products.map((p) => p.sort_order)) + 1}
-          onBack={() => setEditing(null)}
+          onBack={() => setView({ screen: "list" })}
           onSaved={async (id) => {
             await changed();
-            setEditing(id);
+            setView({ screen: "form", kind: view.kind, id });
           }}
           onChanged={changed}
         />
-      ) : (
+      )}
+
+      {view.screen === "list" && (
         <>
-          <div className="admin-bar">
-            <p className="muted">
-              {products.length} productos · {products.filter((p) => !p.is_active).length} ocultos
-            </p>
-            <button className="btn ghost small" type="button" onClick={() => setEditing("categories")}>
-              Categorías
-            </button>
-            <button className="btn primary small" type="button" onClick={() => setEditing("new")}>
-              + Agregar producto
-            </button>
-          </div>
-          <div className="admin-list">
-            {products.map((p) => (
-              <Row
-                key={p.id}
-                product={p}
-                category={categories.find((c) => c.id === p.category_id)?.name ?? ""}
-                onEdit={() => setEditing(p.id)}
-                onDelete={() => removeProduct(p)}
-                onToggle={() =>
-                  run(supabase.from("products").update({ is_active: !p.is_active }).eq("id", p.id))
-                }
-                onStock={(stock) => run(supabase.from("products").update({ stock }).eq("id", p.id))}
-              />
-            ))}
-          </div>
+          <section className="admin-section">
+            <div className="admin-bar">
+              <h2>Productos</h2>
+              <p className="muted">
+                {others.length} · {others.filter((p) => !p.is_active).length} ocultos
+              </p>
+              <button className="btn ghost small" type="button" onClick={() => setView({ screen: "categories" })}>
+                Categorías
+              </button>
+              <button
+                className="btn primary small"
+                type="button"
+                onClick={() => setView({ screen: "form", kind: "product", id: null })}
+              >
+                + Agregar producto
+              </button>
+            </div>
+            <div className="admin-list">{rows(others, "product")}</div>
+          </section>
+
+          <section className="admin-section">
+            <div className="admin-bar">
+              <h2>Yerba</h2>
+              <p className="muted">Se vende por peso, de a 250 g. Cargás el precio del kilo y cuántos kilos hay.</p>
+              <button className="btn primary small" type="button" onClick={newYerba}>
+                + Agregar yerba
+              </button>
+            </div>
+            <div className="admin-list">
+              {yerbas.length ? rows(yerbas, "yerba") : <p className="muted">Todavía no cargaste ninguna yerba.</p>}
+            </div>
+          </section>
         </>
       )}
     </div>
@@ -130,6 +190,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
 
 function Row({
   product,
+  byWeight,
   category,
   onEdit,
   onDelete,
@@ -137,23 +198,24 @@ function Row({
   onStock,
 }: {
   product: AdminProduct;
+  byWeight: boolean;
   category: string;
   onEdit: () => void;
   onDelete: () => void;
   onToggle: () => void;
   onStock: (stock: number | null) => void;
 }) {
-  const saved = product.stock === null ? "" : String(product.stock);
+  // El casillero muestra unidades, o kilos si es yerba (en la base van gramos).
+  const saved = byWeight ? gramsToKilos(product.stock) : product.stock === null ? "" : String(product.stock);
   const [stock, setStock] = useState(saved);
   const cover = photosOf(product)[0];
-  const variants = variantsOf(product);
 
   // Guarda el stock al salir del casillero, si cambió. Vacío = sin control de stock.
   function saveStock() {
-    const value = stock.trim();
-    if (value === saved) return;
-    if (value !== "" && !/^\d+$/.test(value)) return setStock(saved);
-    onStock(value === "" ? null : Number(value));
+    if (stock.trim() === saved) return;
+    const value = byWeight ? kilosToGrams(stock) : toInt(stock);
+    if (Number.isNaN(value)) return setStock(saved);
+    onStock(value);
   }
 
   return (
@@ -164,30 +226,22 @@ function Row({
       <div className="admin-name">
         <strong>{product.name}</strong>
         <span className="muted">
-          {category} · {variants.length ? "desde " : ""}
-          {money(product.price)}
+          {byWeight ? `${money(product.price)} el kg` : `${category} · ${money(product.price)}`}
           {!product.is_active && " · oculto"}
         </span>
       </div>
-      {variants.length ? (
-        // con presentaciones, el stock se carga en cada una (botón Editar)
-        <span className="admin-stock">
-          {variants.length} {variants.length === 1 ? "presentación" : "presentaciones"}
-        </span>
-      ) : (
-        <label className="admin-stock">
-          Stock
-          <input
-            className="field-in"
-            inputMode="numeric"
-            placeholder="—"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            onBlur={saveStock}
-            onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-          />
-        </label>
-      )}
+      <label className="admin-stock">
+        {byWeight ? "Kilos" : "Stock"}
+        <input
+          className="field-in"
+          inputMode={byWeight ? "decimal" : "numeric"}
+          placeholder="—"
+          value={stock}
+          onChange={(e) => setStock(e.target.value)}
+          onBlur={saveStock}
+          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+        />
+      </label>
       <div className="admin-actions">
         <button className="btn ghost small" type="button" onClick={onToggle}>
           {product.is_active ? "Ocultar" : "Mostrar"}

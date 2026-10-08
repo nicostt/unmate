@@ -54,7 +54,7 @@ referencia/          El diseño original en un solo HTML (solo para consultar)
 
 ## Cambios frecuentes
 
-- **Productos, categorías, presentaciones (500 g, 1 kg…), precios, stock y fotos:** desde el panel, en `/admin` (en tu compu: http://localhost:3000/admin). Entrás con el email y la contraseña del usuario que creaste en Supabase. Los cambios se ven en la tienda al instante.
+- **Productos, yerba, categorías, precios, stock y fotos:** desde el panel, en `/admin` (en tu compu: http://localhost:3000/admin). Entrás con el email y la contraseña del usuario que creaste en Supabase. Los cambios se ven en la tienda al instante.
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
 - **Textos de la portada o de la guía:** `src/components/site/`.
 - **Colores:** el primer bloque de `src/app/globals.css`.

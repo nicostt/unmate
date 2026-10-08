@@ -1,23 +1,22 @@
 "use client";
 
 import { whatsappLink } from "@/lib/site";
-import type { Product } from "@/lib/types";
+import { perKiloLabel, type Product } from "@/lib/types";
 import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
-import { AddButton, OptionPicker, PriceRow, useSelectedOption } from "./ProductCard";
+import { BuyBox, PriceRow } from "./ProductCard";
 import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
 
 // Ficha de producto: se abre encima del catálogo al tocar una tarjeta.
 export function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const { add, openCart, categories } = useShop();
-  const [option, setOption] = useSelectedOption(product);
   useOverlay(true, onClose);
 
   const categoryName = categories.find((c) => c.slug === product.category)?.name;
 
-  function addAndGoToCart() {
-    if (add(option.key)) {
+  function addAndGoToCart(amount: number) {
+    if (add(product.slug, amount)) {
       onClose();
       openCart();
     }
@@ -48,8 +47,8 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
         <div className="m-info">
           <p className="eyebrow">{categoryName}</p>
           <h3 id="m-title">{product.name}</h3>
-          <OptionPicker product={product} selected={option} onSelect={setOption} />
-          <PriceRow option={option} />
+          {/* la yerba muestra su precio abajo, según la cantidad elegida */}
+          {!product.byWeight && <PriceRow price={product.price} compareAtPrice={product.compareAtPrice} />}
           <p className="muted">
             {product.description ?? "Escribinos y te pasamos fotos, medidas y detalles de este producto."}
           </p>
@@ -64,7 +63,13 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
                 <dd>{product.material}</dd>
               </div>
             )}
-            {option.stock === 1 && (
+            {product.byWeight && (
+              <div>
+                <dt>Precio</dt>
+                <dd>{perKiloLabel(product)}</dd>
+              </div>
+            )}
+            {!product.byWeight && product.stock === 1 && (
               <div>
                 <dt>Disponibilidad</dt>
                 <dd>Última unidad</dd>
@@ -72,7 +77,7 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
             )}
           </dl>
           <div className="m-actions">
-            <AddButton option={option} onAdd={addAndGoToCart} />
+            <BuyBox product={product} onAdd={addAndGoToCart} />
             <a
               className="btn ghost"
               target="_blank"

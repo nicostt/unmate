@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { normalize } from "@/lib/format";
-import { fromPrice, type Product } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
 import { useShop } from "./ShopProvider";
@@ -28,8 +28,8 @@ export function Catalog() {
     if (!q) return true;
     return normalize(`${p.name} ${p.material ?? ""} ${categoryName(p.category)}`).includes(q);
   });
-  if (sort === "asc") visible.sort((a, b) => fromPrice(a) - fromPrice(b));
-  if (sort === "desc") visible.sort((a, b) => fromPrice(b) - fromPrice(a));
+  if (sort === "asc") visible.sort((a, b) => a.price - b.price);
+  if (sort === "desc") visible.sort((a, b) => b.price - a.price);
   if (sort === "az") visible.sort((a, b) => a.name.localeCompare(b.name, "es"));
 
   const openProduct = products.find((p) => p.slug === openSlug);

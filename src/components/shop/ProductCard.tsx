@@ -2,76 +2,124 @@
 
 import { useState } from "react";
 import { discountPercent, money } from "@/lib/format";
-import type { Product, ProductOption } from "@/lib/types";
+import {
+  isSoldOut,
+  lineTotal,
+  maxQty,
+  perKiloLabel,
+  WEIGHT_STEP,
+  weightLabel,
+  type Product,
+} from "@/lib/types";
 import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 
 // Precio grande + precio anterior tachado + badge de descuento.
-export function PriceRow({ option }: { option: ProductOption }) {
+export function PriceRow({ price, compareAtPrice }: { price: number; compareAtPrice: number | null }) {
   return (
     <div className="price-row">
-      <span className="price">{money(option.price)}</span>
-      {option.compareAtPrice && (
+      <span className="price">{money(price)}</span>
+      {compareAtPrice && (
         <>
-          <s className="was">{money(option.compareAtPrice)}</s>
-          <span className="off">−{discountPercent(option.price, option.compareAtPrice)}%</span>
+          <s className="was">{money(compareAtPrice)}</s>
+          <span className="off">−{discountPercent(price, compareAtPrice)}%</span>
         </>
       )}
     </div>
   );
 }
 
-// Botoncitos para elegir presentación ("500 g", "1 kg"). Si el producto
-// tiene una sola opción no se muestra nada.
-export function OptionPicker({
+// Cantidades de yerba que se ofrecen con un toque; con + y − se sigue de a 250 g.
+const QUICK_WEIGHTS = [250, 500, 750, 1000];
+
+// Zona de compra de un producto: precio y botón "Agregar al carrito".
+// Si el producto va por peso (yerba), antes del botón se elige cuánto llevar
+// y el precio se calcula para esa cantidad.
+export function BuyBox({
   product,
-  selected,
-  onSelect,
+  small,
+  showUnitPrice,
+  onAdd,
 }: {
   product: Product;
-  selected: ProductOption;
-  onSelect: (option: ProductOption) => void;
+  small?: boolean; // botón más chico, para la tarjeta
+  showUnitPrice?: boolean; // mostrar el precio de los productos por unidad
+  onAdd: (amount: number) => void; // unidades, o gramos si va por peso
 }) {
-  if (product.options.length < 2) return null;
-  return (
-    <div className="opts" role="group" aria-label="Presentación">
-      {product.options.map((option) => (
-        <button
-          key={option.key}
-          className="opt"
-          type="button"
-          aria-pressed={option.key === selected.key}
-          onClick={() => onSelect(option)}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
+  const max = maxQty(product);
+  const [chosen, setChosen] = useState(500);
+  // si el stock bajó, la cantidad elegida no puede superarlo
+  const grams = Math.max(WEIGHT_STEP, Math.min(chosen, Math.floor(max / WEIGHT_STEP) * WEIGHT_STEP));
 
-// Botón de compra: se apaga solo cuando la opción elegida no tiene stock.
-export function AddButton({ option, small, onAdd }: { option: ProductOption; small?: boolean; onAdd: () => void }) {
-  const soldOut = option.stock === 0;
-  return (
-    <button className={small ? "btn primary small" : "btn primary"} type="button" disabled={soldOut} onClick={onAdd}>
-      {soldOut ? "Sin stock" : "Agregar al carrito"}
+  const button = (
+    <button
+      className={small ? "btn primary small" : "btn primary"}
+      type="button"
+      disabled={isSoldOut(product)}
+      onClick={() => onAdd(product.byWeight ? grams : 1)}
+    >
+      {isSoldOut(product) ? "Sin stock" : "Agregar al carrito"}
     </button>
   );
-}
 
-// Guarda qué opción está elegida. Si esa opción desaparece del catálogo
-// (por ejemplo, se borró la presentación), vuelve a la primera.
-export function useSelectedOption(product: Product) {
-  const [key, setKey] = useState(product.options[0].key);
-  const selected = product.options.find((o) => o.key === key) ?? product.options[0];
-  return [selected, (option: ProductOption) => setKey(option.key)] as const;
+  if (!product.byWeight) {
+    return (
+      <>
+        {showUnitPrice && <PriceRow price={product.price} compareAtPrice={product.compareAtPrice} />}
+        {button}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="weight">
+        <div className="opts" role="group" aria-label="Cantidad">
+          {QUICK_WEIGHTS.map((w) => (
+            <button
+              key={w}
+              className="opt"
+              type="button"
+              aria-pressed={w === grams}
+              disabled={w > max}
+              onClick={() => setChosen(w)}
+            >
+              {weightLabel(w)}
+            </button>
+          ))}
+        </div>
+        <div className="qty">
+          <button
+            type="button"
+            disabled={grams <= WEIGHT_STEP}
+            onClick={() => setChosen(grams - WEIGHT_STEP)}
+            aria-label="250 gramos menos"
+          >
+            −
+          </button>
+          <span>{weightLabel(grams)}</span>
+          <button
+            type="button"
+            disabled={grams + WEIGHT_STEP > max}
+            onClick={() => setChosen(grams + WEIGHT_STEP)}
+            aria-label="250 gramos más"
+          >
+            +
+          </button>
+        </div>
+      </div>
+      <PriceRow
+        price={lineTotal(product, grams)}
+        compareAtPrice={product.compareAtPrice && Math.round((product.compareAtPrice * grams) / 1000)}
+      />
+      {button}
+    </>
+  );
 }
 
 export function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void }) {
   const { add, categories } = useShop();
-  const [option, setOption] = useSelectedOption(product);
   const categoryName = categories.find((c) => c.slug === product.category)?.name;
 
   return (
@@ -93,17 +141,15 @@ export function ProductCard({ product, onOpen }: { product: Product; onOpen: () 
       )}
       <div className="card-body">
         <div className="tags">
-          <span className="tag">{product.material ?? categoryName}</span>
-          {option.stock === 1 && <span className="tag hot">Última unidad</span>}
+          <span className="tag">{product.byWeight ? perKiloLabel(product) : (product.material ?? categoryName)}</span>
+          {!product.byWeight && product.stock === 1 && <span className="tag hot">Última unidad</span>}
         </div>
         <h3>
           <button type="button" onClick={onOpen}>
             {product.name}
           </button>
         </h3>
-        <OptionPicker product={product} selected={option} onSelect={setOption} />
-        <PriceRow option={option} />
-        <AddButton option={option} small onAdd={() => add(option.key)} />
+        <BuyBox product={product} small showUnitPrice onAdd={(amount) => add(product.slug, amount)} />
       </div>
     </article>
   );

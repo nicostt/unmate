@@ -1,3 +1,7 @@
+-- SIN USO: la yerba terminó vendiéndose por peso (ver WEIGHT_CATEGORY en
+-- src/lib/types.ts) y esta tabla ya no se consulta. Queda registrada porque
+-- se ejecutó en la base; se puede borrar con: drop table public.product_variants;
+--
 -- unmate.es · Presentaciones de un producto (por ejemplo yerba de 500 g y 1 kg).
 -- Se ejecuta una sola vez en Supabase (SQL Editor), después de 0001.
 --

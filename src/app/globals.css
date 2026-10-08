@@ -276,21 +276,22 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .admin-photo-actions button:hover:not(:disabled){background:var(--surface-2)}
 .admin-photo-actions button:disabled{opacity:.35;cursor:default}
 
-/* elegir presentación (500 g / 1 kg) en tarjeta y ficha */
+/* elegir cuánta yerba llevar (tarjeta y ficha) */
+.weight{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
 .opts{display:flex;flex-wrap:wrap;gap:6px}
-.opt{min-height:34px;padding:.25rem .8rem;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer;font-size:.88rem;font-weight:500}
-.opt:hover{border-color:var(--fg)}
+.opt{min-height:34px;padding:.25rem .7rem;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer;font-size:.86rem;font-weight:500}
+.opt:hover:not(:disabled){border-color:var(--fg)}
 .opt[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg);border-color:transparent}
+.opt:disabled,.qty button:disabled{opacity:.35;cursor:default}
+.qty span{padding-inline:6px;white-space:nowrap}
+.btn:disabled{opacity:.6;cursor:default}
 
-/* panel: presentaciones y categorías */
-.admin-variants{display:grid;gap:10px;width:100%}
-.admin-variant{display:grid;grid-template-columns:1.4fr 1fr 1fr .8fr auto;gap:10px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-.admin-variant label{display:grid;gap:4px;font-size:.78rem;color:var(--muted);min-width:0}
-.admin-variant .field-in{min-height:40px;padding:.4rem .6rem;background:var(--bg)}
-.admin-variant .wide{grid-column:1/-1}
-@media(max-width:700px){.admin-variant{grid-template-columns:1fr 1fr}.admin-variant .admin-actions{grid-column:1/-1;justify-content:flex-start}}
+/* panel: secciones (Productos / Yerba) y categorías */
+.admin-section{display:grid;gap:14px}
+.admin-section+.admin-section{margin-top:20px;border-top:1px solid var(--line);padding-top:24px}
 .admin-bar{justify-content:flex-start}
-.admin-bar p{margin-right:auto}
+.admin-bar h2{font-size:1.25rem}
+.admin-bar p{margin-right:auto;font-size:.92rem}
 .admin-row.admin-cat{grid-template-columns:minmax(0,1fr) auto auto}
 .admin-cat .field-in{min-height:40px;padding:.4rem .6rem;background:var(--bg)}
 .admin-cat-add{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
