@@ -6,7 +6,9 @@ export function Footer() {
       <div className="wrap foot">
         <a className="brand" href="#inicio">
           <span className="badge" role="img" aria-label="Logo de unmate.es" />
-          <span className="brand-name">unmate.es</span>
+          <span className="brand-name">
+            unmate<b>.es</b>
+          </span>
         </a>
         <nav aria-label="Pie de página">
           <a href="#catalogo">Catálogo</a>

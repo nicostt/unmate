@@ -120,16 +120,29 @@ export function BuyBox({
 
 export function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void }) {
   const { add, categories } = useShop();
+  // Con el mouse sobre la foto, las fotos pasan solas; si la persona toca una
+  // flecha se frenan, hasta que saque el mouse.
+  const [hovering, setHovering] = useState(false);
+  const [pinned, setPinned] = useState(false);
   const categoryName = categories.find((c) => c.slug === product.category)?.name;
 
   return (
     <article className="card">
       {product.images.length ? (
-        <div className="card-art">
+        <div
+          className="card-art"
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => {
+            setHovering(false);
+            setPinned(false);
+          }}
+        >
           <Gallery
             images={product.images}
             alt={product.name}
             sizes="(max-width: 560px) 100vw, 320px"
+            playing={hovering && !pinned}
+            onManual={() => setPinned(true)}
             onOpen={onOpen}
           />
         </div>

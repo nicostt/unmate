@@ -7,7 +7,9 @@ export function Header() {
       <div className="wrap bar">
         <a className="brand" href="#inicio" aria-label="unmate.es, inicio">
           <span className="badge" role="img" aria-label="Logo de unmate.es" />
-          <span className="brand-name">unmate.es</span>
+          <span className="brand-name">
+            unmate<b>.es</b>
+          </span>
         </a>
         <nav className="nav" aria-label="Principal">
           <a href="#catalogo">Catálogo</a>

@@ -33,15 +33,15 @@ export function Hero() {
 
       <section className="wrap steps" aria-label="Cómo comprar">
         <ol>
-          <li>
+          <li tabIndex={0}>
             <strong>Elegí tus productos</strong>
             <span>Mirá el catálogo con precios claros y sumá lo que quieras.</span>
           </li>
-          <li>
+          <li tabIndex={0}>
             <strong>Armá tu carrito</strong>
             <span>Ajustá cantidades y revisá el total antes de pedir.</span>
           </li>
-          <li>
+          <li tabIndex={0}>
             <strong>Mandá el pedido por WhatsApp</strong>
             <span>Se abre el chat con todo escrito. Coordinamos envío y pago ahí.</span>
           </li>

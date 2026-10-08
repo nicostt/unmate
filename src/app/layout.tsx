@@ -24,7 +24,6 @@ export const metadata: Metadata = {
   title: "unmate.es — Mates, bombillas y termos",
   description:
     "Mates de calabaza y algarrobo, bombillas y termos. Armá tu pedido y cerralo por WhatsApp.",
-  icons: { icon: "/logo.webp" },
 };
 
 export const viewport: Viewport = {

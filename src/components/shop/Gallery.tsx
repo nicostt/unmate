@@ -1,24 +1,34 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Galería de fotos de un producto. Las fotos van una al lado de la otra en
-// una tira que se desliza con el dedo (el "imán" que frena en cada foto es
-// CSS: scroll-snap). En compu aparecen flechas, y abajo un puntito por foto.
+// Cada cuánto pasa sola a la foto siguiente mientras `playing` está activo.
+const AUTOPLAY_MS = 1800;
+
+// Galería de fotos. Las fotos van una al lado de la otra en una tira que se
+// desliza con el dedo (el "imán" que frena en cada foto es CSS: scroll-snap).
+// En compu aparecen flechas, y abajo un puntito por foto.
 export function Gallery({
   images,
   alt,
   sizes,
+  playing = false,
   onOpen,
+  onManual,
+  onIndexChange,
 }: {
   images: string[];
   alt: string;
   sizes: string; // ancho aproximado en pantalla, para que Next elija el tamaño de archivo
-  onOpen?: () => void; // qué hacer al tocar una foto (opcional)
+  playing?: boolean; // true = va pasando las fotos sola
+  onOpen?: () => void; // qué hacer al tocar una foto
+  onManual?: () => void; // avisa que la persona tocó una flecha (para frenar el pase automático)
+  onIndexChange?: (index: number) => void; // avisa qué foto quedó a la vista
 }) {
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  const many = images.length > 1;
 
   function goTo(i: number) {
     const el = track.current;
@@ -27,10 +37,30 @@ export function Gallery({
 
   function onScroll() {
     const el = track.current;
-    if (el) setIndex(Math.round(el.scrollLeft / el.clientWidth));
+    if (!el) return;
+    const next = Math.round(el.scrollLeft / el.clientWidth);
+    if (next !== index) {
+      setIndex(next);
+      onIndexChange?.(next);
+    }
   }
 
-  const many = images.length > 1;
+  // Pase automático: avanza de a una y, al llegar a la última, vuelve a la primera.
+  useEffect(() => {
+    if (!playing || !many) return;
+    const timer = setInterval(() => {
+      const el = track.current;
+      if (!el) return;
+      const current = Math.round(el.scrollLeft / el.clientWidth);
+      el.scrollTo({ left: ((current + 1) % images.length) * el.clientWidth, behavior: "smooth" });
+    }, AUTOPLAY_MS);
+    return () => clearInterval(timer);
+  }, [playing, many, images.length]);
+
+  function manual(i: number) {
+    onManual?.();
+    goTo(i);
+  }
 
   return (
     <div className="gallery">
@@ -59,7 +89,7 @@ export function Gallery({
             <button
               className="gallery-arrow prev"
               type="button"
-              onClick={() => goTo(index - 1)}
+              onClick={() => manual(index - 1)}
               aria-label="Foto anterior"
             >
               ‹
@@ -69,7 +99,7 @@ export function Gallery({
             <button
               className="gallery-arrow next"
               type="button"
-              onClick={() => goTo(index + 1)}
+              onClick={() => manual(index + 1)}
               aria-label="Foto siguiente"
             >
               ›

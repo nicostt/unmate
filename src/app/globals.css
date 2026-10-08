@@ -54,8 +54,10 @@ section[id]{scroll-margin-top:96px}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding-block:10px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-right:auto}
-.badge{width:42px;height:42px;border-radius:50%;background:var(--logo-img) center/cover;border:1px solid var(--line);flex:none}
-.brand-name{font:600 1.25rem var(--f-display);letter-spacing:.01em}
+/* el emblema es una máscara: toma el color del texto, así sirve en tema oscuro y claro */
+.badge{width:50px;height:50px;flex:none;background:var(--fg);-webkit-mask:url("/logo-mark.png") center/contain no-repeat;mask:url("/logo-mark.png") center/contain no-repeat}
+.brand-name{font:700 1.55rem var(--f-display);letter-spacing:-.03em;line-height:1}
+.brand-name b{font-weight:700;color:var(--accent)}
 .nav{display:flex;gap:4px 22px;order:3;width:100%;overflow-x:auto;padding-bottom:2px}
 .nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:500;padding-block:6px}
 .nav a:hover{color:var(--fg)}
@@ -318,3 +320,25 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .admin-status{font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.15rem .5rem;border-radius:4px;border:1px solid var(--line)}
 .admin-status.is-pendiente{background:var(--accent);color:var(--accent-fg);border-color:transparent}
 .admin-status.is-cancelado{color:var(--muted);text-decoration:line-through}
+
+/* ---------- vida al pasar el mouse (solo en dispositivos con mouse) ---------- */
+.card,.chip,.opt,.btn,.icon-btn,.cart-btn,.def div,.steps li::before,.nav a{transition:transform .22s,border-color .22s,box-shadow .22s,background-color .22s,color .22s,padding .22s}
+@media(hover:hover){
+  /* la tarjeta se levanta y se agranda apenas, con un resplandor del color de marca */
+  .card:hover{transform:translateY(-6px) scale(1.025);border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 22px 44px -22px color-mix(in srgb,var(--accent) 55%,transparent);z-index:1}
+  .chip:hover,.opt:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px)}
+  .btn.primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 26px -14px var(--accent)}
+  .btn.ghost:hover:not(:disabled),.icon-btn:hover,.cart-btn:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .nav a{position:relative}
+  .nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--accent);transition:right .22s}
+  .nav a:hover::after{right:0}
+  .def div:hover{padding-left:10px}
+  .def div:hover dt{color:var(--accent)}
+}
+
+/* "cómo comprar": se ve solo el título; la explicación se despliega al
+   pasar el mouse (o al tocar, en el celular) */
+.steps li{cursor:default;outline-offset:6px}
+.steps span{max-height:0;opacity:0;overflow:hidden;transition:max-height .3s,opacity .3s}
+.steps li:hover span,.steps li:focus span{max-height:6em;opacity:1}
+.steps li:hover::before,.steps li:focus::before{background:var(--accent);color:var(--accent-fg);border-color:transparent}
