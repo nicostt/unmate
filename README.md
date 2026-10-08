@@ -39,12 +39,12 @@ src/
     site/            Secciones de texto fijo: Header, Hero, Guide, Contact, Footer
     shop/            Lo interactivo: catálogo, ficha, carrito, "Armá tu equipo"
   lib/
-    catalog.ts       De dónde sale el catálogo (hoy: src/data; después: Supabase)
+    catalog.ts       Lee el catálogo de Supabase (y las fotos de public/productos)
+    supabase.ts      La conexión a Supabase
     cart-store.ts    El carrito, guardado en el navegador del cliente
     site.ts          Número de WhatsApp, Instagram y el texto del pedido
     format.ts        Formato de precios y descuentos
     types.ts         Qué campos tiene un producto y una categoría
-  data/catalog.ts    Los productos (provisorio, hasta conectar la base)
 public/logo.webp     El logo
 public/productos/    Una carpeta de fotos por producto
 supabase/            SQL para crear la base: tablas, seguridad y carga inicial
@@ -54,7 +54,7 @@ referencia/          El diseño original en un solo HTML (solo para consultar)
 ## Cambios frecuentes
 
 - **Fotos de un producto:** copiá las imágenes (JPG, PNG o WebP) a `public/productos/<producto>/`. Se muestran todas, en orden de nombre: llamalas `1.jpg`, `2.jpg`, `3.jpg`... y la `1` es la principal. Con más de una, la foto se desliza. Sin fotos, se ve la ilustración.
-- **Precio, nombre o producto nuevo:** `src/data/catalog.ts` (hasta que exista el panel de administración).
+- **Precio, stock, nombre o producto nuevo:** en Supabase, Table Editor, tabla `products` (hasta que exista el panel de administración). El cambio tarda unos minutos en verse en la web.
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
 - **Textos de la portada o de la guía:** `src/components/site/`.
 - **Colores:** el primer bloque de `src/app/globals.css`.
@@ -64,9 +64,9 @@ referencia/          El diseño original en un solo HTML (solo para consultar)
 Etapa 1 (base):
 
 - [x] Proyecto creado y diseño migrado desde `referencia/unmate.html`
-- [x] SQL de tablas, seguridad y carga inicial escrito (`supabase/`), todavía sin ejecutar
+- [x] Tablas, seguridad y carga inicial ejecutadas en Supabase (`supabase/`)
 - [x] Repositorio subido a GitHub
-- [ ] Proyecto de Supabase creado y catálogo leyendo de la base
+- [x] Proyecto de Supabase creado y catálogo leyendo de la base
 - [ ] Panel de administración con login
 - [ ] Fotos y videos en Storage
 

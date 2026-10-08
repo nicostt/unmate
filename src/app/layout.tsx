@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Outfit } from "next/font/google";
+import Script from "next/script";
 import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -39,10 +40,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning: el script de tema cambia <html> antes de que
     // React arranque, y sin esto React avisaría de esa diferencia.
     <html lang="es-AR" className={`${outfit.variable} ${figtree.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-      </head>
-      <body>{children}</body>
+      <body>
+        <Script id="tema" strategy="beforeInteractive">
+          {THEME_SCRIPT}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }
