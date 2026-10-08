@@ -11,7 +11,7 @@ export function ChooseGuide() {
       <div className="feature">
         <div className="feature-head">
           <p className="eyebrow">Guía rápida</p>
-          <h2>¿Cuál es tu mate?</h2>
+          <h2>¿Cuál es tu tipo de mate?</h2>
           <p className="lead">
             Cada tipo tiene su forma, su material y su manera de tomar. Pasá por los nombres y encontrá el tuyo.
           </p>

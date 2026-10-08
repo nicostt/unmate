@@ -58,7 +58,8 @@ section[id]{scroll-margin-top:96px}
 .badge{width:50px;height:50px;flex:none;background:var(--fg);-webkit-mask:url("/logo-mark.png") center/contain no-repeat;mask:url("/logo-mark.png") center/contain no-repeat}
 .brand-name{font:700 1.55rem var(--f-display);letter-spacing:-.03em;line-height:1}
 .brand-name b{font-weight:700;color:var(--accent)}
-.nav{display:flex;gap:4px 22px;order:3;width:100%;overflow-x:auto;padding-bottom:2px}
+.nav{display:flex;gap:4px 22px;order:3;width:100%;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
 .nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:500;padding-block:6px}
 .nav a:hover{color:var(--fg)}
 .cart-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600}
@@ -69,7 +70,7 @@ section[id]{scroll-margin-top:96px}
 .theme-btn .sun{display:var(--icon-sun)}
 .theme-btn .moon{display:var(--icon-moon)}
 #cart-count{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--btn-bg);color:var(--btn-fg);font-size:.8rem;display:grid;place-items:center;font-variant-numeric:tabular-nums}
-@media(min-width:760px){.nav{order:0;width:auto}.bar{flex-wrap:nowrap}.brand{margin-right:0}.nav{margin-right:auto;margin-left:28px}}
+@media(min-width:1000px){.nav{order:0;width:auto}.bar{flex-wrap:nowrap}.brand{margin-right:0}.nav{margin-right:auto;margin-left:28px}}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,5vw,64px);align-items:center;padding-block:clamp(36px,7vw,84px) clamp(28px,5vw,56px)}
