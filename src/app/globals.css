@@ -137,8 +137,6 @@ section[id]{scroll-margin-top:96px}
 .gallery-arrow:hover{border-color:var(--fg)}
 .gallery-arrow.prev{left:8px}
 .gallery-arrow.next{right:8px}
-/* en pantallas táctiles se desliza con el dedo: las flechas sobran */
-@media(hover:none){.gallery-arrow{display:none}}
 .gallery-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none}
 .gallery-dots span{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.5;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .gallery-dots span.on{opacity:1}
