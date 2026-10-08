@@ -4,28 +4,43 @@ import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 import { weightLabel, weightPrice, type WeightTier } from "@/lib/types";
-import { gramsToKilos, kilosToGrams } from "./types";
 
-// Precio de ejemplo para mostrar cómo quedan los tramos.
+// Cantidades de ejemplo para mostrar cómo quedan los precios.
 const SAMPLE_WEIGHTS = [250, 500, 750, 1000, 2000, 3000];
 
-type Row = { kilos: string; percent: string };
+// Los dos cortes del sistema: menos de 1 kg es "poco", 2 kg o más es "mucho".
+const SMALL_UNDER = 1000;
+const BIG_FROM = 2000;
 
-const toRows = (tiers: WeightTier[]): Row[] =>
-  [...tiers].sort((a, b) => a.min - b.min).map((t) => ({ kilos: gramsToKilos(t.min), percent: String(t.percent) }));
+// Arma los tramos que entiende la tienda a partir de los dos porcentajes.
+function toTiers(extra: number, discount: number): WeightTier[] {
+  return [
+    { min: 0, percent: extra },
+    { min: SMALL_UNDER, percent: 0 },
+    { min: BIG_FROM, percent: -discount },
+  ];
+}
 
-// Precio de la yerba según cuánto se lleve. Cada yerba tiene su precio base
-// por kilo; acá se define cuánto sube o baja ese precio por tramo de
-// cantidad, y vale para todas las yerbas.
-//   "Desde 0 kg: +10"  -> comprando menos de lo que diga el tramo siguiente, 10 % más caro
-//   "Desde 1 kg: 0"    -> precio base
-//   "Desde 2 kg: -8"   -> 8 % más barato
+// "10", "10%" o "" -> número entero de 0 a 90. Otra cosa -> null (inválido).
+function toPercent(text: string): number | null {
+  const clean = text.trim().replace("%", "");
+  if (clean === "") return 0;
+  return /^\d{1,2}$/.test(clean) && Number(clean) <= 90 ? Number(clean) : null;
+}
+
+// Precio de la yerba según cuánto se lleve. Cada yerba tiene su precio por
+// kilo; acá se decide, para todas las yerbas a la vez:
+//   - cuánto MÁS CARO sale el kilo si se lleva menos de 1 kg;
+//   - cuánto MÁS BARATO sale si se llevan 2 kg o más.
+// Entre 1 kg y 2 kg se cobra el precio normal.
 export function YerbaPricing({ samplePrice, onChanged }: { samplePrice: number; onChanged: () => Promise<void> }) {
-  const [rows, setRows] = useState<Row[]>();
+  const [extra, setExtra] = useState<string>();
+  const [discount, setDiscount] = useState("");
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // Lee lo guardado y lo pasa a los dos casilleros.
   useEffect(() => {
     supabase
       .from("settings")
@@ -34,38 +49,27 @@ export function YerbaPricing({ samplePrice, onChanged }: { samplePrice: number; 
       .maybeSingle()
       .then(({ data, error }) => {
         if (error) setError(error.message);
-        setRows(toRows(Array.isArray(data?.value) && data.value.length ? data.value : [{ min: 0, percent: 0 }]));
+        const tiers: WeightTier[] = Array.isArray(data?.value) ? data.value : [];
+        const at = (min: number) => tiers.find((t) => t.min === min)?.percent ?? 0;
+        setExtra(String(Math.max(0, at(0))));
+        setDiscount(String(Math.max(0, -at(BIG_FROM))));
       });
   }, []);
 
-  if (!rows) return <p className="muted">Cargando precios por cantidad…</p>;
+  if (extra === undefined) return <p className="muted">Cargando precios por cantidad…</p>;
 
-  // Convierte lo escrito en tramos; null si hay algo mal cargado.
-  function parse(): WeightTier[] | null {
-    const tiers: WeightTier[] = [];
-    for (const row of rows!) {
-      const min = kilosToGrams(row.kilos) ?? 0;
-      const percent = Number(row.percent.replace(",", ".").replace("%", "") || 0);
-      if (Number.isNaN(min) || !Number.isInteger(percent) || percent <= -100) return null;
-      tiers.push({ min, percent });
-    }
-    return tiers.sort((a, b) => a.min - b.min);
-  }
-
-  const tiers = parse();
-  const edit = (i: number, patch: Partial<Row>) => setRows(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const extraValue = toPercent(extra);
+  const discountValue = toPercent(discount);
+  const tiers = extraValue !== null && discountValue !== null ? toTiers(extraValue, discountValue) : null;
 
   async function save() {
     setError("");
     setNote("");
-    if (!tiers) return setError("Revisá los números: los kilos van como 1 o 0,5 y el porcentaje como 10 o -8, sin decimales.");
-    if (!tiers.some((t) => t.min === 0))
-      return setError('Tiene que haber un tramo "desde 0 kg", para las compras más chicas.');
+    if (!tiers) return setError("Escribí solo números enteros, por ejemplo 10. Dejá 0 si no querés ajuste.");
     setBusy(true);
     const { error } = await supabase.from("settings").upsert({ key: "yerba_tiers", value: tiers });
     if (error) setError(error.message);
     else {
-      setRows(toRows(tiers));
       setNote("Guardado.");
       await onChanged();
     }
@@ -78,46 +82,37 @@ export function YerbaPricing({ samplePrice, onChanged }: { samplePrice: number; 
         <strong>Precio según la cantidad</strong>
       </header>
       <p className="muted">
-        Cada yerba tiene su precio base por kilo. Acá decidís cuánto cambia ese precio según cuánto lleven, para todas
-        las yerbas. Un número positivo encarece (+10 = 10 % más caro) y uno negativo abarata (-8 = 8 % más barato).
-        Dejá todo en 0 para cobrar siempre proporcional al kilo.
+        Vale para todas las yerbas. Entre 1 kg y 2 kg se cobra el precio normal del kilo. Poné 0 donde no quieras
+        ajuste.
       </p>
 
       <div className="tiers">
-        {rows.map((row, i) => (
-          <div className="tier" key={i}>
-            <label>
-              Desde (kg)
-              <input
-                className="field-in"
-                inputMode="decimal"
-                value={row.kilos}
-                onChange={(e) => edit(i, { kilos: e.target.value })}
-              />
-            </label>
-            <label>
-              Ajuste (%)
-              <input
-                className="field-in"
-                inputMode="numeric"
-                placeholder="0"
-                value={row.percent}
-                onChange={(e) => edit(i, { percent: e.target.value })}
-              />
-            </label>
-            <button
-              className="btn ghost small danger"
-              type="button"
-              disabled={rows.length === 1}
-              onClick={() => setRows(rows.filter((_, j) => j !== i))}
-            >
-              Quitar
-            </button>
-          </div>
-        ))}
-        <button className="btn ghost small" type="button" onClick={() => setRows([...rows, { kilos: "", percent: "" }])}>
-          + Agregar tramo
-        </button>
+        <label className="tier-question">
+          Si lleva <strong>menos de 1 kg</strong>, ¿cuánto más caro?
+          <span>
+            <input
+              className="field-in"
+              inputMode="numeric"
+              placeholder="0"
+              value={extra}
+              onChange={(e) => setExtra(e.target.value)}
+            />
+            % más caro
+          </span>
+        </label>
+        <label className="tier-question">
+          Si lleva <strong>2 kg o más</strong>, ¿cuánto más barato?
+          <span>
+            <input
+              className="field-in"
+              inputMode="numeric"
+              placeholder="0"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+            />
+            % más barato
+          </span>
+        </label>
       </div>
 
       {tiers && (
@@ -141,7 +136,7 @@ export function YerbaPricing({ samplePrice, onChanged }: { samplePrice: number; 
       {error && <p className="admin-error">{error}</p>}
       <div className="admin-submit">
         <button className="btn primary small" type="button" disabled={busy} onClick={save}>
-          {busy ? "Guardando…" : "Guardar precios por cantidad"}
+          {busy ? "Guardando…" : "Guardar"}
         </button>
         {note && <span className="muted">{note}</span>}
       </div>
