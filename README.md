@@ -65,7 +65,7 @@ Etapa 1 (base):
 
 - [x] Proyecto creado y diseño migrado desde `referencia/unmate.html`
 - [x] SQL de tablas, seguridad y carga inicial escrito (`supabase/`), todavía sin ejecutar
-- [ ] Repositorio subido a GitHub
+- [x] Repositorio subido a GitHub
 - [ ] Proyecto de Supabase creado y catálogo leyendo de la base
 - [ ] Panel de administración con login
 - [ ] Fotos y videos en Storage

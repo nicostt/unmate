@@ -21,7 +21,11 @@ Tienda online de mates, bombillas y termos. Hoy es un catálogo con carrito que 
 - 7/10/2026: proyecto Next.js 16 creado (App Router, TypeScript, CSS plano, sin Tailwind). Diseño migrado y verificado. El catálogo se lee de `src/data/catalog.ts` a través de `getCatalog()` en `src/lib/catalog.ts`.
 - Fotos: `getCatalog()` lista las imágenes de `public/productos/<slug>/` (provisorio hasta Storage); `Gallery.tsx` las muestra deslizables en tarjeta y ficha. Botón de modo claro/oscuro en el header (`ThemeToggle.tsx`, `src/lib/theme.ts`).
 - `supabase/migrations/0001_catalogo.sql` y `supabase/seed.sql` están escritos pero nunca se ejecutaron: revisarlos contra el proyecto real al conectarlo.
-- Falta de la etapa 1: primer commit y GitHub, proyecto Supabase, catálogo desde la base, panel admin con login, Storage.
+- GitHub: `https://github.com/nicostt/unmate.git` (rama `main`). Nicolás quiere commit antes de cambios grandes y ver la web en vivo mientras se edita.
+- Panel admin (pedido por Nicolás): modificar stock y precios, agregar y eliminar productos, subir/cambiar fotos, y mostrar u ocultar un producto (columna `is_active`).
+- Hosting (revisado 7/10/2026): Netlify Free permite proyectos comerciales según su anuncio oficial del plan; hoy es por créditos (300/mes) y el sitio se pausa si se agotan. Cloudflare no prohíbe uso comercial en el plan gratis, pero su acuerdo (2.2.1 h) prohíbe procesar o recolectar datos de tarjeta en sitios con servicio gratis (no nos afecta mientras el pago sea el checkout de Mercado Pago) y Next.js ahí corre con un adaptador ("vinext") con compatibilidad parcial. Preferencia: Netlify; confirmar soporte de Next 16 al publicar.
+- Dominios (7/10/2026): `unmate.es` ya está registrado por alguien (DNS en dondominio.com); `unmate.com.ar` no tiene DNS, probablemente libre (confirmar en nic.ar).
+- Falta de la etapa 1: proyecto Supabase, catálogo desde la base, panel admin con login, Storage.
 - Next 16 cambió APIs: consultar `node_modules/next/dist/docs/` antes de escribir código (ver `AGENTS.md`).
 
 ## Seguridad
