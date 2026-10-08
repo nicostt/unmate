@@ -5,6 +5,7 @@ import { getCart, setCart, useCart } from "@/lib/cart-store";
 import { saveCart, track, trackVisit } from "@/lib/track";
 import {
   cartKey,
+  isSoldOut,
   lineTotal,
   maxQty,
   productLabel,
@@ -70,11 +71,14 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     }
   }
 
-  // Si algo guardado en el carrito ya no existe en el catálogo (por ejemplo,
-  // un diseño que se vendió), se ignora.
-  const lines: CartLine[] = Object.entries(cart).flatMap(([key, qty]) => {
+  // Lo guardado en el carrito se ajusta a lo que hay hoy: si algo ya no
+  // existe (por ejemplo, un diseño que se vendió) o se quedó sin stock, se
+  // ignora; y si quedan menos unidades que las guardadas, se usa lo que hay.
+  const lines: CartLine[] = Object.entries(cart).flatMap(([key, saved]) => {
     const found = byKey.get(key);
-    return found ? [{ key, ...found, qty }] : [];
+    if (!found || isSoldOut(found.product)) return [];
+    const qty = Math.min(saved, maxQty(found.product, found.design));
+    return qty > 0 ? [{ key, ...found, qty }] : [];
   });
   const count = lines.reduce((sum, line) => sum + (line.product.byWeight ? 1 : line.qty), 0);
   const total = lines.reduce((sum, line) => sum + lineTotal(line.product, line.qty), 0);
@@ -107,6 +111,10 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     if (!found) return false;
     const { product, design } = found;
     const name = productLabel(product, design);
+    if (isSoldOut(product)) {
+      notify(`"${name}" está agotado`);
+      return false;
+    }
     const plus = amount ?? stepOf(product);
     const max = maxQty(product, design);
     const current = getCart();

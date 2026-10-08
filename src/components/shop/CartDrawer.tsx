@@ -25,7 +25,16 @@ export function CartDrawer() {
     // abren "solas" un rato después del clic. Cuando la base responde con el
     // número de pedido, se la manda a WhatsApp.
     const tab = window.open("", "_blank");
-    const orderNumber = await createOrder(lines, name, note);
+    const result = await createOrder(lines, name, note);
+    // Sin stock: el pedido no se registró. Se cierra la pestaña y se avisa,
+    // en vez de mandar por WhatsApp algo que no se puede vender.
+    if (result && "soldOut" in result) {
+      tab?.close();
+      notify(`"${result.soldOut}" ya no tiene stock suficiente. Ajustá tu carrito para seguir.`);
+      setSending(false);
+      return;
+    }
+    const orderNumber = result?.number ?? null;
     const link = whatsappLink(orderMessage(lines, total, name, note, orderNumber));
     if (tab) {
       tab.opener = null;

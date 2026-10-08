@@ -50,7 +50,11 @@ const NEXT_STEPS: Record<Status, [Status, string][]> = {
     ["cancelado", "Cancelar"],
   ],
   entregado: [],
-  cancelado: [["pendiente", "Reabrir"]],
+  // al reabrir se elige: confirmado vuelve a descontar el stock; pendiente no
+  cancelado: [
+    ["confirmado", "Reabrir confirmado (baja el stock)"],
+    ["pendiente", "Reabrir como pendiente"],
+  ],
 };
 
 async function fetchOrders(): Promise<Order[]> {
@@ -63,6 +67,10 @@ async function fetchOrders(): Promise<Order[]> {
   return data as Order[];
 }
 
+// Nombre con que se muestra un pedido: el que escribió el cliente al
+// pedir ("Pedido Juan"), o su número si no puso nombre.
+const orderName = (order: Order) => `Pedido ${order.customer_name?.trim() || `#${order.id}`}`;
+
 const when = (iso: string) =>
   new Date(iso).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
@@ -71,10 +79,11 @@ const when = (iso: string) =>
 //  - mode "sold" (Vendidos): los entregados, como historial de ventas.
 //
 // Qué pasa al cambiar el estado (lo hace la base, función set_order_status):
-//  - Confirmar: lo pedido queda apartado. El stock se descuenta y los
-//    diseños se ocultan de la tienda.
-//  - Marcar entregado: los diseños se eliminan y el pedido pasa a Vendidos.
-//  - Cancelar: el stock vuelve y los diseños reaparecen.
+//  - Confirmar: BAJA EL STOCK. Se descuentan unidades o gramos, y los
+//    diseños pedidos (piezas únicas) dejan de ofrecerse.
+//  - Marcar entregado: DEFINITIVO. El stock queda descontado, los diseños
+//    se eliminan y el pedido pasa a Vendidos. No se puede volver atrás.
+//  - Cancelar un confirmado: el stock vuelve y los diseños reaparecen.
 export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStockChanged: () => Promise<void> }) {
   const [orders, setOrders] = useState<Order[]>();
   const [filter, setFilter] = useState<Status>("pendiente");
@@ -103,7 +112,12 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
       const warning = designs.length
         ? ` ${designs.length === 1 ? "El diseño pedido se elimina" : "Los diseños pedidos se eliminan"} de la tienda y no se puede deshacer.`
         : "";
-      if (!confirm(`¿Marcar el pedido #${order.id} como entregado? Pasa a Vendidos.${warning}`)) return;
+      if (
+        !confirm(
+          `¿Marcar "${orderName(order)}" como entregado? Es definitivo: pasa a Vendidos y el stock queda descontado.${warning}`,
+        )
+      )
+        return;
       // Al eliminar un diseño se van sus fotos de la tabla. Acá se borran del
       // almacenamiento los otros ángulos; la foto principal se conserva
       // porque es la que queda en el historial de Vendidos.
@@ -121,8 +135,8 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
   async function remove(order: Order) {
     const text =
       mode === "sold"
-        ? `¿Borrar la venta #${order.id} del historial? Deja de contar en las estadísticas.`
-        : `¿Eliminar el pedido #${order.id}? No se puede deshacer.`;
+        ? `¿Borrar "${orderName(order)}" del historial? No devuelve stock y deja de contar en las estadísticas.`
+        : `¿Eliminar "${orderName(order)}"? No se puede deshacer.`;
     if (!confirm(text)) return;
     // las fotos de diseños ya eliminados solo vivían para este historial
     const orphans = order.order_items.filter((i) => i.design_id === null && i.design_photo).map((i) => i.design_photo!);
@@ -171,12 +185,16 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
         {visible.map((order) => (
           <article className="admin-order" key={order.id}>
             <header>
-              <strong>Pedido #{order.id}</strong>
+              <OrderName
+                order={order}
+                disabled={busy}
+                onRename={(name) => run(supabase.from("orders").update({ customer_name: name }).eq("id", order.id))}
+              />
               <span className={`admin-status is-${order.status}`}>{STATUS_LABEL[order.status]}</span>
+              <span className="muted">#{order.id}</span>
               <span className="muted">{when(order.created_at)}</span>
               <strong className="admin-order-total">{money(order.total)}</strong>
             </header>
-            {order.customer_name && <p>{order.customer_name}</p>}
             <ul>
               {order.order_items.map((item) => (
                 <li key={item.id}>
@@ -219,5 +237,53 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
         ))}
       </div>
     </section>
+  );
+}
+
+// Título de un pedido, con un lápiz para cambiarle el nombre.
+function OrderName({
+  order,
+  disabled,
+  onRename,
+}: {
+  order: Order;
+  disabled: boolean;
+  onRename: (name: string | null) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(order.customer_name ?? "");
+
+  if (!editing) {
+    return (
+      <>
+        <strong>{orderName(order)}</strong>
+        <button className="admin-rename" type="button" disabled={disabled} onClick={() => setEditing(true)} title="Cambiar el nombre">
+          ✎ <span className="sr">Cambiar el nombre del pedido</span>
+        </button>
+      </>
+    );
+  }
+
+  return (
+    <form
+      className="admin-rename-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        setEditing(false);
+        onRename(name.trim() || null);
+      }}
+    >
+      <input
+        className="field-in"
+        aria-label="Nombre del pedido"
+        placeholder="Nombre"
+        autoFocus
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <button className="btn ghost small" type="submit">
+        Guardar
+      </button>
+    </form>
   );
 }

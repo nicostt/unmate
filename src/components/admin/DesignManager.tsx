@@ -14,8 +14,8 @@ const PHOTOS_PER_DESIGN = 4;
 // sus fotos. Hay tantos en stock como diseños cargados.
 //
 // Si un cliente pidió un diseño, acá aparece marcado con el número de
-// pedido. Al CONFIRMAR ese pedido el diseño queda reservado (oculto en la
-// tienda) y al marcarlo ENTREGADO se elimina solo. También se puede
+// pedido. Al CONFIRMAR ese pedido el diseño queda apartado (baja del
+// stock y deja de ofrecerse) y al marcarlo ENTREGADO se elimina solo. También se puede
 // eliminar a mano desde acá.
 export function DesignManager({ product, onChanged }: { product: AdminProduct; onChanged: () => Promise<void> }) {
   const designs = designsOf(product);
@@ -85,7 +85,7 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
       <h3>Diseños ({designs.length} en stock)</h3>
       <p className="muted">
         Cada diseño es una pieza única. Subí una foto por cada mate que tengas: se numeran solos. Después podés
-        sumarle hasta tres ángulos más. Al confirmar un pedido el diseño se oculta, y al entregarlo se elimina solo.
+        sumarle hasta tres ángulos más. Al confirmar un pedido su diseño baja del stock, y al entregarlo se elimina solo.
       </p>
 
       {designs.map((design) => (
@@ -93,7 +93,7 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
           <header>
             <strong>Diseño #{design.number}</strong>
             {design.is_hidden ? (
-              <span className="admin-status is-pendiente">Reservado · oculto en la tienda</span>
+              <span className="admin-status is-pendiente">Apartado por un pedido confirmado</span>
             ) : null}
             {requested[design.id]?.length ? (
               <span className="admin-status">Pedido #{requested[design.id].join(", #")}</span>

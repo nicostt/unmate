@@ -9,11 +9,12 @@ import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
 
 // Las tres partes del equipo. `none` es el texto de "no quiero esta parte";
-// el mate no lo tiene porque es obligatorio.
+// el mate no lo tiene porque es obligatorio. `art` es el dibujo que muestra
+// el casillero mientras no se eligió nada.
 const STEPS = [
-  { id: "mate", label: "Mate", category: "mates", none: null },
-  { id: "bombilla", label: "Bombilla", category: "bombillas", none: "Sin bombilla" },
-  { id: "termo", label: "Termo", category: "termos", none: "Sin termo" },
+  { id: "mate", label: "Mate", category: "mates", none: null, art: "camionero" },
+  { id: "bombilla", label: "Bombilla", category: "bombillas", none: "Sin bombilla", art: "loro" },
+  { id: "termo", label: "Termo", category: "termos", none: "Sin termo", art: "termo" },
 ] as const;
 
 type Step = (typeof STEPS)[number];
@@ -93,15 +94,17 @@ export function KitBuilder() {
         </div>
 
         <div className="kit-slots">
-          {STEPS.map((step, i) => {
+          {STEPS.map((step) => {
             const option = chosen(step.id);
             return (
               <button key={step.id} className="kit-slot" type="button" aria-haspopup="dialog" onClick={() => setOpen(step)}>
-                <span className="kit-slot-art">{option ? <OptionArt option={option} /> : <span>{i + 1}</span>}</span>
+                <span className={option ? "kit-slot-art" : "kit-slot-art is-empty"}>
+                  {option ? <OptionArt option={option} /> : <ProductArt shape={step.art} />}
+                </span>
                 <span className="kit-slot-text">
                   <small>{step.label}</small>
                   <strong>{option?.name ?? (step.none ?? "Elegí tu mate")}</strong>
-                  <small>{option ? money(option.price) : "Tocá para elegir"}</small>
+                  <small>{option ? money(option.price) : "Tocá para elegir →"}</small>
                 </span>
               </button>
             );

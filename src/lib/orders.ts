@@ -1,13 +1,20 @@
 import { visitorId } from "./track";
 import type { CartLine } from "./types";
 
-// Registra el pedido en la base y devuelve su número (o null si no se pudo).
-// Se manda solo qué productos, cuánto y qué diseño: los precios los calcula
-// la base (función create_order).
-//
-// Nunca lanza error: si la base no responde, el pedido igual puede seguir
-// por WhatsApp, solo que sin número.
-export async function createOrder(lines: CartLine[], name: string, note: string): Promise<number | null> {
+// Resultado de intentar registrar un pedido:
+//  - { number }  -> quedó registrado con ese número;
+//  - { soldOut } -> NO se registró: ese producto ya no tiene stock suficiente;
+//  - null        -> no se pudo registrar por otro motivo (sin conexión, base
+//                   caída). El pedido igual puede seguir por WhatsApp, sin número.
+export type OrderResult = { number: number } | { soldOut: string } | null;
+
+// Así empieza el mensaje de error de la base cuando falta stock.
+const NO_STOCK = "SIN_STOCK:";
+
+// Registra el pedido en la base. Se manda solo qué productos, cuánto y qué
+// diseño: los precios y el control de stock los hace la base (función
+// create_order). Nunca lanza error.
+export async function createOrder(lines: CartLine[], name: string, note: string): Promise<OrderResult> {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/create_order`, {
       method: "POST",
@@ -27,10 +34,12 @@ export async function createOrder(lines: CartLine[], name: string, note: string)
       }),
       signal: AbortSignal.timeout(6000), // no dejar al cliente esperando
     });
-    if (!response.ok) return null;
-    const data: unknown = await response.json();
-    const number = (data as { number?: unknown } | null)?.number;
-    return typeof number === "number" ? number : null;
+    const data = (await response.json()) as { number?: unknown; message?: unknown } | null;
+    if (!response.ok) {
+      const message = typeof data?.message === "string" ? data.message : "";
+      return message.startsWith(NO_STOCK) ? { soldOut: message.slice(NO_STOCK.length) } : null;
+    }
+    return typeof data?.number === "number" ? { number: data.number } : null;
   } catch {
     return null;
   }

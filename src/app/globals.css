@@ -516,10 +516,30 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .review figcaption{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
 .review-avatar{position:relative;overflow:hidden;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:700 .95rem var(--f-display);flex:none}
 .review-avatar img{object-fit:cover}
-/* lo que dijo el cliente va en otra letra, para que se lea como su voz */
-.review blockquote{margin:0;font:italic 400 1rem/1.5 Georgia,"Times New Roman",serif;color:var(--fg)}
+.review blockquote{margin:0;line-height:1.5}
 .review-photos{display:flex;gap:6px;flex-wrap:wrap}
-.review-photos a{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--surface-2);transition:transform .2s}
+.review-photos a{position:relative;width:104px;height:104px;border-radius:10px;overflow:hidden;background:var(--surface-2);transition:transform .2s}
 .review-photos a:hover{transform:scale(1.05)}
 .review-photos img{object-fit:cover}
 .reviews-more{margin:8px auto 0;display:flex}
+
+/* ---------- armá tu equipo: que se note ---------- */
+.kit{border:2px solid var(--accent);background:linear-gradient(140deg,color-mix(in srgb,var(--accent) 16%,var(--surface)),var(--surface) 55%);box-shadow:0 30px 70px -40px var(--accent)}
+.kit-intro .eyebrow{color:var(--accent)}
+.kit-intro h2{font-size:clamp(2.1rem,4.6vw,3.2rem);line-height:1.05;letter-spacing:-.02em;margin:0}
+.kit-intro .muted{font-size:1.05rem;max-width:44rem}
+.kit-slots{gap:14px}
+.kit-slot{flex-direction:column;align-items:stretch;gap:12px;padding:12px;border-width:2px}
+.kit-slot-art{width:100%;height:auto;aspect-ratio:4/3;border-radius:12px}
+/* casillero todavía vacío: el dibujo de lo que va ahí, en el color de marca */
+.kit-slot-art.is-empty{background:color-mix(in srgb,var(--accent) 12%,var(--surface-2));color:var(--accent)}
+.kit-slot-art.is-empty svg{width:auto;height:82%}
+.kit-slot-text strong{font-size:1.15rem;white-space:normal}
+.kit-slot-text small:last-child{color:var(--accent);font-weight:600}
+@media(max-width:760px){.kit-slot{flex-direction:row;align-items:center}.kit-slot-art{width:96px;flex:none;aspect-ratio:1}}
+
+/* panel: cambiar el nombre de un pedido */
+.admin-rename{background:none;border:0;padding:2px 6px;cursor:pointer;color:var(--muted);font-size:1rem;border-radius:6px}
+.admin-rename:hover{color:var(--accent)}
+.admin-rename-form{display:flex;gap:8px;align-items:center}
+.admin-rename-form .field-in{min-height:38px;padding:.3rem .6rem;width:180px;background:var(--bg)}
