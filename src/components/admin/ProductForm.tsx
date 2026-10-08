@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { normalize } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 import { PhotoManager } from "./PhotoManager";
-import type { AdminCategory, AdminProduct } from "./types";
+import { parsePricing, slugify, type AdminCategory, type AdminProduct } from "./types";
+import { VariantManager } from "./VariantManager";
 
 // Ilustraciones disponibles para cuando un producto no tiene fotos.
 const SHAPES = [
@@ -17,21 +17,8 @@ const SHAPES = [
   ["bombillon", "Bombillón recto"],
   ["bombillon-curvo", "Bombillón curvo"],
   ["termo", "Termo"],
+  ["yerba", "Paquete de yerba"],
 ];
-
-// "Camionero Premium" -> "camionero-premium": el nombre interno, sin tildes ni espacios.
-function slugify(name: string): string {
-  return normalize(name)
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-// "34.900" o "$ 34900" -> 34900. Vacío -> null. Otra cosa -> NaN (inválido).
-function toInt(text: string): number | null {
-  const clean = text.replace(/[\s.$]/g, "");
-  if (clean === "") return null;
-  return /^\d+$/.test(clean) ? Number(clean) : NaN;
-}
 
 const text = (value: string | number | null) => (value === null ? "" : String(value));
 
@@ -78,15 +65,9 @@ export function ProductForm({
     setError("");
     setNote("");
 
-    const price = toInt(f.price);
-    const compare = toInt(f.compare_at_price);
-    const stock = toInt(f.stock);
     if (!f.name.trim()) return setError("Falta el nombre.");
-    if (price === null || Number.isNaN(price)) return setError("El precio tiene que ser un número.");
-    if (Number.isNaN(compare)) return setError('El precio "antes" tiene que ser un número o quedar vacío.');
-    if (compare !== null && compare <= price)
-      return setError('El precio "antes" tiene que ser mayor que el precio actual.');
-    if (Number.isNaN(stock)) return setError("El stock tiene que ser un número o quedar vacío.");
+    const parsed = parsePricing(f.price, f.compare_at_price, f.stock);
+    if (parsed.error) return setError(parsed.error);
 
     const values = {
       name: f.name.trim(),
@@ -94,9 +75,7 @@ export function ProductForm({
       shape: f.shape,
       material: f.material.trim() || null,
       description: f.description.trim() || null,
-      price,
-      compare_at_price: compare,
-      stock,
+      ...parsed.values!,
       is_active: f.is_active,
     };
 
@@ -201,9 +180,12 @@ export function ProductForm({
       </form>
 
       {product ? (
-        <PhotoManager product={product} onChanged={onChanged} />
+        <>
+          <VariantManager product={product} onChanged={onChanged} />
+          <PhotoManager product={product} onChanged={onChanged} />
+        </>
       ) : (
-        <p className="muted">Las fotos se agregan después de crear el producto.</p>
+        <p className="muted">Las presentaciones y las fotos se agregan después de crear el producto.</p>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { money } from "@/lib/format";
 import { orderMessage, whatsappLink } from "@/lib/site";
+import { optionName } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
@@ -38,8 +39,8 @@ export function CartDrawer() {
               </a>
             </div>
           )}
-          {lines.map(({ product, qty }) => (
-            <div className="line" key={product.slug}>
+          {lines.map(({ product, option, qty }) => (
+            <div className="line" key={option.key}>
               <div className="thumb">
                 {product.images.length ? (
                   <Image src={product.images[0]} alt="" fill sizes="64px" />
@@ -48,20 +49,20 @@ export function CartDrawer() {
                 )}
               </div>
               <div className="line-info">
-                <strong>{product.name}</strong>
+                <strong>{optionName(product, option)}</strong>
                 <div className="line-row">
                   <div className="qty">
-                    <button type="button" onClick={() => decrement(product.slug)} aria-label="Quitar una unidad">
+                    <button type="button" onClick={() => decrement(option.key)} aria-label="Quitar una unidad">
                       −
                     </button>
                     <span>{qty}</span>
-                    <button type="button" onClick={() => add(product.slug)} aria-label="Sumar una unidad">
+                    <button type="button" onClick={() => add(option.key)} aria-label="Sumar una unidad">
                       +
                     </button>
                   </div>
-                  <span className="line-price">{money(product.price * qty)}</span>
+                  <span className="line-price">{money(option.price * qty)}</span>
                 </div>
-                <button className="rm" type="button" onClick={() => remove(product.slug)}>
+                <button className="rm" type="button" onClick={() => remove(option.key)}>
                   Quitar
                 </button>
               </div>

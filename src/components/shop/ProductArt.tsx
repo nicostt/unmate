@@ -50,6 +50,17 @@ function Termo() {
   );
 }
 
+function Yerba() {
+  return (
+    <>
+      <path d="M40 34h40l4 70H36z" />
+      <path d="M40 34l6-10h28l6 10" />
+      <path d="M46 24h28" opacity={0.4} />
+      <rect x="47" y="56" width="26" height="22" rx="3" opacity={0.6} />
+    </>
+  );
+}
+
 function Bombilla({ shape }: { shape: Shape }) {
   const bulb = shape === "loro" ? 9 : 13;
   let stem = "M44 98 L80 24 L86 26";
@@ -77,7 +88,15 @@ export function ProductArt({ shape }: { shape: Shape }) {
       aria-hidden="true"
     >
       <path d="M14 92A50 50 0 1 1 106 92" opacity={0.32} />
-      {mate ? <Mate {...mate} /> : shape === "termo" ? <Termo /> : <Bombilla shape={shape} />}
+      {mate ? (
+        <Mate {...mate} />
+      ) : shape === "termo" ? (
+        <Termo />
+      ) : shape === "yerba" ? (
+        <Yerba />
+      ) : (
+        <Bombilla shape={shape} />
+      )}
     </svg>
   );
 }

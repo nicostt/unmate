@@ -25,7 +25,10 @@ Tienda online de mates, bombillas y termos. Hoy es un catálogo con carrito que 
 - Panel admin (pedido por Nicolás): modificar stock y precios, agregar y eliminar productos, subir/cambiar fotos, y mostrar u ocultar un producto (columna `is_active`).
 - Hosting (revisado 7/10/2026): Netlify Free permite proyectos comerciales según su anuncio oficial del plan; hoy es por créditos (300/mes) y el sitio se pausa si se agotan. Cloudflare no prohíbe uso comercial en el plan gratis, pero su acuerdo (2.2.1 h) prohíbe procesar o recolectar datos de tarjeta en sitios con servicio gratis (no nos afecta mientras el pago sea el checkout de Mercado Pago) y Next.js ahí corre con un adaptador ("vinext") con compatibilidad parcial. Preferencia: Netlify; confirmar soporte de Next 16 al publicar.
 - Dominios (7/10/2026): `unmate.es` ya está registrado por alguien (DNS en dondominio.com); `unmate.com.ar` no tiene DNS, probablemente libre (confirmar en nic.ar).
-- Falta de la etapa 1: que Nicolás pruebe el panel con su cuenta; videos de curado (recomendado: YouTube incrustado); reordenar productos desde el panel.
+- Ramas: se trabaja y se sube a `dev`; `main` es lo que publica Netlify (15 créditos por publicación) y solo se actualiza cuando Nicolás pide publicar.
+- Presentaciones (yerba por 500 g / 1 kg): tabla `product_variants` (`supabase/migrations/0002_presentaciones.sql`). En el código cada producto tiene `options` (una sola si no hay presentaciones); el carrito guarda `ProductOption.key`. Categorías editables desde el panel.
+- Netlify: proyecto enlazado al repo por Nicolás; faltan las dos variables `NEXT_PUBLIC_SUPABASE_*` y la primera publicación.
+- Falta de la etapa 1: videos de curado (recomendado: YouTube incrustado); reordenar productos desde el panel.
 - Next 16 cambió APIs: consultar `node_modules/next/dist/docs/` antes de escribir código (ver `AGENTS.md`).
 
 ## Seguridad

@@ -5,17 +5,18 @@ import { useEffect, useState } from "react";
 import { refreshCatalog } from "@/lib/admin-actions";
 import { money } from "@/lib/format";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
+import { CategoryManager } from "./CategoryManager";
 import { ProductForm } from "./ProductForm";
-import { photosOf, type AdminCategory, type AdminProduct } from "./types";
+import { photosOf, variantsOf, type AdminCategory, type AdminProduct } from "./types";
 
 // Trae de la base todo lo que el panel necesita. Con la sesión de admin
 // iniciada llegan también los productos ocultos.
 async function fetchAll() {
   const [categories, products] = await Promise.all([
-    supabase.from("categories").select("id, slug, name").order("sort_order"),
+    supabase.from("categories").select("id, slug, name, sort_order").order("sort_order"),
     supabase
       .from("products")
-      .select("*, product_media(id, kind, path, sort_order)")
+      .select("*, product_media(id, kind, path, sort_order), product_variants(*)")
       .order("sort_order"),
   ]);
   const error = categories.error ?? products.error;
@@ -23,11 +24,11 @@ async function fetchAll() {
   return { categories: categories.data as AdminCategory[], products: products.data as AdminProduct[] };
 }
 
-// Pantalla principal del panel: la lista de productos, o el formulario
-// cuando se está creando o editando uno.
+// Pantalla principal del panel: la lista de productos, el formulario cuando
+// se está creando o editando uno, o la pantalla de categorías.
 export function Panel({ accessToken, email }: { accessToken: string; email: string }) {
   const [data, setData] = useState<{ categories: AdminCategory[]; products: AdminProduct[] }>();
-  const [editing, setEditing] = useState<number | "new" | null>(null);
+  const [editing, setEditing] = useState<number | "new" | "categories" | null>(null);
   const [error, setError] = useState("");
 
   const fail = (e: unknown) => setError(e instanceof Error ? e.message : String(e));
@@ -77,7 +78,9 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
 
       {error && <p className="admin-error">{error}</p>}
 
-      {editing !== null ? (
+      {editing === "categories" ? (
+        <CategoryManager categories={categories} products={products} onBack={() => setEditing(null)} onChanged={changed} />
+      ) : editing !== null ? (
         <ProductForm
           // key: al pasar de "nuevo" al producto recién creado, el formulario arranca de cero
           key={editing}
@@ -97,6 +100,9 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
             <p className="muted">
               {products.length} productos · {products.filter((p) => !p.is_active).length} ocultos
             </p>
+            <button className="btn ghost small" type="button" onClick={() => setEditing("categories")}>
+              Categorías
+            </button>
             <button className="btn primary small" type="button" onClick={() => setEditing("new")}>
               + Agregar producto
             </button>
@@ -140,6 +146,7 @@ function Row({
   const saved = product.stock === null ? "" : String(product.stock);
   const [stock, setStock] = useState(saved);
   const cover = photosOf(product)[0];
+  const variants = variantsOf(product);
 
   // Guarda el stock al salir del casillero, si cambió. Vacío = sin control de stock.
   function saveStock() {
@@ -157,22 +164,30 @@ function Row({
       <div className="admin-name">
         <strong>{product.name}</strong>
         <span className="muted">
-          {category} · {money(product.price)}
+          {category} · {variants.length ? "desde " : ""}
+          {money(product.price)}
           {!product.is_active && " · oculto"}
         </span>
       </div>
-      <label className="admin-stock">
-        Stock
-        <input
-          className="field-in"
-          inputMode="numeric"
-          placeholder="—"
-          value={stock}
-          onChange={(e) => setStock(e.target.value)}
-          onBlur={saveStock}
-          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-        />
-      </label>
+      {variants.length ? (
+        // con presentaciones, el stock se carga en cada una (botón Editar)
+        <span className="admin-stock">
+          {variants.length} {variants.length === 1 ? "presentación" : "presentaciones"}
+        </span>
+      ) : (
+        <label className="admin-stock">
+          Stock
+          <input
+            className="field-in"
+            inputMode="numeric"
+            placeholder="—"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            onBlur={saveStock}
+            onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          />
+        </label>
+      )}
       <div className="admin-actions">
         <button className="btn ghost small" type="button" onClick={onToggle}>
           {product.is_active ? "Ocultar" : "Mostrar"}

@@ -20,11 +20,12 @@ export function KitBuilder() {
   const [bombilla, setBombilla] = useState(() => pick(bombillas, "bombilla-pico-loro"));
   const [termo, setTermo] = useState("");
 
-  const chosen = [mate, bombilla, termo].filter(Boolean);
-  const total = products.filter((p) => chosen.includes(p.slug)).reduce((sum, p) => sum + p.price, 0);
+  // De cada producto elegido se toma su primera opción de compra.
+  const chosen = products.filter((p) => [mate, bombilla, termo].includes(p.slug)).map((p) => p.options[0]);
+  const total = chosen.reduce((sum, option) => sum + option.price, 0);
 
   function addKit() {
-    if (addMany(chosen)) {
+    if (addMany(chosen.map((option) => option.key))) {
       notify("Equipo agregado al carrito");
       openCart();
     } else {
@@ -35,7 +36,7 @@ export function KitBuilder() {
   const options = (list: typeof products) =>
     list.map((p) => (
       <option key={p.slug} value={p.slug}>
-        {p.name} · {money(p.price)}
+        {p.name} · {money(p.options[0].price)}
       </option>
     ));
 

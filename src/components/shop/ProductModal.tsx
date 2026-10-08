@@ -4,19 +4,20 @@ import { whatsappLink } from "@/lib/site";
 import type { Product } from "@/lib/types";
 import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
-import { PriceRow } from "./ProductCard";
+import { AddButton, OptionPicker, PriceRow, useSelectedOption } from "./ProductCard";
 import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
 
 // Ficha de producto: se abre encima del catálogo al tocar una tarjeta.
 export function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const { add, openCart, categories } = useShop();
+  const [option, setOption] = useSelectedOption(product);
   useOverlay(true, onClose);
 
   const categoryName = categories.find((c) => c.slug === product.category)?.name;
 
   function addAndGoToCart() {
-    if (add(product.slug)) {
+    if (add(option.key)) {
       onClose();
       openCart();
     }
@@ -47,7 +48,8 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
         <div className="m-info">
           <p className="eyebrow">{categoryName}</p>
           <h3 id="m-title">{product.name}</h3>
-          <PriceRow product={product} />
+          <OptionPicker product={product} selected={option} onSelect={setOption} />
+          <PriceRow option={option} />
           <p className="muted">
             {product.description ?? "Escribinos y te pasamos fotos, medidas y detalles de este producto."}
           </p>
@@ -62,7 +64,7 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
                 <dd>{product.material}</dd>
               </div>
             )}
-            {product.stock === 1 && (
+            {option.stock === 1 && (
               <div>
                 <dt>Disponibilidad</dt>
                 <dd>Última unidad</dd>
@@ -70,9 +72,7 @@ export function ProductModal({ product, onClose }: { product: Product; onClose: 
             )}
           </dl>
           <div className="m-actions">
-            <button className="btn primary" type="button" onClick={addAndGoToCart}>
-              Agregar al carrito
-            </button>
+            <AddButton option={option} onAdd={addAndGoToCart} />
             <a
               className="btn ghost"
               target="_blank"

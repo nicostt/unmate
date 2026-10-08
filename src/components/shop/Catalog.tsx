@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { normalize } from "@/lib/format";
-import type { Product } from "@/lib/types";
+import { fromPrice, type Product } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
 import { useShop } from "./ShopProvider";
@@ -19,14 +19,17 @@ export function Catalog() {
 
   const categoryName = (slug: string) => categories.find((c) => c.slug === slug)?.name ?? "";
 
+  // una categoría recién creada, todavía sin productos, no se muestra
+  const usedCategories = categories.filter((c) => products.some((p) => p.category === c.slug));
+
   const q = normalize(query.trim());
   const visible: Product[] = products.filter((p) => {
     if (category !== "todos" && p.category !== category) return false;
     if (!q) return true;
     return normalize(`${p.name} ${p.material ?? ""} ${categoryName(p.category)}`).includes(q);
   });
-  if (sort === "asc") visible.sort((a, b) => a.price - b.price);
-  if (sort === "desc") visible.sort((a, b) => b.price - a.price);
+  if (sort === "asc") visible.sort((a, b) => fromPrice(a) - fromPrice(b));
+  if (sort === "desc") visible.sort((a, b) => fromPrice(b) - fromPrice(a));
   if (sort === "az") visible.sort((a, b) => a.name.localeCompare(b.name, "es"));
 
   const openProduct = products.find((p) => p.slug === openSlug);
@@ -42,7 +45,7 @@ export function Catalog() {
 
       <div className="toolbar">
         <div className="chips" role="group" aria-label="Categorías">
-          {[{ slug: "todos", name: "Todo" }, ...categories].map((c) => (
+          {[{ slug: "todos", name: "Todo" }, ...usedCategories].map((c) => (
             <button
               key={c.slug}
               className="chip"
