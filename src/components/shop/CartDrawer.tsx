@@ -3,19 +3,45 @@
 import Image from "next/image";
 import { useState } from "react";
 import { money } from "@/lib/format";
+import { createOrder } from "@/lib/orders";
 import { orderMessage, whatsappLink } from "@/lib/site";
 import { lineTotal, weightLabel } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
 
-// Panel del carrito que entra desde la derecha. El botón final abre WhatsApp
-// con el pedido ya escrito.
+// Panel del carrito que entra desde la derecha. El botón final registra el
+// pedido en la base y abre WhatsApp con el pedido ya escrito.
 export function CartDrawer() {
-  const { lines, total, add, decrement, remove, cartOpen, closeCart } = useShop();
+  const { lines, total, add, decrement, remove, clear, notify, cartOpen, closeCart } = useShop();
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
+  const [sending, setSending] = useState(false);
   useOverlay(cartOpen, closeCart);
+
+  async function send() {
+    setSending(true);
+    // La pestaña se abre ya mismo, vacía: los navegadores bloquean las que se
+    // abren "solas" un rato después del clic. Cuando la base responde con el
+    // número de pedido, se la manda a WhatsApp.
+    const tab = window.open("", "_blank");
+    const orderNumber = await createOrder(lines, name, note);
+    const link = whatsappLink(orderMessage(lines, total, name, note, orderNumber));
+    if (tab) {
+      tab.opener = null;
+      tab.location.href = link;
+    } else {
+      window.location.href = link;
+    }
+    // Si quedó registrado, el carrito ya cumplió. Si no, se deja como está
+    // para que el cliente pueda reintentar.
+    if (orderNumber) {
+      clear();
+      closeCart();
+      notify(`Pedido #${orderNumber} registrado. Terminá de enviarlo por WhatsApp.`);
+    }
+    setSending(false);
+  }
 
   if (!cartOpen) return null;
 
@@ -97,14 +123,9 @@ export function CartDrawer() {
               <span className="muted">Total</span>
               <strong>{money(total)}</strong>
             </div>
-            <a
-              className="btn primary wide"
-              href={whatsappLink(orderMessage(lines, total, name, note))}
-              target="_blank"
-              rel="noopener"
-            >
-              Enviar pedido por WhatsApp
-            </a>
+            <button className="btn primary wide" type="button" disabled={sending} onClick={send}>
+              {sending ? "Preparando el pedido…" : "Enviar pedido por WhatsApp"}
+            </button>
             <p className="fine">
               Se abre WhatsApp con tu pedido ya escrito. El envío y el pago los coordinamos por ahí.
             </p>

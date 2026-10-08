@@ -7,6 +7,7 @@ import { money } from "@/lib/format";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { WEIGHT_CATEGORY } from "@/lib/types";
 import { CategoryManager } from "./CategoryManager";
+import { Orders } from "./Orders";
 import { ProductForm } from "./ProductForm";
 import {
   gramsToKilos,
@@ -36,6 +37,7 @@ async function fetchAll() {
 // producto o de una yerba (nuevo, o el que tiene ese id).
 type View =
   | { screen: "list" }
+  | { screen: "orders" }
   | { screen: "categories" }
   | { screen: "form"; kind: "product" | "yerba"; id: number | null };
 
@@ -91,11 +93,29 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
   const yerbas = products.filter((p) => p.category_id === yerbaCategory?.id);
   const others = products.filter((p) => p.category_id !== yerbaCategory?.id);
 
+  // Mueve un producto un lugar dentro de su lista (-1 arriba, +1 abajo).
+  // Los números de orden de esa lista se reparten de nuevo en la secuencia
+  // nueva, así no cambia cómo se intercalan productos y yerbas en la tienda.
+  async function move(list: AdminProduct[], index: number, by: -1 | 1) {
+    const slots = list.map((p) => p.sort_order);
+    const next = [...list];
+    [next[index], next[index + by]] = [next[index + by], next[index]];
+    setError("");
+    for (const [i, product] of next.entries()) {
+      if (product.sort_order === slots[i]) continue;
+      const { error } = await supabase.from("products").update({ sort_order: slots[i] }).eq("id", product.id);
+      if (error) setError(error.message);
+    }
+    await changed();
+  }
+
   const rows = (list: AdminProduct[], kind: "product" | "yerba") =>
-    list.map((p) => (
+    list.map((p, i) => (
       <Row
         key={p.id}
         product={p}
+        onUp={i > 0 ? () => move(list, i, -1) : undefined}
+        onDown={i < list.length - 1 ? () => move(list, i, 1) : undefined}
         byWeight={kind === "yerba"}
         category={categories.find((c) => c.id === p.category_id)?.name ?? ""}
         onEdit={() => setView({ screen: "form", kind, id: p.id })}
@@ -118,7 +138,30 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
         </button>
       </header>
 
+      {(view.screen === "list" || view.screen === "orders") && (
+        <nav className="chips" aria-label="Secciones del panel">
+          <button
+            className="chip"
+            type="button"
+            aria-pressed={view.screen === "list"}
+            onClick={() => setView({ screen: "list" })}
+          >
+            Productos y yerba
+          </button>
+          <button
+            className="chip"
+            type="button"
+            aria-pressed={view.screen === "orders"}
+            onClick={() => setView({ screen: "orders" })}
+          >
+            Pedidos
+          </button>
+        </nav>
+      )}
+
       {error && <p className="admin-error">{error}</p>}
+
+      {view.screen === "orders" && <Orders onStockChanged={changed} />}
 
       {view.screen === "categories" && (
         <CategoryManager
@@ -192,6 +235,8 @@ function Row({
   product,
   byWeight,
   category,
+  onUp,
+  onDown,
   onEdit,
   onDelete,
   onToggle,
@@ -200,6 +245,8 @@ function Row({
   product: AdminProduct;
   byWeight: boolean;
   category: string;
+  onUp: (() => void) | undefined; // undefined = ya es el primero
+  onDown: (() => void) | undefined; // undefined = ya es el último
   onEdit: () => void;
   onDelete: () => void;
   onToggle: () => void;
@@ -220,6 +267,14 @@ function Row({
 
   return (
     <div className={product.is_active ? "admin-row" : "admin-row is-hidden"}>
+      <div className="admin-move">
+        <button type="button" disabled={!onUp} onClick={onUp} aria-label="Subir en la lista" title="Subir">
+          ↑
+        </button>
+        <button type="button" disabled={!onDown} onClick={onDown} aria-label="Bajar en la lista" title="Bajar">
+          ↓
+        </button>
+      </div>
       <div className="admin-thumb">
         {cover && <Image src={photoUrl(cover.path)} alt="" fill sizes="56px" />}
       </div>

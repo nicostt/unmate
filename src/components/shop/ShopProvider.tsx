@@ -31,6 +31,7 @@ type Shop = {
   addMany: (slugs: string[]) => number; // devuelve cuántos pudo sumar
   decrement: (slug: string) => void;
   remove: (slug: string) => void;
+  clear: () => void; // vaciar el carrito
   cartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -130,6 +131,7 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     addMany,
     decrement,
     remove,
+    clear: () => setCart({}),
     cartOpen,
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),

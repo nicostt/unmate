@@ -298,3 +298,23 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .admin-cat-add label{display:grid;gap:6px;font-size:.92rem;font-weight:500;color:var(--muted)}
 .admin-form-wrap .admin-list{width:100%;max-width:760px}
 @media(max-width:760px){.admin-row.admin-cat{grid-template-columns:1fr}}
+
+/* panel: ordenar productos y pedidos */
+.admin-row{grid-template-columns:32px 56px minmax(0,1fr) 96px auto}
+.admin-move{display:grid;gap:4px}
+.admin-move button{width:32px;height:26px;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer;line-height:1;padding:0}
+.admin-move button:hover:not(:disabled){border-color:var(--fg)}
+.admin-move button:disabled{opacity:.25;cursor:default}
+@media(max-width:760px){.admin-row{grid-template-columns:32px 56px minmax(0,1fr) 84px}}
+.admin-row.admin-cat{grid-template-columns:minmax(0,1fr) auto auto}
+@media(max-width:760px){.admin-row.admin-cat{grid-template-columns:1fr}}
+.admin-order{display:grid;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.admin-order header{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.admin-order-total{margin-left:auto;font:700 1.15rem var(--f-display);font-variant-numeric:tabular-nums}
+.admin-order ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.admin-order li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:4px}
+.admin-order .note{margin:0}
+.admin-order .admin-actions{justify-content:flex-start}
+.admin-status{font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.15rem .5rem;border-radius:4px;border:1px solid var(--line)}
+.admin-status.is-pendiente{background:var(--accent);color:var(--accent-fg);border-color:transparent}
+.admin-status.is-cancelado{color:var(--muted);text-decoration:line-through}

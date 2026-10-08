@@ -14,8 +14,17 @@ export function whatsappLink(text: string): string {
 export const CONSULTA_LINK = whatsappLink("Hola unmate.es! Quiero hacer una consulta.");
 
 // Texto del pedido que se manda por WhatsApp.
-export function orderMessage(lines: CartLine[], total: number, name: string, note: string): string {
-  let t = "Hola unmate.es! Quiero hacer este pedido:\n\n";
+// `orderNumber` es el número con que quedó registrado; null si no se pudo registrar.
+export function orderMessage(
+  lines: CartLine[],
+  total: number,
+  name: string,
+  note: string,
+  orderNumber: number | null,
+): string {
+  let t = orderNumber
+    ? `Hola unmate.es! Quiero hacer este pedido (Pedido #${orderNumber}):\n\n`
+    : "Hola unmate.es! Quiero hacer este pedido:\n\n";
   for (const { product, qty } of lines) {
     t += `• ${lineLabel(product, qty)} — ${money(lineTotal(product, qty))}\n`;
   }
