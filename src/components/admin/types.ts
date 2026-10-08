@@ -7,8 +7,8 @@ export type AdminMedia = { id: number; kind: string; path: string; sort_order: n
 
 export type AdminDesign = { id: number; number: number };
 
-// Recordar: en la yerba (productos de la categoría "yerba"), `price` es el
-// precio del KILO y `stock` está en GRAMOS. En los productos por diseños
+// Recordar: en la yerba suelta (by_weight), `price` es el precio del KILO
+// y `stock` está en GRAMOS. En los productos por diseños
 // (by_design) el stock es la cantidad de diseños cargados. Ver src/lib/types.ts.
 export type AdminProduct = {
   id: number;
@@ -23,6 +23,9 @@ export type AdminProduct = {
   stock: number | null;
   is_active: boolean;
   by_design: boolean;
+  by_weight: boolean; // yerba suelta
+  weight_extra: number; // % más caro el kilo llevando menos de 1 kg
+  weight_discount: number; // % más barato el kilo llevando 2 kg o más
   sort_order: number;
   product_media: AdminMedia[];
   product_designs: AdminDesign[];

@@ -18,13 +18,33 @@ export type Category = {
   name: string;
 };
 
-// Un tramo del precio por cantidad de la yerba: "desde `min` gramos, el
-// precio del kilo cambia un `percent` %". +10 = 10 % más caro; -8 = 8 % más
-// barato. Se cargan en el panel, sección Yerba, y valen para todas las yerbas.
+// Un tramo del precio por cantidad de la yerba suelta: "desde `min` gramos,
+// el precio del kilo cambia un `percent` %". +10 = 10 % más caro; -8 = 8 %
+// más barato.
 export type WeightTier = { min: number; percent: number };
 
+// Cada yerba suelta define dos porcentajes (panel, Editar la yerba):
+//  - extra: cuánto MÁS CARO sale el kilo si se lleva menos de 1 kg;
+//  - discount: cuánto MÁS BARATO sale si se llevan 2 kg o más.
+// Entre 1 kg y 2 kg se cobra el precio normal. Esta función los convierte
+// en tramos. La base de datos usa los mismos cortes (función create_order).
+export function weightTiers(extra: number, discount: number): WeightTier[] {
+  return [
+    { min: 0, percent: extra },
+    { min: 1000, percent: 0 },
+    { min: 2000, percent: -discount },
+  ];
+}
+
 // Una reseña de un cliente, cargada desde el panel.
-export type Review = { id: number; name: string; text: string | null; photos: string[] };
+export type Review = {
+  id: number;
+  name: string;
+  text: string | null;
+  photos: string[];
+  avatar: string | null; // foto chica del cliente, al lado del nombre
+  featured: boolean; // true = se ve siempre; false = aparece al tocar "Ver todas"
+};
 
 // Una pieza única de un tipo de mate: "Imperial de algarrobo · Diseño #2".
 export type Design = {
@@ -39,8 +59,8 @@ export type Design = {
 // Hay tres formas de vender un producto:
 //  - por unidad (bombillas, termos): `price` es el precio de uno y `stock`
 //    son unidades;
-//  - por peso (yerba, byWeight = true): `price` es el precio del KILO y
-//    `stock` son GRAMOS;
+//  - por peso (yerba suelta, byWeight = true): `price` es el precio del
+//    KILO y `stock` son GRAMOS. La yerba en paquete va por unidad;
 //  - por diseño (mates artesanales, byDesign = true): cada unidad es una
 //    pieza distinta que está en `designs`. Todas valen `price`, y hay tantas
 //    en stock como diseños cargados (`stock` no se usa).
@@ -76,8 +96,8 @@ export function cartKey(product: Product, design: Design | null): string {
   return design ? `${product.slug}#${design.id}` : product.slug;
 }
 
-// Todo lo que esté en esta categoría se vende por peso.
-export const WEIGHT_CATEGORY = "yerba";
+// Categoría donde vive la yerba, suelta o en paquete.
+export const YERBA_CATEGORY = "yerba";
 
 // La yerba se vende de a 250 g.
 export const WEIGHT_STEP = 250;

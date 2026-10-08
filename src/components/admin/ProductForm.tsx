@@ -12,6 +12,7 @@ import {
   type AdminCategory,
   type AdminProduct,
 } from "./types";
+import { toPercent, YerbaPricing } from "./YerbaPricing";
 
 // Ilustraciones disponibles para cuando un producto no tiene fotos.
 const SHAPES = [
@@ -26,11 +27,22 @@ const SHAPES = [
   ["termo", "Termo"],
 ];
 
+// Qué se está cargando. Cambia qué campos muestra el formulario:
+//  - "product": un producto común (mate, bombilla, termo...), con todos los campos;
+//  - "yerba":   yerba suelta, por peso: precio del kilo, kilos y ajuste por cantidad;
+//  - "pack":    yerba en paquete, por unidad: precio del paquete y cuántos hay.
+// En "yerba" y "pack" la categoría y el dibujo se ponen solos.
+export type FormKind = "product" | "yerba" | "pack";
+
+const TITLES: Record<FormKind, [string, string]> = {
+  product: ["Producto nuevo", "Crear producto"],
+  yerba: ["Yerba suelta nueva", "Crear yerba"],
+  pack: ["Paquete de yerba nuevo", "Crear paquete"],
+};
+
 const text = (value: string | number | null) => (value === null ? "" : String(value));
 
 // Formulario para crear (product = null) o editar un producto.
-// Con kind = "yerba" es la versión corta: nombre, precio del kilo y kilos
-// disponibles. La categoría y el dibujo se ponen solos.
 export function ProductForm({
   kind,
   product,
@@ -41,7 +53,7 @@ export function ProductForm({
   onSaved,
   onChanged,
 }: {
-  kind: "product" | "yerba";
+  kind: FormKind;
   product: AdminProduct | null;
   categories: AdminCategory[];
   yerbaCategoryId: number | undefined;
@@ -50,7 +62,8 @@ export function ProductForm({
   onSaved: (id: number) => Promise<void>;
   onChanged: () => Promise<void>;
 }) {
-  const yerba = kind === "yerba";
+  const loose = kind === "yerba"; // yerba suelta
+  const common = kind === "product";
   const [f, setF] = useState({
     name: product?.name ?? "",
     category_id: String(product?.category_id ?? categories[0]?.id ?? ""),
@@ -59,10 +72,12 @@ export function ProductForm({
     description: product?.description ?? "",
     price: text(product?.price ?? null),
     compare_at_price: text(product?.compare_at_price ?? null),
-    // la yerba se carga en kilos, aunque en la base se guarden gramos
-    stock: yerba ? gramsToKilos(product?.stock ?? null) : text(product?.stock ?? null),
+    // la yerba suelta se carga en kilos, aunque en la base se guarden gramos
+    stock: loose ? gramsToKilos(product?.stock ?? null) : text(product?.stock ?? null),
     is_active: product?.is_active ?? true,
     by_design: product?.by_design ?? false,
+    weight_extra: String(product?.weight_extra ?? 0),
+    weight_discount: String(product?.weight_discount ?? 0),
   });
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
@@ -83,7 +98,9 @@ export function ProductForm({
     const price = toInt(f.price);
     const compare = toInt(f.compare_at_price);
     // en un producto por diseños el stock es la cantidad de diseños: el número no se usa
-    const stock = f.by_design ? null : yerba ? kilosToGrams(f.stock) : toInt(f.stock);
+    const stock = f.by_design ? null : loose ? kilosToGrams(f.stock) : toInt(f.stock);
+    const extra = toPercent(f.weight_extra);
+    const discount = toPercent(f.weight_discount);
     if (!f.name.trim()) return setError("Falta el nombre.");
     if (price === null || Number.isNaN(price)) return setError("El precio tiene que ser un número.");
     if (Number.isNaN(compare)) return setError('El precio "antes" tiene que ser un número o quedar vacío.');
@@ -91,21 +108,29 @@ export function ProductForm({
       return setError('El precio "antes" tiene que ser mayor que el precio actual.');
     if (Number.isNaN(stock))
       return setError(
-        yerba ? "Los kilos tienen que ser un número (por ejemplo 12,5) o quedar vacío." : "El stock tiene que ser un número o quedar vacío.",
+        loose
+          ? "Los kilos tienen que ser un número (por ejemplo 12,5) o quedar vacío."
+          : "El stock tiene que ser un número o quedar vacío.",
       );
-    if (yerba && !yerbaCategoryId) return setError("No se encontró la categoría Yerba. Volvé a la lista y probá de nuevo.");
+    if (loose && (extra === null || discount === null))
+      return setError("Los porcentajes van como número entero, por ejemplo 10. Dejá 0 si no querés ajuste.");
+    if (!common && !yerbaCategoryId)
+      return setError("No se encontró la categoría Yerba. Volvé a la lista y probá de nuevo.");
 
     const values = {
       name: f.name.trim(),
-      category_id: yerba ? yerbaCategoryId : Number(f.category_id),
-      shape: yerba ? "yerba" : f.shape,
+      category_id: common ? Number(f.category_id) : yerbaCategoryId,
+      shape: common ? f.shape : "yerba",
       material: f.material.trim() || null,
       description: f.description.trim() || null,
       price,
       compare_at_price: compare,
       stock,
       is_active: f.is_active,
-      by_design: !yerba && f.by_design,
+      by_design: common && f.by_design,
+      by_weight: loose,
+      weight_extra: loose ? extra : 0,
+      weight_discount: loose ? discount : 0,
     };
 
     setBusy(true);
@@ -139,15 +164,20 @@ export function ProductForm({
       <button className="btn ghost small" type="button" onClick={onBack}>
         ← Volver a la lista
       </button>
-      <h2>{product ? `Editar: ${product.name}` : yerba ? "Yerba nueva" : "Producto nuevo"}</h2>
+      <h2>{product ? `Editar: ${product.name}` : TITLES[kind][0]}</h2>
 
       <form className="admin-form" onSubmit={submit}>
         <label className="wide">
           Nombre
-          <input className="field-in" required placeholder={yerba ? "Yerba Canarias" : undefined} {...field("name")} />
+          <input
+            className="field-in"
+            required
+            placeholder={loose ? "Yerba Canarias" : kind === "pack" ? "Yerba Canarias 1 kg" : undefined}
+            {...field("name")}
+          />
         </label>
 
-        {yerba ? (
+        {loose && (
           <>
             <label>
               Precio del kilo
@@ -157,8 +187,29 @@ export function ProductForm({
               Kilos disponibles <small>(vacío = no se controla)</small>
               <input className="field-in" inputMode="decimal" placeholder="12,5" {...field("stock")} />
             </label>
+            <YerbaPricing
+              pricePerKilo={toInt(f.price) || null}
+              extra={f.weight_extra}
+              discount={f.weight_discount}
+              onChange={(patch) => setF({ ...f, ...patch })}
+            />
           </>
-        ) : (
+        )}
+
+        {kind === "pack" && (
+          <>
+            <label>
+              Precio del paquete
+              <input className="field-in" inputMode="numeric" placeholder="6500" required {...field("price")} />
+            </label>
+            <label>
+              Paquetes en stock <small>(vacío = no se controla)</small>
+              <input className="field-in" inputMode="numeric" placeholder="—" {...field("stock")} />
+            </label>
+          </>
+        )}
+
+        {common && (
           <>
             <label>
               Categoría
@@ -209,7 +260,7 @@ export function ProductForm({
           Descripción <small>(opcional)</small>
           <textarea className="field-in" rows={3} {...field("description")} />
         </label>
-        {!yerba && (
+        {common && (
           <label className="admin-check wide">
             <input
               type="checkbox"
@@ -233,16 +284,14 @@ export function ProductForm({
         {error && <p className="admin-error wide">{error}</p>}
         <div className="admin-submit wide">
           <button className="btn primary" type="submit" disabled={busy}>
-            {busy ? "Guardando…" : product ? "Guardar cambios" : yerba ? "Crear yerba" : "Crear producto"}
+            {busy ? "Guardando…" : product ? "Guardar cambios" : TITLES[kind][1]}
           </button>
           {note && <span className="muted">{note}</span>}
         </div>
       </form>
 
       {!product ? (
-        <p className="muted">
-          Las fotos{yerba ? "" : " y los diseños"} se agregan después de crear {yerba ? "la yerba" : "el producto"}.
-        </p>
+        <p className="muted">Las fotos{common ? " y los diseños" : ""} se agregan después de crearlo.</p>
       ) : product.by_design ? (
         <DesignManager product={product} onChanged={onChanged} />
       ) : (

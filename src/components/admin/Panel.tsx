@@ -5,13 +5,12 @@ import { useEffect, useState } from "react";
 import { refreshCatalog } from "@/lib/admin-actions";
 import { money } from "@/lib/format";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
-import { WEIGHT_CATEGORY } from "@/lib/types";
+import { YERBA_CATEGORY } from "@/lib/types";
 import { CategoryManager } from "./CategoryManager";
 import { Orders } from "./Orders";
 import { ReviewsAdmin } from "./ReviewsAdmin";
 import { Stats } from "./Stats";
-import { YerbaPricing } from "./YerbaPricing";
-import { ProductForm } from "./ProductForm";
+import { ProductForm, type FormKind } from "./ProductForm";
 import {
   coverOf,
   gramsToKilos,
@@ -45,7 +44,7 @@ type View =
   | { screen: "stats" }
   | { screen: "reviews" }
   | { screen: "categories" }
-  | { screen: "form"; kind: "product" | "yerba"; id: number | null };
+  | { screen: "form"; kind: FormKind; id: number | null };
 
 // Pestañas del panel, en el orden en que se muestran.
 const TABS = [
@@ -93,19 +92,21 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
 
   // La yerba vive en su propia categoría. Si todavía no existe, se crea sola
   // la primera vez que se va a cargar una yerba.
-  async function newYerba() {
-    if (!data?.categories.some((c) => c.slug === WEIGHT_CATEGORY)) {
+  async function newYerba(kind: "yerba" | "pack") {
+    if (!data?.categories.some((c) => c.slug === YERBA_CATEGORY)) {
       const sort_order = Math.max(0, ...(data?.categories.map((c) => c.sort_order) ?? [])) + 1;
-      await run(supabase.from("categories").insert({ slug: WEIGHT_CATEGORY, name: "Yerba", sort_order }));
+      await run(supabase.from("categories").insert({ slug: YERBA_CATEGORY, name: "Yerba", sort_order }));
     }
-    setView({ screen: "form", kind: "yerba", id: null });
+    setView({ screen: "form", kind, id: null });
   }
 
   if (!data) return <p className="admin-msg">{error || "Cargando productos…"}</p>;
   const { categories, products } = data;
 
-  const yerbaCategory = categories.find((c) => c.slug === WEIGHT_CATEGORY);
-  const yerbas = products.filter((p) => p.category_id === yerbaCategory?.id);
+  const yerbaCategory = categories.find((c) => c.slug === YERBA_CATEGORY);
+  const inYerba = products.filter((p) => p.category_id === yerbaCategory?.id);
+  const loose = inYerba.filter((p) => p.by_weight); // yerba suelta, por peso
+  const packs = inYerba.filter((p) => !p.by_weight); // paquetes, por unidad
   const others = products.filter((p) => p.category_id !== yerbaCategory?.id);
 
   // Mueve un producto un lugar dentro de su lista (-1 arriba, +1 abajo).
@@ -124,7 +125,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
     await changed();
   }
 
-  const rows = (list: AdminProduct[], kind: "product" | "yerba") =>
+  const rows = (list: AdminProduct[], kind: FormKind) =>
     list.map((p, i) => (
       <Row
         key={p.id}
@@ -191,10 +192,10 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
           kind={view.kind}
           product={products.find((p) => p.id === view.id) ?? null}
           // la yerba tiene su propia sección: no se ofrece como categoría de un producto común
-          categories={view.kind === "yerba" ? categories : categories.filter((c) => c.id !== yerbaCategory?.id)}
+          categories={categories.filter((c) => c.id !== yerbaCategory?.id)}
           yerbaCategoryId={yerbaCategory?.id}
           nextSortOrder={Math.max(0, ...products.map((p) => p.sort_order)) + 1}
-          onBack={() => setView({ screen: view.kind === "yerba" ? "yerba" : "list" })}
+          onBack={() => setView({ screen: view.kind === "product" ? "list" : "yerba" })}
           onSaved={async (id) => {
             await changed();
             setView({ screen: "form", kind: view.kind, id });
@@ -228,20 +229,35 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
       )}
 
       {view.screen === "yerba" && (
-        <section className="admin-section">
-          <div className="admin-bar">
-            <h2>Yerba</h2>
-            <p className="muted">Se vende por peso, de a 250 g. Cargás el precio del kilo y cuántos kilos hay.</p>
-            <button className="btn primary small" type="button" onClick={newYerba}>
-              + Agregar yerba
-            </button>
-          </div>
-          <div className="admin-list">
-            {yerbas.length ? rows(yerbas, "yerba") : <p className="muted">Todavía no cargaste ninguna yerba.</p>}
-          </div>
-          {/* el ejemplo usa el precio de la primera yerba cargada */}
-          <YerbaPricing samplePrice={yerbas[0]?.price ?? 10000} onChanged={changed} />
-        </section>
+        <>
+          <section className="admin-section">
+            <div className="admin-bar">
+              <h2>Yerba suelta</h2>
+              <p className="muted">
+                Por peso, de a 250 g. En Editar cargás el precio del kilo, los kilos y cuánto cambia según la cantidad.
+              </p>
+              <button className="btn primary small" type="button" onClick={() => newYerba("yerba")}>
+                + Agregar yerba suelta
+              </button>
+            </div>
+            <div className="admin-list">
+              {loose.length ? rows(loose, "yerba") : <p className="muted">Todavía no cargaste yerba suelta.</p>}
+            </div>
+          </section>
+
+          <section className="admin-section">
+            <div className="admin-bar">
+              <h2>Paquetes</h2>
+              <p className="muted">Yerba ya envasada, que se vende por unidad: un paquete de 500 g, de 1 kg, etc.</p>
+              <button className="btn primary small" type="button" onClick={() => newYerba("pack")}>
+                + Agregar paquete
+              </button>
+            </div>
+            <div className="admin-list">
+              {packs.length ? rows(packs, "pack") : <p className="muted">Todavía no cargaste paquetes.</p>}
+            </div>
+          </section>
+        </>
       )}
     </div>
   );

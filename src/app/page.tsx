@@ -3,7 +3,7 @@ import { KitBuilder } from "@/components/shop/KitBuilder";
 import { ShopProvider } from "@/components/shop/ShopProvider";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
-import { Guide } from "@/components/site/Guide";
+import { ChooseGuide, CureGuide } from "@/components/site/Guide";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { Reviews } from "@/components/site/Reviews";
@@ -18,11 +18,13 @@ export default async function Home() {
     <ShopProvider catalog={catalog}>
       <Header />
       <main>
+        {/* El orden de la página se decide acá: cada línea es una sección. */}
         <Hero />
+        <ChooseGuide />
         <Catalog />
         <KitBuilder />
-        <Guide />
         <Reviews reviews={catalog.reviews} />
+        <CureGuide />
         <Contact />
       </main>
       <Footer />

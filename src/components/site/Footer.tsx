@@ -12,7 +12,8 @@ export function Footer() {
         </a>
         <nav aria-label="Pie de página">
           <a href="#catalogo">Catálogo</a>
-          <a href="#guia">Guía del mate</a>
+          <a href="#elegir">Elegí tu mate</a>
+          <a href="#curado">Cómo curarlo</a>
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener">
             Instagram
           </a>

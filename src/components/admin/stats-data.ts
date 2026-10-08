@@ -178,7 +178,7 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
       const product = bySlug.get(item.slug);
       if (!product) continue;
       inCarts.set(product.name, (inCarts.get(product.name) ?? 0) + 1);
-      cartsValue += product.shape === "yerba" ? Math.round((product.price * item.qty) / 1000) : product.price * item.qty;
+      cartsValue += product.by_weight ? Math.round((product.price * item.qty) / 1000) : product.price * item.qty;
     }
 
   return {
