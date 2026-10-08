@@ -229,3 +229,49 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--btn-bg);color:var(--btn-fg);padding:.65rem 1.2rem;border-radius:999px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* panel de administración (/admin) */
+.admin{padding-block:28px 64px;display:grid;gap:20px}
+.admin-msg{display:grid;gap:14px;justify-items:center;padding:96px 16px;text-align:center;color:var(--muted)}
+.admin-error{color:#e0705a;font-weight:500}
+.admin-login{display:grid;gap:16px;width:min(380px,calc(100% - 32px));margin:12vh auto;padding:28px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.admin-login h1{font-size:1.5rem}
+.admin-login label,.admin-form label{display:grid;gap:6px;font-size:.92rem;font-weight:500;color:var(--muted);min-width:0}
+.admin-form small{font-weight:400}
+.admin-head{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:18px}
+.admin-head h1{font-size:1.6rem;margin-right:auto}
+.admin-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.admin-list{display:grid;gap:10px}
+.admin-row{display:grid;grid-template-columns:56px minmax(0,1fr) 96px auto;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.admin-row.is-hidden{opacity:.6}
+.admin-thumb{position:relative;width:56px;height:56px;border-radius:10px;background:var(--surface-2);overflow:hidden}
+.admin-thumb img,.admin-photo-img img{object-fit:cover}
+.admin-name{display:grid;gap:2px;min-width:0}
+.admin-name span{font-size:.9rem}
+.admin-stock{display:grid;gap:4px;font-size:.78rem;color:var(--muted)}
+.admin-stock input{min-height:40px;padding:.4rem .6rem;background:var(--bg)}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn.danger:hover{border-color:#e0705a;color:#e0705a}
+.btn:disabled,.btn.is-busy{opacity:.6;cursor:default}
+@media(max-width:760px){.admin-row{grid-template-columns:56px minmax(0,1fr) 84px}.admin-actions{grid-column:1/-1;justify-content:flex-start}}
+.admin-form-wrap{display:grid;gap:20px;justify-items:start}
+.admin-form-wrap h2{font-size:1.4rem}
+.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:760px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,28px)}
+.admin-form .wide{grid-column:1/-1}
+.admin-form .field-in{background:var(--bg)}
+.admin-form textarea{resize:vertical}
+.admin-form label.admin-check{display:flex;align-items:center;gap:10px;color:var(--fg);cursor:pointer}
+.admin-check input{width:20px;height:20px;accent-color:var(--accent)}
+.admin-submit{display:flex;align-items:center;gap:14px}
+@media(max-width:600px){.admin-form{grid-template-columns:1fr}}
+.admin-photos{display:grid;gap:14px;justify-items:start;width:100%;max-width:760px}
+.admin-photos h3{font-size:1.2rem}
+.admin-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;width:100%}
+.admin-photo{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.admin-photo-img{position:relative;aspect-ratio:1;background:var(--surface-2)}
+.admin-photo-img .off{position:absolute;left:8px;top:8px}
+.admin-photo-actions{display:flex}
+.admin-photo-actions button{flex:1;min-height:38px;background:none;border:0;border-top:1px solid var(--line);cursor:pointer;font-size:.85rem}
+.admin-photo-actions button+button{border-left:1px solid var(--line)}
+.admin-photo-actions button:hover:not(:disabled){background:var(--surface-2)}
+.admin-photo-actions button:disabled{opacity:.35;cursor:default}

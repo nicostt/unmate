@@ -34,9 +34,11 @@ src/
   app/
     layout.tsx       Marco de todas las páginas: fuentes, título, descripción
     page.tsx         La página de inicio: arma las secciones en orden
+    admin/page.tsx   La página del panel de administración
     globals.css      Todos los estilos. Los colores están arriba de todo, en variables
   components/
     site/            Secciones de texto fijo: Header, Hero, Guide, Contact, Footer
+    admin/           El panel: login, lista, formulario y fotos
     shop/            Lo interactivo: catálogo, ficha, carrito, "Armá tu equipo"
   lib/
     catalog.ts       Lee el catálogo de Supabase (y las fotos de public/productos)
@@ -46,15 +48,13 @@ src/
     format.ts        Formato de precios y descuentos
     types.ts         Qué campos tiene un producto y una categoría
 public/logo.webp     El logo
-public/productos/    Una carpeta de fotos por producto
 supabase/            SQL para crear la base: tablas, seguridad y carga inicial
 referencia/          El diseño original en un solo HTML (solo para consultar)
 ```
 
 ## Cambios frecuentes
 
-- **Fotos de un producto:** copiá las imágenes (JPG, PNG o WebP) a `public/productos/<producto>/`. Se muestran todas, en orden de nombre: llamalas `1.jpg`, `2.jpg`, `3.jpg`... y la `1` es la principal. Con más de una, la foto se desliza. Sin fotos, se ve la ilustración.
-- **Precio, stock, nombre o producto nuevo:** en Supabase, Table Editor, tabla `products` (hasta que exista el panel de administración). El cambio tarda unos minutos en verse en la web.
+- **Productos, precios, stock y fotos:** desde el panel, en `/admin` (en tu compu: http://localhost:3000/admin). Entrás con el email y la contraseña del usuario que creaste en Supabase. Los cambios se ven en la tienda al instante.
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
 - **Textos de la portada o de la guía:** `src/components/site/`.
 - **Colores:** el primer bloque de `src/app/globals.css`.
@@ -67,8 +67,9 @@ Etapa 1 (base):
 - [x] Tablas, seguridad y carga inicial ejecutadas en Supabase (`supabase/`)
 - [x] Repositorio subido a GitHub
 - [x] Proyecto de Supabase creado y catálogo leyendo de la base
-- [ ] Panel de administración con login
-- [ ] Fotos y videos en Storage
+- [x] Panel de administración con login (falta probarlo con la cuenta real)
+- [x] Fotos en Storage, subidas desde el panel
+- [ ] Videos de curado
 
 Después: 2) pedidos registrados con estados, 3) pagos con Mercado Pago, 4) envíos y facturación.
 

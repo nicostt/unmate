@@ -19,12 +19,13 @@ Tienda online de mates, bombillas y termos. Hoy es un catálogo con carrito que 
 
 ## Estado (actualizar al avanzar)
 - 7/10/2026: proyecto Next.js 16 creado (App Router, TypeScript, CSS plano, sin Tailwind). Diseño migrado y verificado. Supabase creado por Nicolás y conectado (`.env.local`): `getCatalog()` en `src/lib/catalog.ts` lee `categories` y `products` con "use cache" (tag `catalog`). SQL de `supabase/` ejecutado y verificado: lectura pública OK, escritura anónima rechazada, signup apagado.
-- Fotos: `getCatalog()` lista las imágenes de `public/productos/<slug>/` (provisorio hasta Storage); `Gallery.tsx` las muestra deslizables en tarjeta y ficha. Botón de modo claro/oscuro en el header (`ThemeToggle.tsx`, `src/lib/theme.ts`).
+- Fotos: tabla `product_media` + bucket `productos` de Storage; `Gallery.tsx` las muestra deslizables. Botón de modo claro/oscuro en el header.
+- Panel en `/admin` (`src/components/admin/`): todo del lado del navegador con supabase-js (sesión en localStorage); la seguridad es la RLS. Tras cada cambio llama a la server action `refreshCatalog` (updateTag `catalog`). Claude no puede iniciar sesión (no maneja la contraseña): los flujos con login los prueba Nicolás.
 - GitHub: `https://github.com/nicostt/unmate.git` (rama `main`). Nicolás quiere commit antes de cambios grandes y ver la web en vivo mientras se edita.
 - Panel admin (pedido por Nicolás): modificar stock y precios, agregar y eliminar productos, subir/cambiar fotos, y mostrar u ocultar un producto (columna `is_active`).
 - Hosting (revisado 7/10/2026): Netlify Free permite proyectos comerciales según su anuncio oficial del plan; hoy es por créditos (300/mes) y el sitio se pausa si se agotan. Cloudflare no prohíbe uso comercial en el plan gratis, pero su acuerdo (2.2.1 h) prohíbe procesar o recolectar datos de tarjeta en sitios con servicio gratis (no nos afecta mientras el pago sea el checkout de Mercado Pago) y Next.js ahí corre con un adaptador ("vinext") con compatibilidad parcial. Preferencia: Netlify; confirmar soporte de Next 16 al publicar.
 - Dominios (7/10/2026): `unmate.es` ya está registrado por alguien (DNS en dondominio.com); `unmate.com.ar` no tiene DNS, probablemente libre (confirmar en nic.ar).
-- Falta de la etapa 1: panel admin con login, Storage.
+- Falta de la etapa 1: que Nicolás pruebe el panel con su cuenta; videos de curado (recomendado: YouTube incrustado); reordenar productos desde el panel.
 - Next 16 cambió APIs: consultar `node_modules/next/dist/docs/` antes de escribir código (ver `AGENTS.md`).
 
 ## Seguridad

@@ -1,16 +1,14 @@
-import { existsSync, readdirSync } from "node:fs";
-import path from "node:path";
 import { cacheLife, cacheTag } from "next/cache";
-import { supabase } from "./supabase";
+import { photoUrl, supabase } from "./supabase";
 import type { Catalog, Shape } from "./types";
 
-// Único lugar de donde la web saca el catálogo: las tablas `categories` y
-// `products` de Supabase. Solo llegan los productos visibles (is_active),
-// porque así lo deciden las reglas de seguridad de la base.
+// Único lugar de donde la web saca el catálogo: las tablas `categories`,
+// `products` y `product_media` de Supabase. Solo llegan los productos
+// visibles (is_active), porque así lo deciden las reglas de la base.
 //
 // "use cache" guarda el resultado para no consultar la base en cada visita.
-// Se renueva solo cada pocos minutos: un cambio de precio o de stock tarda
-// como mucho eso en verse en la web.
+// Se renueva solo cada pocos minutos, y al instante cuando se cambia algo
+// desde el panel (ver refreshCatalog en src/lib/admin-actions.ts).
 export async function getCatalog(): Promise<Catalog> {
   "use cache";
   cacheLife("minutes");
@@ -20,7 +18,9 @@ export async function getCatalog(): Promise<Catalog> {
     supabase.from("categories").select("slug, name").order("sort_order"),
     supabase
       .from("products")
-      .select("slug, name, shape, material, description, price, compare_at_price, stock, categories(slug)")
+      .select(
+        "slug, name, shape, material, description, price, compare_at_price, stock, categories(slug), product_media(kind, path, sort_order)",
+      )
       .order("sort_order"),
   ]);
   if (categories.error) throw new Error(`No se pudieron leer las categorías: ${categories.error.message}`);
@@ -39,22 +39,10 @@ export async function getCatalog(): Promise<Catalog> {
       price: p.price,
       compareAtPrice: p.compare_at_price,
       stock: p.stock,
-      images: imagesOf(p.slug),
+      images: p.product_media
+        .filter((m) => m.kind === "image")
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((m) => photoUrl(m.path)),
     })),
   };
-}
-
-// Fotos de un producto: todos los archivos de imagen que haya en
-// public/productos/<slug>/, ordenados por nombre (1.jpg, 2.jpg, 10.jpg...).
-// La primera es la principal. Provisorio hasta que las fotos se suban desde
-// el panel de administración.
-const PHOTOS_DIR = path.join(process.cwd(), "public", "productos");
-
-function imagesOf(slug: string): string[] {
-  const dir = path.join(PHOTOS_DIR, slug);
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir)
-    .filter((file) => /\.(jpe?g|png|webp|avif)$/i.test(file))
-    .sort((a, b) => a.localeCompare(b, "es", { numeric: true }))
-    .map((file) => `/productos/${slug}/${file}`);
 }
