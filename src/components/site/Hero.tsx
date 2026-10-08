@@ -1,20 +1,29 @@
 import { CONSULTA_LINK } from "@/lib/site";
 import { WhatsAppIcon } from "./BrandIcons";
+import { HeroMedia } from "./HeroMedia";
 
 // Portada + los tres pasos de "cómo comprar".
-export function Hero() {
+// La portada ocupa casi toda la pantalla: de fondo van los videos (o fotos,
+// ver src/lib/hero.ts), oscurecidos para que el texto se lea, y el título va
+// centrado encima.
+export function Hero({ media }: { media: string[] }) {
   return (
     <>
-      <section className="wrap hero" id="inicio">
-        <div className="hero-copy" data-reveal>
-          <p className="eyebrow">Mates · Bombillas · Termos</p>
-          <h1>Todo para tu mate de cada día.</h1>
+      <section className="hero-video" id="inicio">
+        <HeroMedia media={media} />
+        <div className="wrap hero-video-copy" data-reveal>
+          <p className="eyebrow">Mates · Bombillas · Yerba · Termos</p>
+          <h1>
+            Todo para tu mate
+            <br />
+            <span>de cada día.</span>
+          </h1>
           <p className="lead">
             Calabaza y algarrobo, bombillas de acero, alpaca y bronce. Elegí lo que te gusta, armá tu pedido y
             cerralo por WhatsApp.
           </p>
           <div className="cta-row">
-            <a className="btn primary" href="#catalogo">
+            <a className="btn accent" href="#catalogo">
               Ver catálogo
             </a>
             <a className="btn wa" href={CONSULTA_LINK} target="_blank" rel="noopener">
@@ -22,14 +31,6 @@ export function Hero() {
               Consultar por WhatsApp
             </a>
           </div>
-        </div>
-        <div className="hero-art" data-reveal>
-          <div className="ring" />
-          <div
-            className="logo-card"
-            role="img"
-            aria-label="Logo de unmate.es: un mate con bombilla dentro de un arco"
-          />
         </div>
       </section>
 

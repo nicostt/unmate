@@ -9,6 +9,7 @@ import { Hero } from "@/components/site/Hero";
 import { Reveal } from "@/components/site/Reveal";
 import { Reviews } from "@/components/site/Reviews";
 import { getCatalog } from "@/lib/catalog";
+import { getHeroMedia } from "@/lib/hero";
 
 // Página de inicio. Se arma en el servidor: busca el catálogo y se lo pasa a
 // ShopProvider, que lo comparte con el carrito y las secciones interactivas.
@@ -20,7 +21,7 @@ export default async function Home() {
       <Header />
       <main>
         {/* El orden de la página se decide acá: cada línea es una sección. */}
-        <Hero />
+        <Hero media={getHeroMedia(catalog.products)} />
         <Catalog />
         <ChooseGuide />
         <KitBuilder />
