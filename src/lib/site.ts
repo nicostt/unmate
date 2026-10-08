@@ -25,8 +25,11 @@ export function orderMessage(
   let t = orderNumber
     ? `Hola unmate.es! Quiero hacer este pedido (Pedido #${orderNumber}):\n\n`
     : "Hola unmate.es! Quiero hacer este pedido:\n\n";
-  for (const { product, qty } of lines) {
-    t += `• ${lineLabel(product, qty)} — ${money(lineTotal(product, qty))}\n`;
+  for (const line of lines) {
+    t += `• ${lineLabel(line)} — ${money(lineTotal(line.product, line.qty))}\n`;
+    // WhatsApp no deja adjuntar una imagen desde un link: va el enlace a la
+    // foto del diseño elegido, para que no haya dudas de cuál es.
+    if (line.design) t += `   Foto: ${line.design.images[0]}\n`;
   }
   t += `\nTotal: ${money(total)}\n`;
   if (name.trim()) t += `\nNombre: ${name.trim()}`;

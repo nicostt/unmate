@@ -1,8 +1,9 @@
+import { visitorId } from "./track";
 import type { CartLine } from "./types";
 
 // Registra el pedido en la base y devuelve su número (o null si no se pudo).
-// Se manda solo qué productos y cuánto: los precios los calcula la base
-// (función create_order, en supabase/migrations/0003_pedidos.sql).
+// Se manda solo qué productos, cuánto y qué diseño: los precios los calcula
+// la base (función create_order).
 //
 // Nunca lanza error: si la base no responde, el pedido igual puede seguir
 // por WhatsApp, solo que sin número.
@@ -15,9 +16,14 @@ export async function createOrder(lines: CartLine[], name: string, note: string)
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        p_items: lines.map((line) => ({ slug: line.product.slug, qty: line.qty })),
+        p_items: lines.map((line) => ({
+          slug: line.product.slug,
+          qty: line.qty,
+          design: line.design?.id ?? null,
+        })),
         p_name: name,
         p_note: note,
+        p_visitor: visitorId(),
       }),
       signal: AbortSignal.timeout(6000), // no dejar al cliente esperando
     });

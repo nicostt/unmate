@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
-import { supabase } from "@/lib/supabase";
+import { photoUrl, supabase } from "@/lib/supabase";
 import { weightLabel } from "@/lib/types";
 
 type Status = "pendiente" | "confirmado" | "entregado" | "cancelado";
@@ -13,6 +14,8 @@ type OrderItem = {
   by_weight: boolean;
   quantity: number; // unidades, o gramos si by_weight
   line_total: number;
+  design_number: number | null; // diseño elegido, si el producto va por diseños
+  design_photo: string | null;
 };
 
 type Order = {
@@ -49,7 +52,7 @@ const NEXT_STEPS: Record<Status, [Status, string][]> = {
 async function fetchOrders(): Promise<Order[]> {
   const { data, error } = await supabase
     .from("orders")
-    .select("*, order_items(id, product_name, by_weight, quantity, line_total)")
+    .select("*, order_items(id, product_name, by_weight, quantity, line_total, design_number, design_photo)")
     .order("id", { ascending: false })
     .limit(200);
   if (error) throw new Error(error.message);
@@ -124,10 +127,16 @@ export function Orders({ onStockChanged }: { onStockChanged: () => Promise<void>
             <ul>
               {order.order_items.map((item) => (
                 <li key={item.id}>
+                  {item.design_photo && (
+                    <a className="admin-thumb" href={photoUrl(item.design_photo)} target="_blank" rel="noopener">
+                      <Image src={photoUrl(item.design_photo)} alt="Foto del diseño elegido" fill sizes="56px" />
+                    </a>
+                  )}
                   <span>
                     {item.by_weight
                       ? `${weightLabel(item.quantity)} de ${item.product_name}`
                       : `${item.quantity} × ${item.product_name}`}
+                    {item.design_number !== null && <strong> · Diseño #{item.design_number}</strong>}
                   </span>
                   <span className="muted">{money(item.line_total)}</span>
                 </li>

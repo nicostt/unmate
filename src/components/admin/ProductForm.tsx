@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { DesignManager } from "./DesignManager";
 import { PhotoManager } from "./PhotoManager";
 import {
   gramsToKilos,
@@ -61,6 +62,7 @@ export function ProductForm({
     // la yerba se carga en kilos, aunque en la base se guarden gramos
     stock: yerba ? gramsToKilos(product?.stock ?? null) : text(product?.stock ?? null),
     is_active: product?.is_active ?? true,
+    by_design: product?.by_design ?? false,
   });
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
@@ -80,7 +82,8 @@ export function ProductForm({
 
     const price = toInt(f.price);
     const compare = toInt(f.compare_at_price);
-    const stock = yerba ? kilosToGrams(f.stock) : toInt(f.stock);
+    // en un producto por diseños el stock es la cantidad de diseños: el número no se usa
+    const stock = f.by_design ? null : yerba ? kilosToGrams(f.stock) : toInt(f.stock);
     if (!f.name.trim()) return setError("Falta el nombre.");
     if (price === null || Number.isNaN(price)) return setError("El precio tiene que ser un número.");
     if (Number.isNaN(compare)) return setError('El precio "antes" tiene que ser un número o quedar vacío.');
@@ -102,6 +105,7 @@ export function ProductForm({
       compare_at_price: compare,
       stock,
       is_active: f.is_active,
+      by_design: !yerba && f.by_design,
     };
 
     setBusy(true);
@@ -182,10 +186,12 @@ export function ProductForm({
               Precio antes <small>(solo si está en oferta)</small>
               <input className="field-in" inputMode="numeric" placeholder="41900" {...field("compare_at_price")} />
             </label>
-            <label>
-              Stock <small>(vacío = no se controla)</small>
-              <input className="field-in" inputMode="numeric" placeholder="—" {...field("stock")} />
-            </label>
+            {!f.by_design && (
+              <label>
+                Stock <small>(vacío = no se controla)</small>
+                <input className="field-in" inputMode="numeric" placeholder="—" {...field("stock")} />
+              </label>
+            )}
             <label>
               Dibujo si no hay fotos
               <select className="field-in" value={f.shape} onChange={(e) => setF({ ...f, shape: e.target.value })}>
@@ -203,6 +209,18 @@ export function ProductForm({
           Descripción <small>(opcional)</small>
           <textarea className="field-in" rows={3} {...field("description")} />
         </label>
+        {!yerba && (
+          <label className="admin-check wide">
+            <input
+              type="checkbox"
+              checked={f.by_design}
+              onChange={(e) => setF({ ...f, by_design: e.target.checked })}
+            />
+            <span>
+              Cada unidad es un diseño distinto <small>(mates artesanales: el cliente elige cuál quiere)</small>
+            </span>
+          </label>
+        )}
         <label className="admin-check wide">
           <input
             type="checkbox"
@@ -221,10 +239,20 @@ export function ProductForm({
         </div>
       </form>
 
-      {product ? (
-        <PhotoManager product={product} onChanged={onChanged} />
+      {!product ? (
+        <p className="muted">
+          Las fotos{yerba ? "" : " y los diseños"} se agregan después de crear {yerba ? "la yerba" : "el producto"}.
+        </p>
+      ) : product.by_design ? (
+        <DesignManager product={product} onChanged={onChanged} />
       ) : (
-        <p className="muted">Las fotos se agregan después de crear {yerba ? "la yerba" : "el producto"}.</p>
+        <section className="admin-photos">
+          <h3>Fotos</h3>
+          <p className="muted">
+            La primera es la principal. Con más de una, en la tienda se deslizan. Se achican solas al subirlas.
+          </p>
+          <PhotoManager product={product} onChanged={onChanged} />
+        </section>
       )}
     </div>
   );

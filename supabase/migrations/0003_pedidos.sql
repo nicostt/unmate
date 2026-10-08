@@ -1,3 +1,7 @@
+-- ¡¡ NO EJECUTAR !! Este archivo quedó reemplazado por
+-- 0003_pedidos_disenos_estadisticas.sql, que trae lo mismo y más.
+-- Nunca se ejecutó en la base. Se puede borrar.
+--
 -- unmate.es · Etapa 2: pedidos registrados con número y estado.
 -- Se ejecuta una sola vez en Supabase (SQL Editor).
 

@@ -1,15 +1,19 @@
 "use client";
 
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { getCart, setCart, useCart } from "@/lib/cart-store";
+import { saveCart, track, trackVisit } from "@/lib/track";
 import {
+  cartKey,
   lineTotal,
   maxQty,
+  productLabel,
   stepOf,
   weightLabel,
   type CartLine,
   type Catalog,
   type Category,
+  type Design,
   type Product,
 } from "@/lib/types";
 import { CartDrawer } from "./CartDrawer";
@@ -18,8 +22,9 @@ import { CartDrawer } from "./CartDrawer";
 // componente de la página, sin tener que pasarlos a mano de uno a otro.
 // Se usa con el hook useShop().
 //
-// El carrito guarda { slug: cantidad }. La cantidad son unidades, o gramos
-// si el producto se vende por peso (ver src/lib/types.ts).
+// El carrito guarda { key: cantidad }. La key es el slug del producto, o
+// "slug#idDeDiseño" si se eligió un diseño (ver cartKey en src/lib/types.ts).
+// La cantidad son unidades, o gramos si el producto se vende por peso.
 
 type Shop = {
   categories: Category[];
@@ -27,10 +32,10 @@ type Shop = {
   lines: CartLine[]; // lo que hay en el carrito, con su cantidad
   count: number; // cuántas cosas hay (cada yerba cuenta como una)
   total: number; // en pesos
-  add: (slug: string, amount?: number) => boolean; // false si no alcanza el stock
-  addMany: (slugs: string[]) => number; // devuelve cuántos pudo sumar
-  decrement: (slug: string) => void;
-  remove: (slug: string) => void;
+  add: (key: string, amount?: number) => boolean; // false si no alcanza el stock
+  addMany: (keys: string[]) => number; // devuelve cuántos pudo sumar
+  decrement: (key: string) => void;
+  remove: (key: string) => void;
   clear: () => void; // vaciar el carrito
   cartOpen: boolean;
   openCart: () => void;
@@ -46,6 +51,8 @@ export function useShop(): Shop {
   return shop;
 }
 
+type Found = { product: Product; design: Design | null };
+
 export function ShopProvider({ catalog, children }: { catalog: Catalog; children: React.ReactNode }) {
   const { categories, products } = catalog;
   const cart = useCart();
@@ -53,15 +60,40 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
   const [toast, setToast] = useState({ text: "", show: false });
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const bySlug = new Map(products.map((p) => [p.slug, p]));
+  // Índice para encontrar producto y diseño a partir de una key del carrito.
+  const byKey = new Map<string, Found>();
+  for (const product of products) {
+    if (product.byDesign) {
+      for (const design of product.designs) byKey.set(cartKey(product, design), { product, design });
+    } else {
+      byKey.set(cartKey(product, null), { product, design: null });
+    }
+  }
 
-  // Si un producto guardado en el carrito ya no existe en el catálogo, se ignora.
-  const lines: CartLine[] = Object.entries(cart).flatMap(([slug, qty]) => {
-    const product = bySlug.get(slug);
-    return product ? [{ product, qty }] : [];
+  // Si algo guardado en el carrito ya no existe en el catálogo (por ejemplo,
+  // un diseño que se vendió), se ignora.
+  const lines: CartLine[] = Object.entries(cart).flatMap(([key, qty]) => {
+    const found = byKey.get(key);
+    return found ? [{ key, ...found, qty }] : [];
   });
   const count = lines.reduce((sum, line) => sum + (line.product.byWeight ? 1 : line.qty), 0);
   const total = lines.reduce((sum, line) => sum + lineTotal(line.product, line.qty), 0);
+
+  // Estadísticas: la visita se anota una vez; el carrito, un rato después de
+  // cada cambio (así no se manda un aviso por cada clic).
+  useEffect(trackVisit, []);
+  const cartSummary = JSON.stringify(
+    lines.map((l) => ({ slug: l.product.slug, qty: l.qty, design: l.design?.id ?? null })),
+  );
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    const timer = setTimeout(() => saveCart(JSON.parse(cartSummary)), 1500);
+    return () => clearTimeout(timer);
+  }, [cartSummary]);
 
   function notify(text: string) {
     setToast({ text, show: true });
@@ -70,54 +102,61 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
   }
 
   // Suma `amount` al carrito: una unidad, o 250 g, si no se indica otra cosa.
-  function add(slug: string, amount?: number): boolean {
-    const product = bySlug.get(slug);
-    if (!product) return false;
+  function add(key: string, amount?: number): boolean {
+    const found = byKey.get(key);
+    if (!found) return false;
+    const { product, design } = found;
+    const name = productLabel(product, design);
     const plus = amount ?? stepOf(product);
+    const max = maxQty(product, design);
     const current = getCart();
-    const qty = current[slug] ?? 0;
-    if (qty + plus > maxQty(product)) {
+    const qty = current[key] ?? 0;
+    if (qty + plus > max) {
       notify(
-        product.byWeight
-          ? `De "${product.name}" quedan ${weightLabel(maxQty(product))}`
-          : product.stock === 1
-            ? `De "${product.name}" queda una sola unidad`
-            : `No queda más stock de "${product.name}"`,
+        design
+          ? `"${name}" ya está en tu carrito: es una pieza única`
+          : product.byWeight
+            ? `De "${name}" quedan ${weightLabel(max)}`
+            : product.stock === 1
+              ? `De "${name}" queda una sola unidad`
+              : `No queda más stock de "${name}"`,
       );
       return false;
     }
-    setCart({ ...current, [slug]: qty + plus });
-    notify(product.byWeight ? `Agregado: ${weightLabel(plus)} de ${product.name}` : `Agregado: ${product.name}`);
+    setCart({ ...current, [key]: qty + plus });
+    notify(product.byWeight ? `Agregado: ${weightLabel(plus)} de ${name}` : `Agregado: ${name}`);
+    track("add", { slug: product.slug, design: design?.id });
     return true;
   }
 
-  function addMany(slugs: string[]): number {
+  function addMany(keys: string[]): number {
     const next = { ...getCart() };
     let added = 0;
-    for (const slug of slugs) {
-      const product = bySlug.get(slug);
-      if (!product) continue;
-      const qty = next[slug] ?? 0;
-      if (qty + stepOf(product) <= maxQty(product)) {
-        next[slug] = qty + stepOf(product);
+    for (const key of keys) {
+      const found = byKey.get(key);
+      if (!found) continue;
+      const qty = next[key] ?? 0;
+      if (qty + stepOf(found.product) <= maxQty(found.product, found.design)) {
+        next[key] = qty + stepOf(found.product);
         added++;
+        track("add", { slug: found.product.slug, design: found.design?.id });
       }
     }
     if (added) setCart(next);
     return added;
   }
 
-  function decrement(slug: string) {
-    const product = bySlug.get(slug);
+  function decrement(key: string) {
+    const found = byKey.get(key);
     const next = { ...getCart() };
-    next[slug] = (next[slug] ?? 0) - (product ? stepOf(product) : 1);
-    if (next[slug] <= 0) delete next[slug];
+    next[key] = (next[key] ?? 0) - (found ? stepOf(found.product) : 1);
+    if (next[key] <= 0) delete next[key];
     setCart(next);
   }
 
-  function remove(slug: string) {
+  function remove(key: string) {
     const next = { ...getCart() };
-    delete next[slug];
+    delete next[key];
     setCart(next);
   }
 

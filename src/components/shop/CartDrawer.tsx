@@ -5,7 +5,7 @@ import { useState } from "react";
 import { money } from "@/lib/format";
 import { createOrder } from "@/lib/orders";
 import { orderMessage, whatsappLink } from "@/lib/site";
-import { lineTotal, weightLabel } from "@/lib/types";
+import { lineTotal, productLabel, weightLabel } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
@@ -65,30 +65,43 @@ export function CartDrawer() {
               </a>
             </div>
           )}
-          {lines.map(({ product, qty }) => (
-            <div className="line" key={product.slug}>
+          {lines.map(({ key, product, design, qty }) => (
+            <div className="line" key={key}>
               <div className="thumb">
-                {product.images.length ? (
-                  <Image src={product.images[0]} alt="" fill sizes="64px" />
+                {(design?.images[0] ?? product.images[0]) ? (
+                  <Image src={design?.images[0] ?? product.images[0]} alt="" fill sizes="64px" />
                 ) : (
                   <ProductArt shape={product.shape} />
                 )}
               </div>
               <div className="line-info">
-                <strong>{product.name}</strong>
+                <strong>{productLabel(product, design)}</strong>
                 <div className="line-row">
-                  <div className="qty">
-                    <button type="button" onClick={() => decrement(product.slug)} aria-label={product.byWeight ? "Quitar 250 gramos" : "Quitar una unidad"}>
-                      −
-                    </button>
-                    <span>{product.byWeight ? weightLabel(qty) : qty}</span>
-                    <button type="button" onClick={() => add(product.slug)} aria-label={product.byWeight ? "Sumar 250 gramos" : "Sumar una unidad"}>
-                      +
-                    </button>
-                  </div>
+                  {design ? (
+                    // un diseño es una pieza única: no hay cantidad que elegir
+                    <span className="muted">Pieza única</span>
+                  ) : (
+                    <div className="qty">
+                      <button
+                        type="button"
+                        onClick={() => decrement(key)}
+                        aria-label={product.byWeight ? "Quitar 250 gramos" : "Quitar una unidad"}
+                      >
+                        −
+                      </button>
+                      <span>{product.byWeight ? weightLabel(qty) : qty}</span>
+                      <button
+                        type="button"
+                        onClick={() => add(key)}
+                        aria-label={product.byWeight ? "Sumar 250 gramos" : "Sumar una unidad"}
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
                   <span className="line-price">{money(lineTotal(product, qty))}</span>
                 </div>
-                <button className="rm" type="button" onClick={() => remove(product.slug)}>
+                <button className="rm" type="button" onClick={() => remove(key)}>
                   Quitar
                 </button>
               </div>

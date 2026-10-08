@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { money } from "@/lib/format";
+import { cartKey, isSoldOut } from "@/lib/types";
 import { useShop } from "./ShopProvider";
 
 // "Armá tu equipo": elegís mate, bombilla y termo y se suman juntos al carrito.
 export function KitBuilder() {
   const { products, addMany, openCart, notify } = useShop();
 
-  const mates = products.filter((p) => p.category === "mates");
-  const bombillas = products.filter((p) => p.category === "bombillas");
-  const termos = products.filter((p) => p.category === "termos");
+  // solo se ofrece lo que hay para vender
+  const available = products.filter((p) => !isSoldOut(p));
+  const mates = available.filter((p) => p.category === "mates");
+  const bombillas = available.filter((p) => p.category === "bombillas");
+  const termos = available.filter((p) => p.category === "termos");
 
   // Combo sugerido de entrada; si esos productos no están, el primero de la lista.
   const pick = (list: typeof products, preferred: string) =>
@@ -20,11 +23,12 @@ export function KitBuilder() {
   const [bombilla, setBombilla] = useState(() => pick(bombillas, "bombilla-pico-loro"));
   const [termo, setTermo] = useState("");
 
-  const chosen = [mate, bombilla, termo].filter(Boolean);
-  const total = products.filter((p) => chosen.includes(p.slug)).reduce((sum, p) => sum + p.price, 0);
+  const chosen = available.filter((p) => [mate, bombilla, termo].includes(p.slug));
+  const total = chosen.reduce((sum, p) => sum + p.price, 0);
 
   function addKit() {
-    if (addMany(chosen)) {
+    // de un mate por diseños va el primero disponible; el cliente lo puede cambiar desde el catálogo
+    if (addMany(chosen.map((p) => cartKey(p, p.designs[0] ?? null)))) {
       notify("Equipo agregado al carrito");
       openCart();
     } else {

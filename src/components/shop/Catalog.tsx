@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { normalize } from "@/lib/format";
-import type { Product } from "@/lib/types";
+import { track } from "@/lib/track";
+import type { Design, Product } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
 import { useShop } from "./ShopProvider";
@@ -15,7 +16,8 @@ export function Catalog() {
   const [category, setCategory] = useState("todos");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("rel");
-  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  // ficha abierta: de qué producto y en qué diseño arrancar
+  const [open, setOpen] = useState<{ slug: string; design: Design | null } | null>(null);
 
   const categoryName = (slug: string) => categories.find((c) => c.slug === slug)?.name ?? "";
 
@@ -32,7 +34,16 @@ export function Catalog() {
   if (sort === "desc") visible.sort((a, b) => b.price - a.price);
   if (sort === "az") visible.sort((a, b) => a.name.localeCompare(b.name, "es"));
 
-  const openProduct = products.find((p) => p.slug === openSlug);
+  const openProduct = products.find((p) => p.slug === open?.slug);
+
+  // Estadísticas: se anota qué busca la gente y cuántos resultados encontró.
+  // Se espera a que deje de escribir para no anotar cada letra.
+  const found = visible.length;
+  useEffect(() => {
+    if (q.length < 3) return;
+    const timer = setTimeout(() => track("search", { detail: q, value: found }), 1500);
+    return () => clearTimeout(timer);
+  }, [q, found]);
 
   return (
     <section className="wrap block" id="catalogo">
@@ -80,7 +91,7 @@ export function Catalog() {
 
       <div className="grid">
         {visible.length ? (
-          visible.map((p) => <ProductCard key={p.slug} product={p} onOpen={() => setOpenSlug(p.slug)} />)
+          visible.map((p) => <ProductCard key={p.slug} product={p} onOpen={(design) => setOpen({ slug: p.slug, design })} />)
         ) : (
           <p className="empty">
             No encontramos productos con esa búsqueda. Probá con otra palabra o escribinos por WhatsApp.
@@ -88,7 +99,9 @@ export function Catalog() {
         )}
       </div>
 
-      {openProduct && <ProductModal product={openProduct} onClose={() => setOpenSlug(null)} />}
+      {openProduct && (
+        <ProductModal product={openProduct} initialDesign={open?.design ?? null} onClose={() => setOpen(null)} />
+      )}
     </section>
   );
 }

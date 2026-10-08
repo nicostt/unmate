@@ -8,11 +8,12 @@ import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { WEIGHT_CATEGORY } from "@/lib/types";
 import { CategoryManager } from "./CategoryManager";
 import { Orders } from "./Orders";
+import { Stats } from "./Stats";
 import { ProductForm } from "./ProductForm";
 import {
+  coverOf,
   gramsToKilos,
   kilosToGrams,
-  photosOf,
   toInt,
   type AdminCategory,
   type AdminProduct,
@@ -25,7 +26,7 @@ async function fetchAll() {
     supabase.from("categories").select("id, slug, name, sort_order").order("sort_order"),
     supabase
       .from("products")
-      .select("*, product_media(id, kind, path, sort_order)")
+      .select("*, product_media(id, kind, path, sort_order, design_id), product_designs(id, number)")
       .order("sort_order"),
   ]);
   const error = categories.error ?? products.error;
@@ -38,6 +39,7 @@ async function fetchAll() {
 type View =
   | { screen: "list" }
   | { screen: "orders" }
+  | { screen: "stats" }
   | { screen: "categories" }
   | { screen: "form"; kind: "product" | "yerba"; id: number | null };
 
@@ -138,7 +140,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
         </button>
       </header>
 
-      {(view.screen === "list" || view.screen === "orders") && (
+      {(view.screen === "list" || view.screen === "orders" || view.screen === "stats") && (
         <nav className="chips" aria-label="Secciones del panel">
           <button
             className="chip"
@@ -156,12 +158,22 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
           >
             Pedidos
           </button>
+          <button
+            className="chip"
+            type="button"
+            aria-pressed={view.screen === "stats"}
+            onClick={() => setView({ screen: "stats" })}
+          >
+            Estadísticas
+          </button>
         </nav>
       )}
 
       {error && <p className="admin-error">{error}</p>}
 
       {view.screen === "orders" && <Orders onStockChanged={changed} />}
+
+      {view.screen === "stats" && <Stats products={products} />}
 
       {view.screen === "categories" && (
         <CategoryManager
@@ -255,7 +267,7 @@ function Row({
   // El casillero muestra unidades, o kilos si es yerba (en la base van gramos).
   const saved = byWeight ? gramsToKilos(product.stock) : product.stock === null ? "" : String(product.stock);
   const [stock, setStock] = useState(saved);
-  const cover = photosOf(product)[0];
+  const cover = coverOf(product);
 
   // Guarda el stock al salir del casillero, si cambió. Vacío = sin control de stock.
   function saveStock() {
@@ -285,18 +297,26 @@ function Row({
           {!product.is_active && " · oculto"}
         </span>
       </div>
-      <label className="admin-stock">
-        {byWeight ? "Kilos" : "Stock"}
-        <input
-          className="field-in"
-          inputMode={byWeight ? "decimal" : "numeric"}
-          placeholder="—"
-          value={stock}
-          onChange={(e) => setStock(e.target.value)}
-          onBlur={saveStock}
-          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-        />
-      </label>
+      {product.by_design ? (
+        // el stock de un producto por diseños es la cantidad de diseños (se cargan en Editar)
+        <span className="admin-stock">
+          Diseños
+          <strong>{product.product_designs.length}</strong>
+        </span>
+      ) : (
+        <label className="admin-stock">
+          {byWeight ? "Kilos" : "Stock"}
+          <input
+            className="field-in"
+            inputMode={byWeight ? "decimal" : "numeric"}
+            placeholder="—"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            onBlur={saveStock}
+            onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          />
+        </label>
+      )}
       <div className="admin-actions">
         <button className="btn ghost small" type="button" onClick={onToggle}>
           {product.is_active ? "Ocultar" : "Mostrar"}
