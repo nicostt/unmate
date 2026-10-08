@@ -27,7 +27,7 @@ Tienda online de mates, bombillas y termos. Hoy es un catálogo con carrito que 
 - Dominios (7/10/2026): `unmate.es` ya está registrado por alguien (DNS en dondominio.com); `unmate.com.ar` no tiene DNS, probablemente libre (confirmar en nic.ar).
 - Ramas: se trabaja y se sube a `dev`; `main` es lo que publica Netlify (15 créditos por publicación) y solo se actualiza cuando Nicolás pide publicar.
 - Presentaciones (yerba por 500 g / 1 kg): tabla `product_variants` (`supabase/migrations/0002_presentaciones.sql`). En el código cada producto tiene `options` (una sola si no hay presentaciones); el carrito guarda `ProductOption.key`. Categorías editables desde el panel.
-- Netlify: proyecto enlazado al repo por Nicolás; faltan las dos variables `NEXT_PUBLIC_SUPABASE_*` y la primera publicación.
+- Netlify: publicado en https://shiny-hamster-7b8446.netlify.app (publica `main` automáticamente). Requiere `netlify.toml` con el plugin `@netlify/plugin-nextjs` declarado: sin eso Netlify no activaba el adaptador y todo daba 404. El estado de una publicación se consulta sin login en `https://api.netlify.com/api/v1/sites/shiny-hamster-7b8446.netlify.app/deploys?per_page=1` (mirar `state` y `plugin_state`). Al 7/10/2026 se usaron 6 publicaciones (90 de 300 créditos del mes).
 - Falta de la etapa 1: videos de curado (recomendado: YouTube incrustado); reordenar productos desde el panel.
 - Next 16 cambió APIs: consultar `node_modules/next/dist/docs/` antes de escribir código (ver `AGENTS.md`).
 
