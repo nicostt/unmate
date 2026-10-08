@@ -14,8 +14,9 @@ const PHOTOS_PER_DESIGN = 4;
 // sus fotos. Hay tantos en stock como diseños cargados.
 //
 // Si un cliente pidió un diseño, acá aparece marcado con el número de
-// pedido. NO se borra solo: lo elimina el admin cuando la venta se concreta,
-// y recién ahí desaparece de la tienda.
+// pedido. Al CONFIRMAR ese pedido el diseño queda reservado (oculto en la
+// tienda) y al marcarlo ENTREGADO se elimina solo. También se puede
+// eliminar a mano desde acá.
 export function DesignManager({ product, onChanged }: { product: AdminProduct; onChanged: () => Promise<void> }) {
   const designs = designsOf(product);
   const [busy, setBusy] = useState(false);
@@ -84,17 +85,18 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
       <h3>Diseños ({designs.length} en stock)</h3>
       <p className="muted">
         Cada diseño es una pieza única. Subí una foto por cada mate que tengas: se numeran solos. Después podés
-        sumarle hasta tres ángulos más. Cuando vendas uno, eliminalo y sale de la tienda.
+        sumarle hasta tres ángulos más. Al confirmar un pedido el diseño se oculta, y al entregarlo se elimina solo.
       </p>
 
       {designs.map((design) => (
         <article className="admin-design" key={design.id}>
           <header>
             <strong>Diseño #{design.number}</strong>
+            {design.is_hidden ? (
+              <span className="admin-status is-pendiente">Reservado · oculto en la tienda</span>
+            ) : null}
             {requested[design.id]?.length ? (
-              <span className="admin-status is-pendiente">
-                Pedido en #{requested[design.id].join(", #")} · ¿ya lo vendiste?
-              </span>
+              <span className="admin-status">Pedido #{requested[design.id].join(", #")}</span>
             ) : null}
             <button className="btn ghost small danger" type="button" disabled={busy} onClick={() => remove(design)}>
               Eliminar diseño

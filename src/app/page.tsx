@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { ChooseGuide, CureGuide } from "@/components/site/Guide";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
+import { Reveal } from "@/components/site/Reveal";
 import { Reviews } from "@/components/site/Reviews";
 import { getCatalog } from "@/lib/catalog";
 
@@ -28,6 +29,7 @@ export default async function Home() {
         <Contact />
       </main>
       <Footer />
+      <Reveal />
     </ShopProvider>
   );
 }

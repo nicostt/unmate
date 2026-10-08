@@ -426,20 +426,6 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .types-art svg{width:78%;height:auto}
 .types-body p{color:var(--muted)}
 
-/* reseñas */
-.reviews{columns:3 280px;column-gap:18px}
-.review{break-inside:avoid;margin:0 0 18px;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
-@media(hover:hover){.review:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 22px 44px -24px color-mix(in srgb,var(--accent) 60%,transparent)}}
-.review-photos{position:relative;aspect-ratio:4/5;background:var(--surface-2)}
-.review-photos>div{position:absolute;inset:0}
-.review-photos.many{display:flex;aspect-ratio:auto;height:260px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:2px}
-.review-photos.many>div{position:relative;inset:auto;flex:0 0 78%;scroll-snap-align:start}
-.review-photos img{object-fit:cover}
-.review blockquote{margin:0;padding:18px 18px 0;font-size:1.02rem;line-height:1.5}
-.review blockquote::before{content:"“";display:block;font:700 2.4rem/0.6 var(--f-display);color:var(--accent);margin-bottom:8px}
-.review figcaption{display:flex;align-items:center;gap:10px;padding:16px 18px 18px;font-weight:600}
-.review-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:700 .95rem var(--f-display);flex:none}
-
 /* panel: recuadro para subir, arrastrar o pegar fotos */
 .dropzone{display:grid;gap:4px;justify-items:center;text-align:center;width:100%;padding:20px 16px;border:2px dashed var(--line);border-radius:14px;cursor:pointer;color:var(--muted);transition:border-color .2s,background-color .2s,color .2s}
 .dropzone strong{color:var(--fg);font-weight:600}
@@ -460,9 +446,6 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 
 /* ---------- secciones destacadas: "¿Cuál es tu mate?" y "Cómo curarlo" ---------- */
 .feature{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(24px,5vw,64px);align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:clamp(24px,5vw,56px);position:relative;overflow:hidden}
-/* resplandor suave del color de marca en una esquina */
-.feature::before{content:"";position:absolute;width:420px;height:420px;right:-140px;top:-180px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%);pointer-events:none}
-.feature>*{position:relative}
 .feature-head{display:grid;gap:14px;justify-items:start;align-content:start}
 .feature-head h2{font-size:clamp(2rem,4.4vw,3.1rem);font-weight:700;line-height:1.05;letter-spacing:-.02em}
 .feature-head .eyebrow{color:var(--accent)}
@@ -476,15 +459,6 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 /* ---------- armá tu equipo: pestañas con fotos ---------- */
 .kit{display:grid;grid-template-columns:1fr;gap:20px}
 .kit-intro{display:grid;gap:8px}
-.kit-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.kit-tab{display:flex;align-items:center;gap:10px;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:transparent;cursor:pointer;min-width:0;transition:border-color .2s,background-color .2s}
-.kit-tab:hover{border-color:var(--fg)}
-.kit-tab[aria-selected="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.kit-tab-n{width:28px;height:28px;flex:none;border-radius:50%;border:1px solid var(--ring);display:grid;place-items:center;font:600 .85rem var(--f-display)}
-.kit-tab[aria-selected="true"] .kit-tab-n{background:var(--accent);color:var(--accent-fg);border-color:transparent}
-.kit-tab span:last-child{display:grid;min-width:0}
-.kit-tab strong{font:600 1rem var(--f-display)}
-.kit-tab small{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kit-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
 .kit-option{display:grid;gap:6px;align-content:start;text-align:left;padding:8px;border:2px solid var(--line);border-radius:14px;background:var(--bg);cursor:pointer;min-width:0;transition:border-color .2s,transform .2s}
 .kit-option:hover{border-color:var(--fg);transform:translateY(-3px)}
@@ -496,20 +470,7 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .kit-option small{color:var(--muted);font-size:.82rem}
 .kit-foot{display:flex;align-items:center;justify-content:space-between;gap:14px 24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
 .kit-foot .kit-total{border:0;padding:0;margin:0;gap:14px}
-@media(max-width:560px){.kit-tabs{grid-template-columns:1fr}}
 
-/* ---------- reseñas: portada + ver todas ---------- */
-.reviews{columns:3 260px;column-gap:16px}
-.review{margin:0 0 16px}
-.review.is-quote{background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
-.review.is-quote blockquote{font:600 1.3rem/1.3 var(--f-display);padding-top:22px}
-.review.is-text blockquote{font-size:.98rem}
-.review-photos{aspect-ratio:4/5}
-.review:nth-child(3n+2) .review-photos:not(.many){aspect-ratio:1}
-.review:nth-child(3n) .review-photos:not(.many){aspect-ratio:3/4}
-.review-avatar{position:relative;overflow:hidden;width:38px;height:38px}
-.review-avatar img{object-fit:cover}
-.reviews-more{margin:8px auto 0;display:flex}
 /* panel: reseñas */
 .admin-avatar{display:flex;align-items:center;gap:12px}
 .admin-avatar .review-avatar{width:56px;height:56px;background:var(--surface-2)}
@@ -520,3 +481,45 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .admin-pricing .tier-question{color:var(--fg);font-weight:400}
 .admin-pricing .tier-question .field-in{background:var(--surface)}
 .admin-pricing .tiers-preview li{background:var(--surface)}
+
+/* ---------- aparecer al bajar (ver src/components/site/Reveal.tsx) ---------- */
+@media(prefers-reduced-motion:no-preference){
+  .reveal [data-reveal]{transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal [data-reveal]:not(.is-in){opacity:0;transform:translateY(34px)}
+}
+
+/* botón del color de marca: para llamados que tienen que verse */
+.btn.accent{background:var(--accent);color:var(--accent-fg)}
+.btn.accent:hover{transform:translateY(-2px);box-shadow:0 12px 26px -14px var(--accent)}
+.feature-head .cta-row{margin-top:4px}
+
+/* ---------- armá tu equipo: tres casilleros + ventana para elegir ---------- */
+.kit-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kit-slot{display:flex;align-items:center;gap:12px;text-align:left;padding:10px;border:1px solid var(--line);border-radius:16px;background:var(--bg);cursor:pointer;min-width:0;transition:border-color .2s,transform .2s,box-shadow .2s}
+.kit-slot:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 26px -16px var(--accent)}
+.kit-slot-art{position:relative;width:76px;height:76px;flex:none;border-radius:11px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;color:var(--fg);font:600 1.3rem var(--f-display)}
+.kit-slot-art img{object-fit:cover}
+.kit-slot-art svg{width:76%;height:auto}
+.kit-slot-text{display:grid;gap:1px;min-width:0}
+.kit-slot-text small{color:var(--muted);font-size:.8rem}
+.kit-slot-text small:first-child{text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;font-weight:600}
+.kit-slot-text strong{font:600 1.02rem var(--f-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:760px){.kit-slots{grid-template-columns:1fr}}
+.modal-card.kit-picker{display:block;width:min(860px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;padding:clamp(18px,3vw,28px)}
+.kit-picker h3{font-size:1.5rem;margin:0 48px 16px 0}
+.kit-picker .kit-options{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+
+/* ---------- reseñas: tarjetas chicas, tipo comentario ---------- */
+.reviews{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;align-items:start}
+.review{margin:0;display:grid;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .25s,border-color .25s}
+@media(hover:hover){.review:hover{transform:translateY(-4px);border-color:var(--accent)}}
+.review figcaption{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
+.review-avatar{position:relative;overflow:hidden;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:700 .95rem var(--f-display);flex:none}
+.review-avatar img{object-fit:cover}
+/* lo que dijo el cliente va en otra letra, para que se lea como su voz */
+.review blockquote{margin:0;font:italic 400 1rem/1.5 Georgia,"Times New Roman",serif;color:var(--fg)}
+.review-photos{display:flex;gap:6px;flex-wrap:wrap}
+.review-photos a{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--surface-2);transition:transform .2s}
+.review-photos a:hover{transform:scale(1.05)}
+.review-photos img{object-fit:cover}
+.reviews-more{margin:8px auto 0;display:flex}

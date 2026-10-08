@@ -4,29 +4,30 @@ import Image from "next/image";
 import { useState } from "react";
 import type { Review } from "@/lib/types";
 
-// Cuántas reseñas se ven de entrada si el admin no marcó ninguna como portada.
-const COVER_COUNT = 3;
+// Cuántas reseñas se ven de entrada, como máximo. Si el admin marcó más que
+// esto "en portada", las que sobran pasan abajo con el resto.
+const COVER_MAX = 5;
 
-// Hasta cuántos caracteres un texto se considera "corto" y se muestra en letra grande.
-const SHORT_TEXT = 90;
+// Cuántas se ven de entrada si el admin no marcó ninguna.
+const COVER_DEFAULT = 3;
 
 // Reseñas de clientes, cargadas desde el panel (pestaña Reseñas).
-// De entrada se ve una portada con las que el admin eligió; el resto aparece
-// al tocar "Ver todas" y se vuelve a guardar con "Ver menos".
-// Las tarjetas se acomodan en columnas de alto libre, y cada una toma forma
-// según lo que tenga: foto arriba, solo una frase en grande, o texto largo.
+// De entrada se ve una portada corta; el resto aparece al tocar "Ver todas"
+// y se vuelve a guardar con "Ver menos".
+// Cada tarjeta se parece a un comentario: quién lo dijo arriba, lo que dijo
+// en una letra distinta, y abajo las fotos que mandó, en miniatura.
 // Si no hay ninguna reseña, la sección directamente no aparece.
 export function Reviews({ reviews }: { reviews: Review[] }) {
   const [expanded, setExpanded] = useState(false);
   if (reviews.length === 0) return null;
 
   const featured = reviews.filter((r) => r.featured);
-  const cover = featured.length ? featured : reviews.slice(0, COVER_COUNT);
+  const cover = featured.length ? featured.slice(0, COVER_MAX) : reviews.slice(0, COVER_DEFAULT);
   const rest = reviews.filter((r) => !cover.includes(r));
   const visible = expanded ? [...cover, ...rest] : cover;
 
   return (
-    <section className="wrap block" id="resenas">
+    <section className="wrap block" id="resenas" data-reveal>
       <div className="sec-head">
         <div>
           <p className="eyebrow">Reseñas</p>
@@ -44,7 +45,12 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
       </div>
 
       {rest.length > 0 && (
-        <button className="btn ghost reviews-more" type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>
+        <button
+          className="btn ghost reviews-more"
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded(!expanded)}
+        >
           {expanded ? "Ver menos" : `Ver todas las reseñas (${reviews.length})`}
         </button>
       )}
@@ -53,28 +59,8 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
 }
 
 function ReviewCard({ review }: { review: Review }) {
-  const hasPhotos = review.photos.length > 0;
-  const short = !!review.text && review.text.length <= SHORT_TEXT;
-  // sin foto, la frase es la protagonista
-  const kind = hasPhotos ? "with-photo" : short ? "is-quote" : "is-text";
-
   return (
-    <figure className={`review ${kind}`}>
-      {hasPhotos && (
-        <div className={review.photos.length > 1 ? "review-photos many" : "review-photos"}>
-          {review.photos.map((src, i) => (
-            <div key={src}>
-              <Image
-                src={src}
-                alt={`Foto que nos mandó ${review.name}${review.photos.length > 1 ? ` (${i + 1})` : ""}`}
-                fill
-                sizes="(max-width: 560px) 90vw, 340px"
-              />
-            </div>
-          ))}
-        </div>
-      )}
-      {review.text && <blockquote>{review.text}</blockquote>}
+    <figure className="review">
       <figcaption>
         {review.avatar ? (
           <span className="review-avatar">
@@ -88,6 +74,22 @@ function ReviewCard({ review }: { review: Review }) {
         )}
         {review.name}
       </figcaption>
+      {review.text && <blockquote>{review.text}</blockquote>}
+      {review.photos.length > 0 && (
+        <div className="review-photos">
+          {review.photos.map((src, i) => (
+            // la miniatura abre la foto completa en otra pestaña
+            <a key={src} href={src} target="_blank" rel="noopener">
+              <Image
+                src={src}
+                alt={`Foto que nos mandó ${review.name}${review.photos.length > 1 ? ` (${i + 1})` : ""}`}
+                fill
+                sizes="96px"
+              />
+            </a>
+          ))}
+        </div>
+      )}
     </figure>
   );
 }

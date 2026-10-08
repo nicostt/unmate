@@ -27,7 +27,7 @@ async function fetchAll() {
     supabase.from("categories").select("id, slug, name, sort_order").order("sort_order"),
     supabase
       .from("products")
-      .select("*, product_media(id, kind, path, sort_order, design_id), product_designs(id, number)")
+      .select("*, product_media(id, kind, path, sort_order, design_id), product_designs(*)")
       .order("sort_order"),
   ]);
   const error = categories.error ?? products.error;
@@ -41,6 +41,7 @@ type View =
   | { screen: "list" }
   | { screen: "yerba" }
   | { screen: "orders" }
+  | { screen: "sold" }
   | { screen: "stats" }
   | { screen: "reviews" }
   | { screen: "categories" }
@@ -51,6 +52,7 @@ const TABS = [
   ["list", "Productos"],
   ["yerba", "Yerba"],
   ["orders", "Pedidos"],
+  ["sold", "Vendidos"],
   ["stats", "Estadísticas"],
   ["reviews", "Reseñas"],
 ] as const;
@@ -172,7 +174,10 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
 
       {error && <p className="admin-error">{error}</p>}
 
-      {view.screen === "orders" && <Orders onStockChanged={changed} />}
+      {/* key: al cambiar de pestaña el listado arranca de nuevo */}
+      {view.screen === "orders" && <Orders key="open" mode="open" onStockChanged={changed} />}
+
+      {view.screen === "sold" && <Orders key="sold" mode="sold" onStockChanged={changed} />}
 
       {view.screen === "stats" && <Stats products={products} />}
 

@@ -7,7 +7,7 @@ import { MateTypes } from "./MateTypes";
 // Qué tipo de mate conviene. La lista interactiva está en MateTypes.tsx.
 export function ChooseGuide() {
   return (
-    <section className="wrap block" id="elegir">
+    <section className="wrap block" id="elegir" data-reveal>
       <div className="feature">
         <div className="feature-head">
           <p className="eyebrow">Guía rápida</p>
@@ -15,9 +15,14 @@ export function ChooseGuide() {
           <p className="lead">
             Cada tipo tiene su forma, su material y su manera de tomar. Pasá por los nombres y encontrá el tuyo.
           </p>
-          <a className="btn primary" href="#catalogo">
-            Ver el catálogo
-          </a>
+          <div className="cta-row">
+            <a className="btn primary" href="#catalogo">
+              Ver el catálogo
+            </a>
+            <a className="btn accent" href="#curado">
+              ¿Querés saber cómo curarlos? →
+            </a>
+          </div>
         </div>
         <MateTypes />
       </div>
@@ -29,7 +34,7 @@ export function ChooseGuide() {
 // PENDIENTE: sumar los videos de curado cuando Nicolás los suba a YouTube.
 export function CureGuide() {
   return (
-    <section className="wrap block" id="curado">
+    <section className="wrap block" id="curado" data-reveal>
       <div className="feature feature-cure">
         <div className="feature-head">
           <p className="eyebrow">Antes del primer mate</p>

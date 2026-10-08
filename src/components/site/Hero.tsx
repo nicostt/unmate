@@ -5,7 +5,7 @@ export function Hero() {
   return (
     <>
       <section className="wrap hero" id="inicio">
-        <div className="hero-copy">
+        <div className="hero-copy" data-reveal>
           <p className="eyebrow">Mates · Bombillas · Termos</p>
           <h1>Todo para tu mate de cada día.</h1>
           <p className="lead">
@@ -21,7 +21,7 @@ export function Hero() {
             </a>
           </div>
         </div>
-        <div className="hero-art">
+        <div className="hero-art" data-reveal>
           <div className="ring" />
           <div
             className="logo-card"
@@ -31,7 +31,7 @@ export function Hero() {
         </div>
       </section>
 
-      <section className="wrap steps" aria-label="Cómo comprar">
+      <section className="wrap steps" aria-label="Cómo comprar" data-reveal>
         <ol>
           <li tabIndex={0}>
             <strong>Elegí tus productos</strong>

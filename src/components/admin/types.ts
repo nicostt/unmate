@@ -5,7 +5,8 @@ export type AdminCategory = { id: number; slug: string; name: string; sort_order
 // design_id: a qué diseño pertenece la foto; null = foto general del producto.
 export type AdminMedia = { id: number; kind: string; path: string; sort_order: number; design_id: number | null };
 
-export type AdminDesign = { id: number; number: number };
+// is_hidden: reservado por un pedido confirmado; no se ve en la tienda.
+export type AdminDesign = { id: number; number: number; is_hidden?: boolean };
 
 // Recordar: en la yerba suelta (by_weight), `price` es el precio del KILO
 // y `stock` está en GRAMOS. En los productos por diseños

@@ -2,7 +2,7 @@ import { CONSULTA_LINK, INSTAGRAM_URL, WHATSAPP_DISPLAY } from "@/lib/site";
 
 export function Contact() {
   return (
-    <section className="wrap block" id="contacto">
+    <section className="wrap block" id="contacto" data-reveal>
       <div className="contact">
         <div>
           <p className="eyebrow">Contacto</p>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
-import { photoUrl, supabase } from "@/lib/supabase";
+import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { weightLabel } from "@/lib/types";
 
 type Status = "pendiente" | "confirmado" | "entregado" | "cancelado";
@@ -14,8 +14,9 @@ type OrderItem = {
   by_weight: boolean;
   quantity: number; // unidades, o gramos si by_weight
   line_total: number;
-  design_number: number | null; // diseño elegido, si el producto va por diseños
-  design_photo: string | null;
+  design_id: number | null; // null si no era un diseño, o si el diseño ya se eliminó
+  design_number: number | null; // copia del número de diseño elegido
+  design_photo: string | null; // copia de la ubicación de su foto principal
 };
 
 type Order = {
@@ -35,6 +36,9 @@ const STATUS_LABEL: Record<Status, string> = {
   cancelado: "Cancelado",
 };
 
+// Estados que se manejan en la pestaña Pedidos. Los entregados viven en Vendidos.
+const OPEN_STATUSES: Status[] = ["pendiente", "confirmado", "cancelado"];
+
 // Qué se puede hacer con un pedido según su estado: [estado nuevo, texto del botón].
 const NEXT_STEPS: Record<Status, [Status, string][]> = {
   pendiente: [
@@ -45,16 +49,16 @@ const NEXT_STEPS: Record<Status, [Status, string][]> = {
     ["entregado", "Marcar entregado"],
     ["cancelado", "Cancelar"],
   ],
-  entregado: [["cancelado", "Cancelar"]],
+  entregado: [],
   cancelado: [["pendiente", "Reabrir"]],
 };
 
 async function fetchOrders(): Promise<Order[]> {
   const { data, error } = await supabase
     .from("orders")
-    .select("*, order_items(id, product_name, by_weight, quantity, line_total, design_number, design_photo)")
+    .select("*, order_items(id, product_name, by_weight, quantity, line_total, design_id, design_number, design_photo)")
     .order("id", { ascending: false })
-    .limit(200);
+    .limit(300);
   if (error) throw new Error(error.message);
   return data as Order[];
 }
@@ -62,12 +66,18 @@ async function fetchOrders(): Promise<Order[]> {
 const when = (iso: string) =>
   new Date(iso).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
-// Pedidos que llegaron desde la tienda. Confirmar un pedido descuenta el
-// stock; cancelarlo (o reabrirlo) lo devuelve. Eso lo hace la base, en la
-// función set_order_status.
-export function Orders({ onStockChanged }: { onStockChanged: () => Promise<void> }) {
+// Pedidos que llegaron desde la tienda. Se usa en dos pestañas del panel:
+//  - mode "open" (Pedidos): los pendientes, confirmados y cancelados;
+//  - mode "sold" (Vendidos): los entregados, como historial de ventas.
+//
+// Qué pasa al cambiar el estado (lo hace la base, función set_order_status):
+//  - Confirmar: lo pedido queda apartado. El stock se descuenta y los
+//    diseños se ocultan de la tienda.
+//  - Marcar entregado: los diseños se eliminan y el pedido pasa a Vendidos.
+//  - Cancelar: el stock vuelve y los diseños reaparecen.
+export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStockChanged: () => Promise<void> }) {
   const [orders, setOrders] = useState<Order[]>();
-  const [filter, setFilter] = useState<Status | "todos">("pendiente");
+  const [filter, setFilter] = useState<Status>("pendiente");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -87,32 +97,75 @@ export function Orders({ onStockChanged }: { onStockChanged: () => Promise<void>
     setBusy(false);
   }
 
+  async function setStatus(order: Order, status: Status) {
+    if (status === "entregado") {
+      const designs = order.order_items.filter((i) => i.design_id !== null);
+      const warning = designs.length
+        ? ` ${designs.length === 1 ? "El diseño pedido se elimina" : "Los diseños pedidos se eliminan"} de la tienda y no se puede deshacer.`
+        : "";
+      if (!confirm(`¿Marcar el pedido #${order.id} como entregado? Pasa a Vendidos.${warning}`)) return;
+      // Al eliminar un diseño se van sus fotos de la tabla. Acá se borran del
+      // almacenamiento los otros ángulos; la foto principal se conserva
+      // porque es la que queda en el historial de Vendidos.
+      const keep = designs.map((i) => i.design_photo);
+      const { data } = await supabase
+        .from("product_media")
+        .select("path")
+        .in("design_id", designs.map((i) => i.design_id));
+      const extras = (data ?? []).map((m) => m.path).filter((path) => !keep.includes(path));
+      if (extras.length) await supabase.storage.from(PHOTOS_BUCKET).remove(extras);
+    }
+    await run(supabase.rpc("set_order_status", { p_order: order.id, p_status: status }));
+  }
+
+  async function remove(order: Order) {
+    const text =
+      mode === "sold"
+        ? `¿Borrar la venta #${order.id} del historial? Deja de contar en las estadísticas.`
+        : `¿Eliminar el pedido #${order.id}? No se puede deshacer.`;
+    if (!confirm(text)) return;
+    // las fotos de diseños ya eliminados solo vivían para este historial
+    const orphans = order.order_items.filter((i) => i.design_id === null && i.design_photo).map((i) => i.design_photo!);
+    if (orphans.length) await supabase.storage.from(PHOTOS_BUCKET).remove(orphans);
+    await run(supabase.from("orders").delete().eq("id", order.id));
+  }
+
   if (!orders) return <p className="admin-msg">{error || "Cargando pedidos…"}</p>;
 
   const count = (status: Status) => orders.filter((o) => o.status === status).length;
-  const visible = filter === "todos" ? orders : orders.filter((o) => o.status === filter);
+  const visible = orders.filter((o) => o.status === (mode === "sold" ? "entregado" : filter));
+  const soldTotal = visible.reduce((sum, o) => sum + o.total, 0);
 
   return (
     <section className="admin-section">
-      <div className="chips" role="group" aria-label="Filtrar pedidos">
-        {(["pendiente", "confirmado", "entregado", "cancelado"] as Status[]).map((status) => (
-          <button
-            key={status}
-            className="chip"
-            type="button"
-            aria-pressed={filter === status}
-            onClick={() => setFilter(status)}
-          >
-            {STATUS_LABEL[status]}s ({count(status)})
-          </button>
-        ))}
-        <button className="chip" type="button" aria-pressed={filter === "todos"} onClick={() => setFilter("todos")}>
-          Todos
-        </button>
-      </div>
+      {mode === "open" ? (
+        <div className="chips" role="group" aria-label="Filtrar pedidos">
+          {OPEN_STATUSES.map((status) => (
+            <button
+              key={status}
+              className="chip"
+              type="button"
+              aria-pressed={filter === status}
+              onClick={() => setFilter(status)}
+            >
+              {STATUS_LABEL[status]}s ({count(status)})
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="admin-bar">
+          <h2>Vendidos</h2>
+          <p className="muted">
+            {visible.length} {visible.length === 1 ? "venta entregada" : "ventas entregadas"} · {money(soldTotal)}. Es tu
+            historial: podés borrar lo que no quieras guardar.
+          </p>
+        </div>
+      )}
 
       {error && <p className="admin-error">{error}</p>}
-      {visible.length === 0 && <p className="muted">No hay pedidos acá.</p>}
+      {visible.length === 0 && (
+        <p className="muted">{mode === "sold" ? "Todavía no marcaste ningún pedido como entregado." : "No hay pedidos acá."}</p>
+      )}
 
       <div className="admin-list">
         {visible.map((order) => (
@@ -150,23 +203,15 @@ export function Orders({ onStockChanged }: { onStockChanged: () => Promise<void>
                   className={status === "cancelado" ? "btn ghost small danger" : "btn ghost small"}
                   type="button"
                   disabled={busy}
-                  onClick={() => run(supabase.rpc("set_order_status", { p_order: order.id, p_status: status }))}
+                  onClick={() => setStatus(order, status)}
                 >
                   {label}
                 </button>
               ))}
-              {/* borrar solo lo que no tiene stock tomado */}
-              {(order.status === "cancelado" || order.status === "pendiente") && (
-                <button
-                  className="btn ghost small danger"
-                  type="button"
-                  disabled={busy}
-                  onClick={() =>
-                    confirm(`¿Eliminar el pedido #${order.id}? No se puede deshacer.`) &&
-                    run(supabase.from("orders").delete().eq("id", order.id))
-                  }
-                >
-                  Eliminar
+              {/* un pedido confirmado tiene cosas apartadas: primero se cancela o se entrega */}
+              {order.status !== "confirmado" && (
+                <button className="btn ghost small danger" type="button" disabled={busy} onClick={() => remove(order)}>
+                  {mode === "sold" ? "Borrar del historial" : "Eliminar"}
                 </button>
               )}
             </div>
