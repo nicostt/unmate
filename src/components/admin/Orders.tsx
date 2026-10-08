@@ -67,9 +67,12 @@ async function fetchOrders(): Promise<Order[]> {
   return data as Order[];
 }
 
-// Nombre con que se muestra un pedido: el que escribió el cliente al
-// pedir ("Pedido Juan"), o su número si no puso nombre.
-const orderName = (order: Order) => `Pedido ${order.customer_name?.trim() || `#${order.id}`}`;
+// Nombre con que se muestra un pedido: "Pedido de Juan" con el nombre que
+// escribió el cliente al pedir, o "Pedido #8" si no puso ninguno.
+const orderName = (order: Order) => {
+  const name = order.customer_name?.trim();
+  return name ? `Pedido de ${name}` : `Pedido #${order.id}`;
+};
 
 const when = (iso: string) =>
   new Date(iso).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });

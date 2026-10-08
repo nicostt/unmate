@@ -24,8 +24,8 @@ export default async function Home() {
         <ChooseGuide />
         <Catalog />
         <KitBuilder />
-        <Reviews reviews={catalog.reviews} />
         <CureGuide />
+        <Reviews reviews={catalog.reviews} />
         <Contact />
       </main>
       <Footer />
