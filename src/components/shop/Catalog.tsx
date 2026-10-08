@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { WhatsAppIcon } from "@/components/site/BrandIcons";
 import { normalize } from "@/lib/format";
 import { whatsappLink } from "@/lib/site";
 import { track } from "@/lib/track";
@@ -10,6 +11,10 @@ import { ProductModal } from "./ProductModal";
 import { useShop } from "./ShopProvider";
 
 type Sort = "rel" | "asc" | "desc" | "az";
+
+// Marca, dentro de los eventos de búsqueda, que la persona tocó el botón de
+// WhatsApp del cartel "¿No encontrás lo que buscabas?".
+const ASKED = -1;
 
 // Catálogo con filtro por categoría, buscador y orden.
 export function Catalog() {
@@ -96,18 +101,22 @@ export function Catalog() {
         ) : (
           <div className="empty">
             <strong>¿No encontrás lo que buscabas?</strong>
-            <p>Escribinos y te ayudamos a encontrar tu mate ideal.</p>
+            <p>Contanos qué tenés en mente y te ayudamos a encontrar tu mate ideal. Respondemos al toque.</p>
             <a
-              className="btn primary"
+              className="btn wa big"
               target="_blank"
               rel="noopener"
+              // Estadísticas: se anota que alguien preguntó por algo que no encontró.
+              // Va como una búsqueda con valor -1 (ver stats-data.ts).
+              onClick={() => track("search", { detail: q || "(sin texto)", value: ASKED })}
               href={whatsappLink(
                 query.trim()
                   ? `Hola unmate.es! Estoy buscando "${query.trim()}" y no lo encontré en la tienda. ¿Me ayudan?`
                   : "Hola unmate.es! No encontré lo que buscaba en la tienda. ¿Me ayudan?",
               )}
             >
-              Hablar por WhatsApp
+              <WhatsAppIcon />
+              Preguntanos por WhatsApp
             </a>
           </div>
         )}

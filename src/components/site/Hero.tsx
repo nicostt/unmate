@@ -1,4 +1,5 @@
 import { CONSULTA_LINK } from "@/lib/site";
+import { WhatsAppIcon } from "./BrandIcons";
 
 // Portada + los tres pasos de "cómo comprar".
 export function Hero() {
@@ -16,7 +17,8 @@ export function Hero() {
             <a className="btn primary" href="#catalogo">
               Ver catálogo
             </a>
-            <a className="btn ghost" href={CONSULTA_LINK} target="_blank" rel="noopener">
+            <a className="btn wa" href={CONSULTA_LINK} target="_blank" rel="noopener">
+              <WhatsAppIcon />
               Consultar por WhatsApp
             </a>
           </div>

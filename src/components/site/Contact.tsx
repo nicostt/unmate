@@ -1,4 +1,5 @@
 import { CONSULTA_LINK, INSTAGRAM_URL, WHATSAPP_DISPLAY } from "@/lib/site";
+import { InstagramIcon, WhatsAppIcon } from "./BrandIcons";
 
 export function Contact() {
   return (
@@ -15,10 +16,12 @@ export function Contact() {
           <span className="muted">WhatsApp</span>
           <span className="num">{WHATSAPP_DISPLAY}</span>
           <div className="cta-row">
-            <a className="btn primary" href={CONSULTA_LINK} target="_blank" rel="noopener">
+            <a className="btn wa" href={CONSULTA_LINK} target="_blank" rel="noopener">
+              <WhatsAppIcon />
               Abrir WhatsApp
             </a>
-            <a className="btn ghost" href={INSTAGRAM_URL} target="_blank" rel="noopener">
+            <a className="btn ig" href={INSTAGRAM_URL} target="_blank" rel="noopener">
+              <InstagramIcon />
               @unmate.es
             </a>
           </div>

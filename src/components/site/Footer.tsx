@@ -1,4 +1,5 @@
 import { INSTAGRAM_URL } from "@/lib/site";
+import { InstagramIcon } from "./BrandIcons";
 
 export function Footer() {
   return (
@@ -14,7 +15,8 @@ export function Footer() {
           <a href="#catalogo">Catálogo</a>
           <a href="#elegir">Elegí tu mate</a>
           <a href="#curado">Cómo curarlo</a>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener">
+          <a className="foot-ig" href={INSTAGRAM_URL} target="_blank" rel="noopener">
+            <InstagramIcon />
             Instagram
           </a>
           <a

@@ -99,7 +99,10 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
   const views = of("view");
   const adds = of("add");
   const ordered = of("order");
-  const searches = of("search");
+  // Un evento de búsqueda con value -1 no es una búsqueda: marca que la
+  // persona tocó "Preguntanos por WhatsApp" en el cartel de sin resultados.
+  const searches = of("search").filter((e) => e.value !== -1);
+  const asked = of("search").filter((e) => e.value === -1);
 
   const bySlug = new Map(products.map((p) => [p.slug, p]));
   const sold = orders.filter((o) => o.status === "confirmado" || o.status === "entregado");
@@ -197,7 +200,7 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
     // interés sin compra: lo agregaron varios y casi nadie lo pidió
     wanted: productRows
       .filter((r) => r.adders > r.buyers)
-      .map((r) => ({ label: r.name, value: r.adders - r.buyers, note: `${r.adders} lo agregaron, ${r.buyers} lo pidieron` }))
+      .map((r) => ({ label: r.name, value: r.adders - r.buyers }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8),
     // agotados que la gente sigue mirando: candidatos a reponer
@@ -208,6 +211,9 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
     designs,
     topSearches,
     missedSearches,
+    // de los que no encontraron algo, cuántos tocaron el botón de WhatsApp, y por qué búsqueda
+    askedPeople: people(asked),
+    asked: toBars(peopleBy(asked, (e) => e.detail) as Map<string, number>),
     sources,
     devices,
     hours,

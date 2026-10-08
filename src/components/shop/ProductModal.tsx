@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { WhatsAppIcon } from "@/components/site/BrandIcons";
 import { useEffect, useState } from "react";
 import { whatsappLink } from "@/lib/site";
 import { track } from "@/lib/track";
@@ -129,11 +130,12 @@ export function ProductModal({
           <div className="m-actions">
             <BuyBox product={product} design={design} onAdd={addAndGoToCart} />
             <a
-              className="btn ghost"
+              className="btn wa outline"
               target="_blank"
               rel="noopener"
               href={whatsappLink(`Hola unmate.es! Quiero ver más fotos de: ${productLabel(product, design)}`)}
             >
+              <WhatsAppIcon />
               Pedir fotos por WhatsApp
             </a>
           </div>

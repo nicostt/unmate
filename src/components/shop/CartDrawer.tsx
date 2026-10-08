@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { WhatsAppIcon } from "@/components/site/BrandIcons";
 import { useState } from "react";
 import { money } from "@/lib/format";
 import { createOrder } from "@/lib/orders";
@@ -145,7 +146,8 @@ export function CartDrawer() {
               <span className="muted">Total</span>
               <strong>{money(total)}</strong>
             </div>
-            <button className="btn primary wide" type="button" disabled={sending} onClick={send}>
+            <button className="btn wa wide" type="button" disabled={sending} onClick={send}>
+              <WhatsAppIcon />
               {sending ? "Preparando el pedido…" : "Enviar pedido por WhatsApp"}
             </button>
             <p className="fine">

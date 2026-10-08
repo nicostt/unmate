@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
-import { compute, fetchRaw, type Bar, type Raw } from "./stats-data";
+import { compute, fetchRaw, type Bar, type Computed, type Raw } from "./stats-data";
 import type { AdminProduct } from "./types";
 
 const PERIODS = [
@@ -14,6 +14,7 @@ const PERIODS = [
 // Estadísticas de la tienda: cuánta gente entra, qué mira, qué deja en el
 // carrito y qué termina pidiendo. Los datos son anónimos y se juntan desde
 // que se activó el seguimiento (ver src/lib/track.ts).
+// Este componente busca los datos; el dibujo está en StatsView, más abajo.
 export function Stats({ products }: { products: AdminProduct[] }) {
   const [days, setDays] = useState<number>(30);
   const [loaded, setLoaded] = useState<{ days: number; raw: Raw }>();
@@ -30,12 +31,6 @@ export function Stats({ products }: { products: AdminProduct[] }) {
     };
   }, [days]);
 
-  if (error) return <p className="admin-error">{error}</p>;
-  if (!loaded || loaded.days !== days) return <p className="admin-msg">Calculando estadísticas…</p>;
-
-  const s = compute(loaded.raw, products, days);
-  const entered = s.funnel[0].value;
-
   return (
     <section className="stats">
       <div className="chips" role="group" aria-label="Período">
@@ -45,116 +40,138 @@ export function Stats({ products }: { products: AdminProduct[] }) {
           </button>
         ))}
       </div>
-
-      {s.empty ? (
-        <p className="muted">
-          Todavía no hay datos en este período. Empiezan a juntarse solos a medida que la gente entra a la tienda
-          publicada. Tus propias visitas (con la sesión del panel iniciada) no se cuentan.
-        </p>
+      {error ? (
+        <p className="admin-error">{error}</p>
+      ) : !loaded || loaded.days !== days ? (
+        <p className="admin-msg">Calculando estadísticas…</p>
       ) : (
-        <>
-          <div className="stat-tiles">
-            <Tile label="Personas que entraron" value={s.visitors} />
-            <Tile label="Pedidos enviados" value={s.ordersSent} hint={`${s.ordersConfirmed} confirmados`} />
-            <Tile label="Vendido (confirmado)" value={money(s.revenue)} hint={`Ticket promedio ${money(s.averageTicket)}`} />
-            <Tile
-              label="Carritos sin terminar"
-              value={s.openCarts}
-              hint={s.openCarts ? `Suman ${money(s.cartsValue)}` : "en la última semana"}
-            />
-          </div>
-
-          <Block title="El recorrido" help="De todos los que entraron, cuántos llegaron a cada paso. Donde la barra cae fuerte es donde se te va la gente.">
-            <BarList bars={s.funnel.map((b) => ({ ...b, note: entered ? `${Math.round((b.value / entered) * 100)}%` : "" }))} unit="personas" />
-          </Block>
-
-          <Block title="Personas por día" help="Cuántas personas distintas entraron cada día.">
-            <Columns bars={s.perDay} unit="personas" every={Math.ceil(days / 10)} />
-          </Block>
-
-          <div className="stat-grid">
-            <Block title="Interés sin compra" help="Productos que varios agregaron al carrito pero casi nadie pidió. Vale la pena revisar su precio, sus fotos o su descripción.">
-              <BarList bars={s.wanted} unit="personas que no lo pidieron" empty="Nada para marcar todavía." />
-            </Block>
-            <Block title="Qué hay en los carritos sin terminar" help="Lo que la gente dejó en el carrito en la última semana y todavía no pidió.">
-              <BarList bars={s.inCarts} unit="carritos" empty="No hay carritos sin terminar." />
-            </Block>
-          </div>
-
-          <Block title="Productos: quién los mira, quién los agrega, quién los pide" help="Cuenta personas distintas: si alguien agrega 30 veces el mismo mate, vale por una.">
-            {s.productRows.length ? (
-              <div className="stat-table-wrap">
-                <table className="stat-table">
-                  <thead>
-                    <tr>
-                      <th>Producto</th>
-                      <th>Lo vieron</th>
-                      <th>Lo agregaron</th>
-                      <th>Lo pidieron</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {s.productRows.map((r) => (
-                      <tr key={r.name}>
-                        <td>
-                          {r.name}
-                          {r.soldOut && <span className="admin-status"> sin stock</span>}
-                        </td>
-                        <td>{r.viewers}</td>
-                        <td>{r.adders}</td>
-                        <td>{r.buyers}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="muted">Todavía nadie abrió ni agregó productos.</p>
-            )}
-          </Block>
-
-          <div className="stat-grid">
-            <Block title="Diseños más elegidos" help="Los diseños puntuales que más personas agregaron al carrito. Te dice qué estilos gustan.">
-              <BarList bars={s.designs} unit="personas" empty="Todavía nadie eligió un diseño." />
-            </Block>
-            <Block title="Agotados que siguen mirando" help="Productos sin stock que la gente igual abre. Candidatos a reponer.">
-              <BarList bars={s.soldOutWanted} unit="personas" empty="Ningún agotado con visitas." />
-            </Block>
-          </div>
-
-          <div className="stat-grid">
-            <Block title="Buscan y no encuentran" help="Lo que escribieron en el buscador y no dio ningún resultado: te lo están pidiendo y no lo tenés (o está con otro nombre).">
-              <BarList bars={s.missedSearches} unit="personas" empty="Todas las búsquedas encontraron algo." />
-            </Block>
-            <Block title="Lo que más buscan" help="Búsquedas que sí encontraron productos.">
-              <BarList bars={s.topSearches} unit="personas" empty="Todavía nadie usó el buscador." />
-            </Block>
-          </div>
-
-          <div className="stat-grid">
-            <Block title="De dónde llegan" help='Si compartís links con "?utm_source=instagram" al final, acá vas a ver exactamente cuál trajo gente.'>
-              <BarList bars={s.sources} unit="personas" />
-            </Block>
-            <Block title="Celular o compu" help="Con qué entran a la tienda.">
-              <BarList bars={s.devices} unit="personas" />
-            </Block>
-          </div>
-
-          <div className="stat-grid">
-            <Block title="A qué hora entran" help="Sirve para elegir cuándo publicar en Instagram.">
-              <Columns bars={s.hours} unit="personas" every={3} />
-            </Block>
-            <Block title="Qué días entran" help="Personas por día de la semana.">
-              <BarList bars={s.weekdays} unit="personas" />
-            </Block>
-          </div>
-
-          <Block title="Más vendidos" help="Unidades en pedidos confirmados o entregados. La yerba cuenta una vez por pedido.">
-            <BarList bars={s.bestSellers} unit="vendidos" empty="Todavía no hay pedidos confirmados en este período." />
-          </Block>
-        </>
+        <StatsView s={compute(loaded.raw, products, days)} days={days} />
       )}
     </section>
+  );
+}
+
+// Dibuja las estadísticas ya calculadas. Está ordenado en cuatro grupos, de
+// lo más general a lo más fino. La explicación de cada gráfico no se muestra
+// de entrada: aparece al tocar el "?" de su título.
+export function StatsView({ s, days }: { s: Computed; days: number }) {
+  if (s.empty) {
+    return (
+      <p className="muted">
+        Todavía no hay datos en este período. Empiezan a juntarse solos a medida que la gente entra a la tienda
+        publicada. Tus propias visitas (con la sesión del panel iniciada) no se cuentan.
+      </p>
+    );
+  }
+  const entered = s.funnel[0].value;
+
+  return (
+    <>
+      <div className="stat-tiles">
+        <Tile label="Personas que entraron" value={s.visitors} />
+        <Tile label="Pedidos enviados" value={s.ordersSent} hint={`${s.ordersConfirmed} confirmados`} />
+        <Tile label="Vendido (confirmado)" value={money(s.revenue)} hint={`Ticket promedio ${money(s.averageTicket)}`} />
+        <Tile
+          label="Carritos sin terminar"
+          value={s.openCarts}
+          hint={s.openCarts ? `Suman ${money(s.cartsValue)}` : "en la última semana"}
+        />
+      </div>
+
+      <Group title="Cómo viene la tienda">
+        <Block title="El recorrido" help="De todos los que entraron, cuántos llegaron a cada paso. Donde la barra cae fuerte es donde se te va la gente." wide>
+          <BarList
+            bars={s.funnel.map((b) => ({ ...b, note: entered ? `${Math.round((b.value / entered) * 100)}%` : "" }))}
+            unit="personas"
+          />
+        </Block>
+        <Block title="Personas por día" help="Cuántas personas distintas entraron cada día." wide>
+          <Columns bars={s.perDay} unit="personas" every={Math.ceil(days / 10)} />
+        </Block>
+      </Group>
+
+      <Group title="Qué les interesa">
+        <Block title="Interés sin compra" help="Cuántas personas agregaron cada producto al carrito y no lo pidieron. Si el número es alto, vale la pena revisar su precio, sus fotos o su descripción.">
+          <BarList bars={s.wanted} unit="personas que no lo pidieron" empty="Nada para marcar todavía." />
+        </Block>
+        <Block title="En los carritos sin terminar" help="Lo que la gente dejó en el carrito en la última semana y todavía no pidió.">
+          <BarList bars={s.inCarts} unit="carritos" empty="No hay carritos sin terminar." />
+        </Block>
+        <Block title="Diseños más elegidos" help="Los diseños puntuales que más personas agregaron al carrito. Te dice qué estilos gustan.">
+          <BarList bars={s.designs} unit="personas" empty="Todavía nadie eligió un diseño." />
+        </Block>
+        <Block title="Agotados que siguen mirando" help="Productos sin stock que la gente igual abre. Candidatos a reponer.">
+          <BarList bars={s.soldOutWanted} unit="personas" empty="Ningún agotado con visitas." />
+        </Block>
+        <Block title="Producto por producto" help="Cuenta personas distintas: si alguien agrega 30 veces el mismo mate, vale por una." wide>
+          {s.productRows.length ? (
+            <div className="stat-table-wrap">
+              <table className="stat-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Lo vieron</th>
+                    <th>Lo agregaron</th>
+                    <th>Lo pidieron</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {s.productRows.map((r) => (
+                    <tr key={r.name}>
+                      <td>
+                        {r.name}
+                        {r.soldOut && <span className="admin-status"> sin stock</span>}
+                      </td>
+                      <td>{r.viewers}</td>
+                      <td>{r.adders}</td>
+                      <td>{r.buyers}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="muted">Todavía nadie abrió ni agregó productos.</p>
+          )}
+        </Block>
+      </Group>
+
+      <Group title="Qué buscan">
+        <Block title="Buscan y no encuentran" help="Lo que escribieron en el buscador y no dio ningún resultado: te lo están pidiendo y no lo tenés (o está con otro nombre).">
+          <BarList bars={s.missedSearches} unit="personas" empty="Todas las búsquedas encontraron algo." />
+        </Block>
+        <Block
+          title={`Preguntaron por WhatsApp (${s.askedPeople})`}
+          help='Personas que no encontraron algo y tocaron el botón "Preguntanos por WhatsApp" del buscador, y qué estaban buscando.'
+        >
+          <BarList bars={s.asked} unit="personas" empty="Todavía nadie tocó ese botón." />
+        </Block>
+        <Block title="Lo que más buscan" help="Búsquedas que sí encontraron productos.">
+          <BarList bars={s.topSearches} unit="personas" empty="Todavía nadie usó el buscador." />
+        </Block>
+      </Group>
+
+      <Group title="Quiénes entran y cuándo">
+        <Block title="De dónde llegan" help='Si compartís links con "?utm_source=instagram" al final, acá vas a ver exactamente cuál trajo gente.'>
+          <BarList bars={s.sources} unit="personas" />
+        </Block>
+        <Block title="Celular o compu" help="Con qué entran a la tienda.">
+          <BarList bars={s.devices} unit="personas" />
+        </Block>
+        <Block title="A qué hora entran" help="Sirve para elegir cuándo publicar en Instagram.">
+          <Columns bars={s.hours} unit="personas" every={3} />
+        </Block>
+        <Block title="Qué días entran" help="Personas por día de la semana.">
+          <BarList bars={s.weekdays} unit="personas" />
+        </Block>
+      </Group>
+
+      <Group title="Ventas">
+        <Block title="Más vendidos" help="Unidades en pedidos confirmados o entregados. La yerba cuenta una vez por pedido." wide>
+          <BarList bars={s.bestSellers} unit="vendidos" empty="Todavía no hay pedidos confirmados en este período." />
+        </Block>
+      </Group>
+    </>
   );
 }
 
@@ -169,11 +186,29 @@ function Tile({ label, value, hint }: { label: string; value: string | number; h
   );
 }
 
-function Block({ title, help, children }: { title: string; help: string; children: React.ReactNode }) {
+// Un grupo de gráficos con su título.
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <article className="stat-block">
+    <div className="stat-group">
       <h3>{title}</h3>
-      <p className="muted">{help}</p>
+      <div className="stat-grid">{children}</div>
+    </div>
+  );
+}
+
+// Un gráfico con su título. La explicación queda guardada detrás del "?".
+function Block({ title, help, wide, children }: { title: string; help: string; wide?: boolean; children: React.ReactNode }) {
+  return (
+    <article className={wide ? "stat-block wide" : "stat-block"}>
+      <details>
+        <summary>
+          <h4>{title}</h4>
+          <span aria-label="Qué significa" title="Qué significa">
+            ?
+          </span>
+        </summary>
+        <p className="muted">{help}</p>
+      </details>
       {children}
     </article>
   );
@@ -182,7 +217,7 @@ function Block({ title, help, children }: { title: string; help: string; childre
 // Barras horizontales: una por renglón, con su nombre y su valor escritos.
 function BarList({ bars, unit, empty }: { bars: Bar[]; unit: string; empty?: string }) {
   const max = Math.max(1, ...bars.map((b) => b.value));
-  if (!bars.length) return <p className="muted">{empty ?? "Sin datos todavía."}</p>;
+  if (!bars.length) return <p className="stat-empty">{empty ?? "Sin datos todavía."}</p>;
   return (
     <ul className="stat-bars">
       {bars.map((bar) => (
