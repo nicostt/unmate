@@ -24,18 +24,25 @@ async function shrink(file: File): Promise<Blob> {
   );
 }
 
-// Sube una foto y la anota como perteneciente a un producto (y, si se
-// indica, a uno de sus diseños). Lanza un error si algo falla.
-export async function uploadPhoto(file: File, productId: number, designId: number | null, sortOrder: number) {
-  // 1) el archivo va a Storage, en una carpeta con el número del producto
-  const path = `${productId}/${crypto.randomUUID()}.jpg`;
-  const stored = await supabase.storage
+// Guarda una foto en Storage, dentro de la carpeta indicada, y devuelve su
+// ubicación. Lanza un error si algo falla.
+export async function storePhoto(file: File, folder: string): Promise<string> {
+  const path = `${folder}/${crypto.randomUUID()}.jpg`;
+  const { error } = await supabase.storage
     .from(PHOTOS_BUCKET)
     .upload(path, await shrink(file), { contentType: "image/jpeg" });
-  if (stored.error) throw new Error(stored.error.message);
+  if (error) throw new Error(error.message);
+  return path;
+}
+
+// Sube una foto y la anota como perteneciente a un producto (y, si se
+// indica, a uno de sus diseños).
+export async function uploadPhoto(file: File, productId: number, designId: number | null, sortOrder: number) {
+  // 1) el archivo va a Storage, en una carpeta con el número del producto
+  const path = await storePhoto(file, String(productId));
   // 2) se anota en la tabla a qué producto y diseño pertenece
-  const row = await supabase
+  const { error } = await supabase
     .from("product_media")
     .insert({ product_id: productId, design_id: designId, kind: "image", path, sort_order: sortOrder });
-  if (row.error) throw new Error(row.error.message);
+  if (error) throw new Error(error.message);
 }

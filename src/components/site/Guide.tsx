@@ -1,4 +1,7 @@
-// Guía del mate: cómo elegir y cómo curar. Es texto fijo; se edita acá.
+import { MateTypes } from "./MateTypes";
+
+// Guía del mate: cómo elegir (lista interactiva, en MateTypes.tsx) y cómo
+// curar (texto fijo, se edita acá).
 export function Guide() {
   return (
     <section className="wrap block" id="guia">
@@ -6,28 +9,7 @@ export function Guide() {
         <div>
           <p className="eyebrow">Guía del mate</p>
           <h2>Cómo elegir el tuyo</h2>
-          <dl className="def">
-            <div>
-              <dt>Camionero</dt>
-              <dd>De forma robusta y práctica, pensado para el uso de todos los días y para llevar.</dd>
-            </div>
-            <div>
-              <dt>Torpedo</dt>
-              <dd>De forma alargada y más angosta hacia la base.</dd>
-            </div>
-            <div>
-              <dt>Calabaza</dt>
-              <dd>Material natural. Antes de usarlo hay que curarlo.</dd>
-            </div>
-            <div>
-              <dt>Algarrobo</dt>
-              <dd>Madera. También se cura antes del primer mate.</dd>
-            </div>
-            <div>
-              <dt>Bombillón</dt>
-              <dd>Versión más grande de la bombilla, para acompañar mates de más volumen.</dd>
-            </div>
-          </dl>
+          <MateTypes />
         </div>
         <div>
           <p className="eyebrow">Antes del primer mate</p>

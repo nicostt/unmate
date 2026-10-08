@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { discountPercent, money } from "@/lib/format";
 import {
+  betterDeal,
   cartKey,
   coverImages,
   isSoldOut,
   lineTotal,
   maxQty,
   perKiloLabel,
+  stockLabel,
   WEIGHT_STEP,
   weightLabel,
   type Design,
@@ -58,6 +60,7 @@ export function BuyBox({
   // si el stock bajó, la cantidad elegida no puede superarlo
   const grams = Math.max(WEIGHT_STEP, Math.min(chosen, Math.floor(max / WEIGHT_STEP) * WEIGHT_STEP));
   const soldOut = isSoldOut(product);
+  const deal = product.byWeight ? betterDeal(product, grams) : null;
 
   const button = (
     <button
@@ -66,7 +69,7 @@ export function BuyBox({
       disabled={soldOut}
       onClick={() => onAdd(cartKey(product, design), product.byWeight ? grams : 1)}
     >
-      {soldOut ? "Sin stock" : design ? `Agregar el diseño #${design.number}` : "Agregar al carrito"}
+      {soldOut ? "Agotado" : "Agregar al carrito"}
     </button>
   );
 
@@ -120,6 +123,12 @@ export function BuyBox({
         price={lineTotal(product, grams)}
         compareAtPrice={product.compareAtPrice && Math.round((product.compareAtPrice * grams) / 1000)}
       />
+      {/* empujón para llevar más: aparece solo si con más cantidad el kilo sale menos */}
+      {deal && (
+        <p className="deal">
+          Llevando {weightLabel(deal.from)} pagás {money(deal.perKilo)} el kilo
+        </p>
+      )}
       {button}
     </>
   );
@@ -165,6 +174,12 @@ export function ProductCard({
             onIndexChange={setIndex}
             onOpen={() => onOpen(design)}
           />
+          {/* en un mate por diseños: cuál de las piezas se está mirando */}
+          {design && product.designs.length > 1 && (
+            <span className="card-count">
+              {product.designs.indexOf(design) + 1} / {product.designs.length}
+            </span>
+          )}
         </div>
       ) : (
         // sin fotos todavía: se muestra la ilustración
@@ -175,15 +190,8 @@ export function ProductCard({
       <div className="card-body">
         <div className="tags">
           <span className="tag">{product.byWeight ? perKiloLabel(product) : (product.material ?? categoryName)}</span>
-          {design && (
-            <span className="tag hot">
-              Diseño #{design.number} ·{" "}
-              {product.designs.length === 1 ? "último" : `${product.designs.length} disponibles`}
-            </span>
-          )}
-          {!product.byWeight && !product.byDesign && product.stock === 1 && (
-            <span className="tag hot">Última unidad</span>
-          )}
+          {product.byDesign && <span className="tag">Pieza única</span>}
+          {stockLabel(product) && <span className="tag hot">{stockLabel(product)}</span>}
         </div>
         <h3>
           <button type="button" onClick={() => onOpen(design)}>

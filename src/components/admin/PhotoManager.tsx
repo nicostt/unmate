@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
+import { DropZone } from "./DropZone";
 import { uploadPhoto } from "./photos";
 import { photosOf, type AdminMedia, type AdminProduct } from "./types";
 
@@ -98,20 +99,7 @@ export function PhotoManager({
       </div>
 
       {room > 0 && (
-        <label className={busy ? "btn ghost small is-busy" : "btn ghost small"}>
-          {busy ? "Trabajando…" : designId ? "+ Sumar otro ángulo" : "+ Subir fotos"}
-          <input
-            className="sr"
-            type="file"
-            accept="image/*"
-            multiple
-            disabled={busy}
-            onChange={(e) => {
-              if (e.target.files?.length) upload([...e.target.files]);
-              e.target.value = ""; // permite volver a elegir el mismo archivo
-            }}
-          />
-        </label>
+        <DropZone label={designId ? "+ Sumar otro ángulo de este diseño" : "+ Subir fotos"} busy={busy} onFiles={upload} />
       )}
       {error && <p className="admin-error">{error}</p>}
     </>

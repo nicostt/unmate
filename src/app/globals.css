@@ -393,3 +393,70 @@ footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-
 .stat-table td{text-align:right;padding:8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .stat-table th:first-child,.stat-table td:first-child{text-align:left}
 .stat-table tr:last-child td{border-bottom:0}
+
+/* ---------- más presencia al pasar el mouse ---------- */
+@media(hover:hover){
+  /* tarjeta: sale más hacia adelante y brilla */
+  .card:hover{transform:translateY(-12px) scale(1.045);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 30px 60px -24px color-mix(in srgb,var(--accent) 80%,transparent),0 0 46px -10px color-mix(in srgb,var(--accent) 45%,transparent)}
+  .card .gallery-slide img,.card-art svg{transition:filter .3s,transform .3s}
+  .card:hover .gallery-slide img{filter:brightness(1.08) saturate(1.08)}
+  /* opciones: se "llenan" de verde de izquierda a derecha, como si se estuvieran eligiendo */
+  .chip,.opt,.btn.ghost,.cart-btn,.icon-btn{background-image:linear-gradient(90deg,color-mix(in srgb,var(--accent) 26%,transparent),color-mix(in srgb,var(--accent) 26%,transparent));background-repeat:no-repeat;background-size:0% 100%;transition:background-size .28s ease-out,transform .22s,border-color .22s,box-shadow .22s,color .22s}
+  .chip:hover,.opt:hover:not(:disabled),.btn.ghost:hover:not(:disabled),.cart-btn:hover,.icon-btn:hover{background-size:100% 100%;border-color:var(--accent);transform:translateY(-3px) scale(1.04);box-shadow:0 10px 24px -14px var(--accent)}
+  .chip[aria-pressed="true"],.opt[aria-pressed="true"]{background-image:none}
+  .btn.primary:hover:not(:disabled){transform:translateY(-3px) scale(1.03);box-shadow:0 14px 30px -12px var(--accent),0 0 0 2px color-mix(in srgb,var(--accent) 60%,transparent)}
+}
+
+/* tarjeta de un mate por diseños: cuál de las piezas se está mirando */
+.card-count{position:absolute;top:10px;right:10px;font-size:.74rem;font-weight:700;color:#fff;background:rgba(0,0,0,.55);padding:.15rem .5rem;border-radius:999px;pointer-events:none;font-variant-numeric:tabular-nums}
+.deal{font-size:.84rem;font-weight:600;color:var(--accent)}
+
+/* catálogo sin resultados */
+.empty{grid-column:1/-1;display:grid;gap:10px;justify-items:start;padding:32px;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}
+.empty strong{font:600 1.25rem var(--f-display);color:var(--fg)}
+
+/* guía: tipos de mate. Solo el nombre; el resto se abre al pasar el mouse o al elegirlo */
+.types{list-style:none;margin:0;padding:0}
+.types li{border-top:1px solid var(--line)}
+.types button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 0;background:none;border:0;cursor:pointer;text-align:left;font:600 1.35rem var(--f-display);color:var(--muted);transition:color .25s,padding .25s}
+.types button::after{content:"+";font-weight:400;color:var(--muted);transition:transform .25s,color .25s}
+.types li.is-open button{color:var(--fg);padding-left:12px}
+.types li.is-open button::after{transform:rotate(45deg);color:var(--accent)}
+.types button[aria-pressed="true"]{color:var(--accent)}
+.types-body{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:center;max-height:0;opacity:0;overflow:hidden;padding-left:12px;transition:max-height .35s ease,opacity .3s,padding-bottom .35s}
+.types li.is-open .types-body{max-height:240px;opacity:1;padding-bottom:18px}
+.types-art{aspect-ratio:1;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--fg)}
+.types-art svg{width:78%;height:auto}
+.types-body p{color:var(--muted)}
+
+/* reseñas */
+.reviews{columns:3 280px;column-gap:18px}
+.review{break-inside:avoid;margin:0 0 18px;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
+@media(hover:hover){.review:hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 22px 44px -24px color-mix(in srgb,var(--accent) 60%,transparent)}}
+.review-photos{position:relative;aspect-ratio:4/5;background:var(--surface-2)}
+.review-photos>div{position:absolute;inset:0}
+.review-photos.many{display:flex;aspect-ratio:auto;height:260px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;gap:2px}
+.review-photos.many>div{position:relative;inset:auto;flex:0 0 78%;scroll-snap-align:start}
+.review-photos img{object-fit:cover}
+.review blockquote{margin:0;padding:18px 18px 0;font-size:1.02rem;line-height:1.5}
+.review blockquote::before{content:"“";display:block;font:700 2.4rem/0.6 var(--f-display);color:var(--accent);margin-bottom:8px}
+.review figcaption{display:flex;align-items:center;gap:10px;padding:16px 18px 18px;font-weight:600}
+.review-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:700 .95rem var(--f-display);flex:none}
+
+/* panel: recuadro para subir, arrastrar o pegar fotos */
+.dropzone{display:grid;gap:4px;justify-items:center;text-align:center;width:100%;padding:20px 16px;border:2px dashed var(--line);border-radius:14px;cursor:pointer;color:var(--muted);transition:border-color .2s,background-color .2s,color .2s}
+.dropzone strong{color:var(--fg);font-weight:600}
+.dropzone span{font-size:.84rem}
+.dropzone.is-over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.dropzone.is-busy{opacity:.6;cursor:default}
+.admin-design>p{font-size:.9rem}
+/* panel: precios de la yerba por cantidad */
+.tiers{display:grid;gap:10px;justify-items:start;width:100%}
+.tier{display:grid;grid-template-columns:140px 140px auto;gap:10px;align-items:end}
+.tier label{display:grid;gap:4px;font-size:.78rem;color:var(--muted)}
+.tier .field-in{min-height:40px;padding:.4rem .6rem;background:var(--bg)}
+.tiers-preview{width:100%;display:grid;gap:8px}
+.tiers-preview ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.tiers-preview li{display:grid;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tiers-preview li span{font:700 1.15rem var(--f-display);font-variant-numeric:tabular-nums}
+@media(max-width:520px){.tier{grid-template-columns:1fr 1fr}.tier button{grid-column:1/-1;justify-self:start}}

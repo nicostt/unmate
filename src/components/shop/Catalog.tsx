@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { normalize } from "@/lib/format";
+import { whatsappLink } from "@/lib/site";
 import { track } from "@/lib/track";
 import type { Design, Product } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
@@ -93,9 +94,22 @@ export function Catalog() {
         {visible.length ? (
           visible.map((p) => <ProductCard key={p.slug} product={p} onOpen={(design) => setOpen({ slug: p.slug, design })} />)
         ) : (
-          <p className="empty">
-            No encontramos productos con esa búsqueda. Probá con otra palabra o escribinos por WhatsApp.
-          </p>
+          <div className="empty">
+            <strong>¿No encontrás lo que buscabas?</strong>
+            <p>Escribinos y te ayudamos a encontrar tu mate ideal.</p>
+            <a
+              className="btn primary"
+              target="_blank"
+              rel="noopener"
+              href={whatsappLink(
+                query.trim()
+                  ? `Hola unmate.es! Estoy buscando "${query.trim()}" y no lo encontré en la tienda. ¿Me ayudan?`
+                  : "Hola unmate.es! No encontré lo que buscaba en la tienda. ¿Me ayudan?",
+              )}
+            >
+              Hablar por WhatsApp
+            </a>
+          </div>
         )}
       </div>
 

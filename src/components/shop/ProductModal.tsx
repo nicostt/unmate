@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { whatsappLink } from "@/lib/site";
 import { track } from "@/lib/track";
-import { perKiloLabel, productLabel, type Design, type Product } from "@/lib/types";
+import { perKiloLabel, productLabel, stockLabel, type Design, type Product } from "@/lib/types";
 import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
 import { BuyBox, PriceRow } from "./ProductCard";
@@ -82,18 +82,17 @@ export function ProductModal({
 
           {design && product.designs.length > 1 && (
             <div className="design-picker">
-              <p className="muted">Cada pieza es única. Elegí tu diseño:</p>
+              <p className="muted">Cada pieza es única. Elegí la tuya:</p>
               <div className="design-thumbs">
                 {product.designs.map((d) => (
                   <button
                     key={d.id}
                     type="button"
                     aria-pressed={d.id === design.id}
-                    aria-label={`Diseño #${d.number}`}
+                    aria-label={`Pieza ${d.number}`}
                     onClick={() => setDesignId(d.id)}
                   >
                     <Image src={d.images[0]} alt="" fill sizes="64px" />
-                    <span>#{d.number}</span>
                   </button>
                 ))}
               </div>
@@ -120,16 +119,10 @@ export function ProductModal({
                 <dd>{perKiloLabel(product)}</dd>
               </div>
             )}
-            {design && (
-              <div>
-                <dt>Diseño elegido</dt>
-                <dd>#{design.number}</dd>
-              </div>
-            )}
-            {!product.byWeight && !product.byDesign && product.stock === 1 && (
+            {stockLabel(product) && (
               <div>
                 <dt>Disponibilidad</dt>
-                <dd>Última unidad</dd>
+                <dd>{stockLabel(product)}</dd>
               </div>
             )}
           </dl>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PHOTOS_BUCKET, supabase } from "@/lib/supabase";
+import { DropZone } from "./DropZone";
 import { PhotoManager } from "./PhotoManager";
 import { uploadPhoto } from "./photos";
 import { designsOf, photosOf, type AdminDesign, type AdminProduct } from "./types";
@@ -103,20 +104,7 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
         </article>
       ))}
 
-      <label className={busy ? "btn primary small is-busy" : "btn primary small"}>
-        {busy ? "Trabajando…" : "+ Nuevo diseño (subí su foto)"}
-        <input
-          className="sr"
-          type="file"
-          accept="image/*"
-          multiple
-          disabled={busy}
-          onChange={(e) => {
-            if (e.target.files?.length) addDesigns([...e.target.files]);
-            e.target.value = "";
-          }}
-        />
-      </label>
+      <DropZone label="+ Nuevos diseños: una foto por cada mate" busy={busy} onFiles={addDesigns} />
       {error && <p className="admin-error">{error}</p>}
     </section>
   );

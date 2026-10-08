@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { Guide } from "@/components/site/Guide";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
+import { Reviews } from "@/components/site/Reviews";
 import { getCatalog } from "@/lib/catalog";
 
 // Página de inicio. Se arma en el servidor: busca el catálogo y se lo pasa a
@@ -21,6 +22,7 @@ export default async function Home() {
         <Catalog />
         <KitBuilder />
         <Guide />
+        <Reviews reviews={catalog.reviews} />
         <Contact />
       </main>
       <Footer />

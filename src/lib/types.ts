@@ -18,6 +18,14 @@ export type Category = {
   name: string;
 };
 
+// Un tramo del precio por cantidad de la yerba: "desde `min` gramos, el
+// precio del kilo cambia un `percent` %". +10 = 10 % más caro; -8 = 8 % más
+// barato. Se cargan en el panel, sección Yerba, y valen para todas las yerbas.
+export type WeightTier = { min: number; percent: number };
+
+// Una reseña de un cliente, cargada desde el panel.
+export type Review = { id: number; name: string; text: string | null; photos: string[] };
+
 // Una pieza única de un tipo de mate: "Imperial de algarrobo · Diseño #2".
 export type Design = {
   id: number;
@@ -48,6 +56,7 @@ export type Product = {
   compareAtPrice: number | null; // precio "antes", si está en oferta
   stock: number | null; // null = no se controla el stock
   byWeight: boolean;
+  tiers: WeightTier[]; // ajuste del precio según cuánta yerba se lleve (vacío si no va por peso)
   byDesign: boolean;
   designs: Design[]; // vacío si el producto no va por diseños
   images: string[]; // fotos generales, en el orden en que se muestran
@@ -56,6 +65,7 @@ export type Product = {
 export type Catalog = {
   categories: Category[];
   products: Product[];
+  reviews: Review[];
 };
 
 // Un renglón del carrito. `key` es lo que se guarda en el navegador: el slug
@@ -84,6 +94,17 @@ export function maxQty(product: Product, design: Design | null = null): number {
   return product.stock ?? (product.byWeight ? 10_000 : 99);
 }
 
+// Aviso de poco stock para mostrar en la tienda: "Últimas 3", "Últimas 2",
+// "Última unidad" o "Agotado". Con más de tres (o sin control de stock) no
+// se muestra nada.
+export function stockLabel(product: Product): string | null {
+  if (isSoldOut(product)) return "Agotado";
+  if (product.byWeight) return null;
+  const left = product.byDesign ? product.designs.length : product.stock;
+  if (left === null || left > 3) return null;
+  return left === 1 ? "Última unidad" : `Últimas ${left}`;
+}
+
 // ¿No hay nada para vender de este producto?
 export function isSoldOut(product: Product): boolean {
   if (product.byDesign) return product.designs.length === 0;
@@ -95,9 +116,31 @@ export function coverImages(product: Product): string[] {
   return product.byDesign ? product.designs.map((d) => d.images[0]) : product.images;
 }
 
-// Precio de una cantidad: unidades × precio, o la parte del kilo que corresponda.
+// Tramo de precio que corresponde a una cantidad de gramos: el de mayor
+// `min` que no la supere.
+export function tierFor(tiers: WeightTier[], grams: number): WeightTier | undefined {
+  return tiers.filter((t) => t.min <= grams).sort((a, b) => b.min - a.min)[0];
+}
+
+// Precio de una cantidad de yerba: la parte del kilo que corresponda, con el
+// ajuste de su tramo, redondeado a $ 10. La base de datos hace la misma
+// cuenta al registrar el pedido (función create_order).
+export function weightPrice(pricePerKilo: number, grams: number, tiers: WeightTier[]): number {
+  const percent = tierFor(tiers, grams)?.percent ?? 0;
+  return Math.round((pricePerKilo * grams * (100 + percent)) / 1_000_000) * 10;
+}
+
+// Precio de una cantidad: unidades × precio, o lo que salga esa cantidad de yerba.
 export function lineTotal(product: Product, qty: number): number {
-  return product.byWeight ? Math.round((product.price * qty) / 1000) : product.price * qty;
+  return product.byWeight ? weightPrice(product.price, qty, product.tiers) : product.price * qty;
+}
+
+// Si llevando más conviene, devuelve desde cuánto y a cuánto queda el kilo.
+// Sirve para el cartelito "Llevando 1 kg pagás $ X el kilo".
+export function betterDeal(product: Product, grams: number): { from: number; perKilo: number } | null {
+  const current = tierFor(product.tiers, grams)?.percent ?? 0;
+  const next = product.tiers.filter((t) => t.min > grams && t.percent < current).sort((a, b) => a.min - b.min)[0];
+  return next ? { from: next.min, perKilo: weightPrice(product.price, 1000, [{ min: 0, percent: next.percent }]) } : null;
 }
 
 // 750 -> "750 g" · 1000 -> "1 kg" · 1250 -> "1,25 kg"

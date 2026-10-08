@@ -8,7 +8,9 @@ import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { WEIGHT_CATEGORY } from "@/lib/types";
 import { CategoryManager } from "./CategoryManager";
 import { Orders } from "./Orders";
+import { ReviewsAdmin } from "./ReviewsAdmin";
 import { Stats } from "./Stats";
+import { YerbaPricing } from "./YerbaPricing";
 import { ProductForm } from "./ProductForm";
 import {
   coverOf,
@@ -34,14 +36,25 @@ async function fetchAll() {
   return { categories: categories.data as AdminCategory[], products: products.data as AdminProduct[] };
 }
 
-// Qué se está mostrando: la lista, las categorías, o el formulario de un
-// producto o de una yerba (nuevo, o el que tiene ese id).
+// Qué se está mostrando: una de las pestañas, las categorías, o el
+// formulario de un producto o de una yerba (nuevo, o el que tiene ese id).
 type View =
   | { screen: "list" }
+  | { screen: "yerba" }
   | { screen: "orders" }
   | { screen: "stats" }
+  | { screen: "reviews" }
   | { screen: "categories" }
   | { screen: "form"; kind: "product" | "yerba"; id: number | null };
+
+// Pestañas del panel, en el orden en que se muestran.
+const TABS = [
+  ["list", "Productos"],
+  ["yerba", "Yerba"],
+  ["orders", "Pedidos"],
+  ["stats", "Estadísticas"],
+  ["reviews", "Reseñas"],
+] as const;
 
 // Pantalla principal del panel.
 export function Panel({ accessToken, email }: { accessToken: string; email: string }) {
@@ -140,32 +153,19 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
         </button>
       </header>
 
-      {(view.screen === "list" || view.screen === "orders" || view.screen === "stats") && (
+      {TABS.some(([screen]) => screen === view.screen) && (
         <nav className="chips" aria-label="Secciones del panel">
-          <button
-            className="chip"
-            type="button"
-            aria-pressed={view.screen === "list"}
-            onClick={() => setView({ screen: "list" })}
-          >
-            Productos y yerba
-          </button>
-          <button
-            className="chip"
-            type="button"
-            aria-pressed={view.screen === "orders"}
-            onClick={() => setView({ screen: "orders" })}
-          >
-            Pedidos
-          </button>
-          <button
-            className="chip"
-            type="button"
-            aria-pressed={view.screen === "stats"}
-            onClick={() => setView({ screen: "stats" })}
-          >
-            Estadísticas
-          </button>
+          {TABS.map(([screen, label]) => (
+            <button
+              key={screen}
+              className="chip"
+              type="button"
+              aria-pressed={view.screen === screen}
+              onClick={() => setView({ screen })}
+            >
+              {label}
+            </button>
+          ))}
         </nav>
       )}
 
@@ -194,7 +194,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
           categories={view.kind === "yerba" ? categories : categories.filter((c) => c.id !== yerbaCategory?.id)}
           yerbaCategoryId={yerbaCategory?.id}
           nextSortOrder={Math.max(0, ...products.map((p) => p.sort_order)) + 1}
-          onBack={() => setView({ screen: "list" })}
+          onBack={() => setView({ screen: view.kind === "yerba" ? "yerba" : "list" })}
           onSaved={async (id) => {
             await changed();
             setView({ screen: "form", kind: view.kind, id });
@@ -203,41 +203,45 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
         />
       )}
 
-      {view.screen === "list" && (
-        <>
-          <section className="admin-section">
-            <div className="admin-bar">
-              <h2>Productos</h2>
-              <p className="muted">
-                {others.length} · {others.filter((p) => !p.is_active).length} ocultos
-              </p>
-              <button className="btn ghost small" type="button" onClick={() => setView({ screen: "categories" })}>
-                Categorías
-              </button>
-              <button
-                className="btn primary small"
-                type="button"
-                onClick={() => setView({ screen: "form", kind: "product", id: null })}
-              >
-                + Agregar producto
-              </button>
-            </div>
-            <div className="admin-list">{rows(others, "product")}</div>
-          </section>
+      {view.screen === "reviews" && <ReviewsAdmin onChanged={changed} />}
 
-          <section className="admin-section">
-            <div className="admin-bar">
-              <h2>Yerba</h2>
-              <p className="muted">Se vende por peso, de a 250 g. Cargás el precio del kilo y cuántos kilos hay.</p>
-              <button className="btn primary small" type="button" onClick={newYerba}>
-                + Agregar yerba
-              </button>
-            </div>
-            <div className="admin-list">
-              {yerbas.length ? rows(yerbas, "yerba") : <p className="muted">Todavía no cargaste ninguna yerba.</p>}
-            </div>
-          </section>
-        </>
+      {view.screen === "list" && (
+        <section className="admin-section">
+          <div className="admin-bar">
+            <h2>Productos</h2>
+            <p className="muted">
+              {others.length} · {others.filter((p) => !p.is_active).length} ocultos
+            </p>
+            <button className="btn ghost small" type="button" onClick={() => setView({ screen: "categories" })}>
+              Categorías
+            </button>
+            <button
+              className="btn primary small"
+              type="button"
+              onClick={() => setView({ screen: "form", kind: "product", id: null })}
+            >
+              + Agregar producto
+            </button>
+          </div>
+          <div className="admin-list">{rows(others, "product")}</div>
+        </section>
+      )}
+
+      {view.screen === "yerba" && (
+        <section className="admin-section">
+          <div className="admin-bar">
+            <h2>Yerba</h2>
+            <p className="muted">Se vende por peso, de a 250 g. Cargás el precio del kilo y cuántos kilos hay.</p>
+            <button className="btn primary small" type="button" onClick={newYerba}>
+              + Agregar yerba
+            </button>
+          </div>
+          <div className="admin-list">
+            {yerbas.length ? rows(yerbas, "yerba") : <p className="muted">Todavía no cargaste ninguna yerba.</p>}
+          </div>
+          {/* el ejemplo usa el precio de la primera yerba cargada */}
+          <YerbaPricing samplePrice={yerbas[0]?.price ?? 10000} onChanged={changed} />
+        </section>
       )}
     </div>
   );
