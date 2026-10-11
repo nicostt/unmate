@@ -1,0 +1,82 @@
+/* Catálogo: buscador y filtros, tarjetas de producto, galería de fotos y la
+   ficha que se abre al tocar un producto.
+   Componentes: src/components/shop/ (Catalog, ProductCard, Gallery, ProductModal). */
+
+/* ---------- buscador, orden y filtros ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:24px}
+.search{flex:1 1 220px;min-width:0}
+.sort{flex:0 1 210px;min-width:0}
+
+/* ---------- grilla y tarjeta ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:22px 18px}
+.card{display:flex;flex-direction:column;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:var(--t-hover)}
+@media(hover:hover){
+  /* la tarjeta se levanta y se agranda apenas, con un resplandor del color de marca */
+  .card:hover{transform:translateY(-6px) scale(1.025);border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 22px 44px -22px color-mix(in srgb,var(--accent) 55%,transparent);z-index:1}
+}
+/* foto (o dibujo, si el producto no tiene fotos) */
+.card-art{display:grid;place-items:center;aspect-ratio:1/.88;background:var(--surface-2);border:0;cursor:pointer;color:var(--fg);padding:0;width:100%;position:relative}
+.card-art svg{width:72%;height:auto;transition:transform .25s}
+.card-art:hover svg{transform:scale(1.04)}
+/* mate por diseños: cuál de las piezas se está mirando ("2 / 3") */
+.card-count{position:absolute;top:10px;right:10px;font-size:.74rem;font-weight:700;color:#fff;background:rgba(0,0,0,.55);padding:.15rem .5rem;border-radius:999px;pointer-events:none;font-variant-numeric:tabular-nums}
+/* textos */
+.card-body{display:flex;flex-direction:column;gap:8px;padding:16px;flex:1}
+.tags{display:flex;gap:6px 12px;flex-wrap:wrap;min-height:1.2em}
+.tag{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tag.hot{color:var(--accent);font-weight:600}
+.card h3{font-size:1.12rem;font-weight:600;line-height:1.25}
+.card h3 button{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;letter-spacing:inherit}
+.card h3 button:hover{text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- precio ---------- */
+.price-row{display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.price{font:700 1.65rem var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.was{color:var(--muted);text-decoration:line-through;font-variant-numeric:tabular-nums;font-size:.95rem}
+.off{background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.76rem;padding:.12rem .45rem;border-radius:4px}
+/* yerba: aviso de que llevando más sale más barato */
+.deal{font-size:.84rem;font-weight:600;color:var(--accent)}
+
+/* ---------- búsqueda sin resultados: cartel que invita a preguntar ---------- */
+.empty{grid-column:1/-1;display:grid;gap:12px;justify-items:center;text-align:center;padding:clamp(32px,6vw,64px) 24px;border:2px solid var(--accent);border-radius:22px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,var(--surface)),var(--surface));color:var(--muted)}
+.empty strong{font:700 clamp(1.6rem,3.6vw,2.4rem)/1.1 var(--f-display);letter-spacing:-.02em;color:var(--fg)}
+.empty p{max-width:34rem;font-size:1.08rem}
+@media(prefers-reduced-motion:no-preference){.empty .btn.big{animation:latido 2.4s ease-in-out infinite}}
+@keyframes latido{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+/* ---------- galería de fotos deslizable (tarjeta y ficha) ---------- */
+.gallery{position:absolute;inset:0}
+.gallery-track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.gallery-track::-webkit-scrollbar{display:none}
+.gallery-slide{position:relative;flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always}
+.gallery-slide img{object-fit:cover}
+.gallery-arrow{position:absolute;top:50%;translate:0 -50%;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 85%,transparent);color:var(--fg);font-size:1.4rem;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.gallery-arrow:hover{border-color:var(--fg)}
+.gallery-arrow.prev{left:8px}
+.gallery-arrow.next{right:8px}
+.gallery-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.gallery-dots span{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.5;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.gallery-dots span.on{opacity:1}
+
+/* ---------- ficha de producto (va dentro de una ventana, ver overlays.css) ---------- */
+.m-art{background:var(--surface-2);display:grid;place-items:center;padding:28px;min-height:260px}
+.m-art svg{width:84%;height:auto}
+.m-art.has-photos{position:relative;padding:0}
+.m-info{padding:clamp(20px,3vw,32px);display:grid;gap:12px;align-content:start;min-width:0}
+.m-info h3{font-size:1.6rem;font-weight:700;line-height:1.15}
+.m-info dl{margin:0;display:grid;gap:6px}
+.m-info dl div{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:6px;font-size:.93rem}
+.m-info dt{color:var(--muted)}
+.m-info dd{margin:0;font-weight:500;text-align:right}
+.m-actions{display:grid;gap:10px;margin-top:6px}
+@media(max-width:700px){.m-art{min-height:200px}.m-art.has-photos{aspect-ratio:1}}
+
+/* ficha: elegir entre los diseños de un mismo tipo de mate */
+.design-picker{display:grid;gap:8px}
+.design-picker p{font-size:.9rem}
+.design-thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.design-thumbs button{position:relative;width:64px;height:64px;padding:0;border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface-2);cursor:pointer;transition:transform .2s,border-color .2s}
+.design-thumbs button:hover{transform:translateY(-2px);border-color:var(--fg)}
+.design-thumbs button[aria-pressed="true"]{border-color:var(--accent)}
+.design-thumbs img{object-fit:cover}
+.design-thumbs span{position:absolute;left:0;right:0;bottom:0;font-size:.7rem;font-weight:700;color:#fff;background:rgba(0,0,0,.55);line-height:1.5}

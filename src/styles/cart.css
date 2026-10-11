@@ -1,0 +1,30 @@
+/* Carrito: el panel que se abre desde la derecha.
+   Componente: src/components/shop/CartDrawer.tsx. */
+
+/* ---------- el panel ---------- */
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);z-index:60;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);animation:slide .22s ease-out}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.drawer-head h2{font-size:1.3rem;font-weight:600}
+.drawer-body{flex:1;overflow-y:auto;padding:8px 20px}
+.empty-cart{display:grid;gap:14px;justify-items:start;padding-block:32px;color:var(--muted)}
+
+/* ---------- cada producto del carrito ---------- */
+.line{display:grid;grid-template-columns:64px 1fr;gap:14px;padding-block:16px;border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.thumb{position:relative;overflow:hidden;width:64px;height:64px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center}
+.thumb img{object-fit:cover}
+.thumb svg{width:80%;height:auto}
+.line-info{display:grid;gap:6px;min-width:0}
+.line-info strong{font-weight:600;line-height:1.3}
+.line-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.line-price{font-weight:600;font-variant-numeric:tabular-nums}
+/* "Quitar" */
+.rm{background:none;border:0;padding:0;color:var(--muted);cursor:pointer;font-size:.85rem;text-decoration:underline;text-underline-offset:3px;justify-self:start}
+.rm:hover{color:var(--fg)}
+
+/* ---------- pie: nombre, nota, total y botón de pedir ---------- */
+.drawer-foot{padding:16px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:12px}
+.drawer-foot label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px}
+.drawer textarea{resize:vertical;min-height:64px}
+.total-row{display:flex;justify-content:space-between;align-items:baseline}
+.total-row strong{font:700 1.7rem var(--f-display);font-variant-numeric:tabular-nums}

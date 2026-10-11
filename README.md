@@ -1,8 +1,8 @@
 # unmate.es
 
-Tienda online de mates, bombillas y termos. El cliente arma el carrito y manda el pedido por WhatsApp.
+Tienda online de mates, bombillas, yerba y termos. El cliente arma el carrito y manda el pedido por WhatsApp; el pedido queda registrado y se maneja desde un panel de administración.
 
-Hecha con [Next.js](https://nextjs.org/docs) (la web) y, próximamente, [Supabase](https://supabase.com/docs) (base de datos, login y archivos).
+Hecha con [Next.js](https://nextjs.org/docs) (la web) y [Supabase](https://supabase.com/docs) (base de datos, login y fotos). Publicada en Netlify: https://unmatees.lat
 
 ## Cómo correrla en tu compu
 
@@ -31,49 +31,84 @@ y abrís http://localhost:3000. Los cambios que guardes se ven al instante.
 
 ```
 src/
-  app/
-    layout.tsx       Marco de todas las páginas: fuentes, título, descripción
-    page.tsx         La página de inicio: arma las secciones en orden
-    admin/page.tsx   La página del panel de administración
-    globals.css      Todos los estilos. Los colores están arriba de todo, en variables
+  app/                 Las páginas
+    layout.tsx           Marco de todas: fuentes, título, descripción
+    page.tsx             La tienda. Acá se decide el ORDEN de las secciones
+    admin/page.tsx       El panel de administración
   components/
-    site/            Secciones de texto fijo: Header, Hero, Guide, Contact, Footer
-    admin/           El panel: login, lista, formulario y fotos
-    shop/            Lo interactivo: catálogo, ficha, carrito, "Armá tu equipo"
-  lib/
-    catalog.ts       Lee el catálogo de Supabase (y las fotos de public/productos)
-    supabase.ts      La conexión a Supabase
-    cart-store.ts    El carrito, guardado en el navegador del cliente
-    site.ts          Número de WhatsApp, Instagram y el texto del pedido
-    format.ts        Formato de precios y descuentos
-    types.ts         Qué campos tiene un producto y una categoría
-public/logo.webp     El logo
-supabase/            SQL para crear la base: tablas, seguridad y carga inicial
-referencia/          El diseño original en un solo HTML (solo para consultar)
+    site/                Secciones de contenido: encabezado, portada, guías,
+                         reseñas, contacto, pie
+    shop/                Lo que vende: catálogo, tarjeta, ficha, galería,
+                         carrito, "Armá tu equipo"
+    admin/               El panel: login, productos, yerba, pedidos, reseñas,
+                         estadísticas
+  lib/                 Lógica sin pantalla
+    types.ts             Qué es un producto y TODAS las cuentas de precio y stock
+    catalog.ts           Lee el catálogo de la base
+    orders.ts            Registra un pedido
+    site.ts              Número de WhatsApp, Instagram y texto del pedido
+    hero.ts              Qué videos o fotos van en la portada
+    track.ts             Estadísticas anónimas
+    cart-store.ts        El carrito, guardado en el navegador del cliente
+    supabase.ts          La conexión a la base
+    format.ts, theme.ts  Formato de precios; tema claro u oscuro
+  styles/              Los estilos, un archivo por zona (ver abajo)
+public/
+  hero/                Videos de la portada (1.mp4, 2.mp4...)
+  logo-mark.png        El emblema del logo
+supabase/migrations/   Los cambios de la base, numerados en el orden en que se ejecutaron
+referencia/            El diseño original en un solo HTML (solo para consultar)
 ```
+
+### Estilos
+
+`src/styles/index.css` los junta en orden. Para cambiar algo, abrí el archivo de esa zona:
+
+| Archivo | Qué tiene |
+|---|---|
+| `base.css` | Colores (arriba de todo, en variables), fuentes y utilidades |
+| `header.css` | Encabezado y pie |
+| `controls.css` | Botones, filtros, campos y selector de cantidad |
+| `overlays.css` | Ventanas, fondo oscurecido y avisos |
+| `hero.css` | Portada y "cómo comprar" |
+| `catalog.css` | Catálogo, tarjetas, galería y ficha de producto |
+| `cart.css` | Carrito |
+| `sections.css` | Tipos de mate, equipo, curado, reseñas y contacto |
+| `admin.css` | Todo el panel. Solo se carga en `/admin` |
+
+El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
 
 ## Cambios frecuentes
 
-- **Productos, yerba, categorías, precios, stock y fotos:** desde el panel, en `/admin` (en tu compu: http://localhost:3000/admin). Entrás con el email y la contraseña del usuario que creaste en Supabase. Los cambios se ven en la tienda al instante.
+- **Productos, yerba, categorías, precios, stock, fotos, pedidos y reseñas:** desde el panel, en `/admin`. Entrás con el email y la contraseña del usuario de Supabase. Los cambios se ven en la tienda al instante.
+- **Videos de la portada:** copiarlos a `public/hero/` como `.mp4` o `.webm`. Aparecen solos, en orden de nombre.
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
-- **Textos de la portada o de la guía:** `src/components/site/`.
-- **Colores:** el primer bloque de `src/app/globals.css`.
+- **Textos de la portada o de las guías:** `src/components/site/`.
+- **Orden de las secciones:** `src/app/page.tsx`.
+- **Colores:** el primer bloque de `src/styles/base.css`.
 
-## Estado del proyecto
+## Cambios en la base de datos
 
-Etapa 1 (base):
+Cada cambio de estructura es un archivo nuevo en `supabase/migrations/`, con el número siguiente. Se ejecuta una sola vez, entero, en el SQL Editor de Supabase. Los archivos ya ejecutados no se modifican.
 
-- [x] Proyecto creado y diseño migrado desde `referencia/unmate.html`
-- [x] Tablas, seguridad y carga inicial ejecutadas en Supabase (`supabase/`)
-- [x] Repositorio subido a GitHub
-- [x] Proyecto de Supabase creado y catálogo leyendo de la base
-- [x] Panel de administración con login (falta probarlo con la cuenta real)
-- [x] Fotos en Storage, subidas desde el panel
-- [ ] Videos de curado
+La tabla `product_variants` (migración 0002) y la fila `yerba_tiers` de `settings` (0004) quedaron sin uso: la tienda no las lee.
 
-Después: 2) pedidos registrados con estados, 3) pagos con Mercado Pago, 4) envíos y facturación.
+## Publicar
+
+Se trabaja en la rama `dev`. Netlify publica lo que llega a `main`, y cada publicación gasta créditos del plan gratis, así que conviene juntar cambios y publicar de a tandas.
+
+`netlify.toml` declara el plugin `@netlify/plugin-nextjs`. Sin eso el sitio se publica pero todo da "Page not found".
+
+## Etapas
+
+- [x] 1. Base: catálogo en la base, panel con login, fotos
+- [x] 2. Pedidos por WhatsApp registrados, con estados y control de stock
+- [ ] 3. Pagos con Mercado Pago
+- [ ] 4. Envíos y facturación
 
 ## Seguridad
 
-- Las claves van en `.env.local`, que **nunca** se sube al repositorio (ya está en `.gitignore`).
+- Las claves van en `.env.local`, que **nunca** se sube al repositorio (ya está en `.gitignore`). El modelo está en `.env.example`.
 - La clave secreta de Supabase (service role) no se usa en el navegador ni se comparte por chat.
+- El panel no tiene nada secreto en sí: lo que protege los datos son las reglas de la base (Row Level Security). El público solo lee el catálogo; solo el administrador escribe.
+- Los precios y el stock de un pedido los calcula la base, no el navegador.

@@ -10,7 +10,7 @@ import { useEffect } from "react";
 //  - un script mínimo (src/lib/theme.ts) le pone la clase "reveal" a <html>
 //    antes de pintar la página; sin esa clase nada se oculta, así que si el
 //    JavaScript fallara el contenido se ve igual;
-//  - el CSS (globals.css) oculta los [data-reveal] que no tengan "is-in";
+//  - el CSS (src/styles/base.css) oculta los [data-reveal] que no tengan "is-in";
 //  - este componente revisa, al cargar y cada vez que se mueve la página,
 //    cuáles ya asoman en pantalla y les pone "is-in".
 //

@@ -1,0 +1,17 @@
+/* Estilos de la tienda, repartidos por zona. Cada archivo junta todo lo de
+   una parte de la página, así que para cambiar algo alcanza con abrir el que
+   corresponde.
+
+   EL ORDEN IMPORTA: cuando dos reglas pisan lo mismo gana la que está más
+   abajo. Por eso van primero las bases y después lo específico.
+
+   Los estilos del panel (/admin) no están acá: viven en admin.css y solo se
+   cargan en esa página, para que la tienda pese menos. */
+@import "./base.css";      /* colores, fuentes, tipografía y utilidades */
+@import "./header.css";    /* encabezado y pie */
+@import "./controls.css";  /* botones, filtros, campos y cantidades */
+@import "./overlays.css";  /* ventanas, fondo oscurecido y avisos */
+@import "./hero.css";      /* portada y "cómo comprar" */
+@import "./catalog.css";   /* catálogo, tarjetas, galería y ficha */
+@import "./cart.css";      /* carrito */
+@import "./sections.css";  /* tipos de mate, equipo, curado, reseñas, contacto */

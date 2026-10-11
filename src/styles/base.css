@@ -1,0 +1,74 @@
+/* Bases: colores, fuentes, tipografía y utilidades que usa toda la web.
+   Los colores viven en variables (--bg, --fg, --accent...). Para cambiar la
+   paleta alcanza con tocar este primer bloque: el resto del CSS las usa. */
+:root{
+  /* tema oscuro (principal) */
+  --bg:#220f09;
+  --surface:#2d1810;
+  --surface-2:#3a2018;
+  --line:rgba(246,239,233,.17);
+  --ring:rgba(246,239,233,.55);
+  --fg:#f6efe9;
+  --muted:#c0afa3;
+  --accent:#aac56b;
+  --accent-fg:#220f09;
+  --btn-bg:#f6efe9;
+  --btn-fg:#220f09;
+  /* qué ícono muestra el botón de tema: el del modo al que se cambia */
+  --icon-sun:block;
+  --icon-moon:none;
+  /* --font-outfit y --font-figtree las define next/font en src/app/layout.tsx */
+  --f-display:var(--font-outfit),'Avenir Next','Segoe UI',sans-serif;
+  --f-body:var(--font-figtree),'Segoe UI',system-ui,sans-serif;
+  /* transición común de todo lo que reacciona al mouse (tarjetas, botones, filtros) */
+  --t-hover:transform .22s,border-color .22s,box-shadow .22s,background-color .22s,color .22s,padding .22s;
+  color-scheme:dark;
+}
+/* tema claro: se activa solo si el dispositivo del visitante está en modo claro */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#ece5de;--surface:#f7f2ed;--surface-2:#e2d8ce;--line:rgba(34,15,9,.17);--ring:rgba(34,15,9,.5);
+    --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;--icon-sun:none;--icon-moon:block;
+    color-scheme:light;
+  }
+}
+/* ...o si el visitante lo eligió con el botón del encabezado */
+:root[data-theme="light"]{
+  --bg:#ece5de;--surface:#f7f2ed;--surface-2:#e2d8ce;--line:rgba(34,15,9,.17);--ring:rgba(34,15,9,.5);
+  --fg:#220f09;--muted:#6a584d;--accent:#4d6820;--accent-fg:#ffffff;--btn-bg:#220f09;--btn-fg:#f6efe9;--icon-sun:none;--icon-moon:block;
+  color-scheme:light;
+}
+
+/* ---------- punto de partida ---------- */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+/* quien pidió menos movimiento en su dispositivo no ve animaciones */
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* ---------- utilidades ---------- */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1160px;margin-inline:auto;padding-inline:clamp(16px,4vw,32px)}
+.muted{color:var(--muted)}
+.eyebrow{font:500 .78rem var(--f-display);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.lead{max-width:34rem;font-size:1.12rem;color:var(--muted)}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.note{margin-top:14px;font-size:.92rem;color:var(--muted);border-left:2px solid var(--accent);padding-left:12px}
+.fine{font-size:.85rem;color:var(--muted)}
+
+/* ---------- armazón de una sección ---------- */
+section[id]{scroll-margin-top:96px}
+.block{padding-block:clamp(44px,7vw,84px) 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:20px}
+.sec-head h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:700}
+
+/* ---------- aparecer al bajar (ver src/components/site/Reveal.tsx) ---------- */
+@media(prefers-reduced-motion:no-preference){
+  .reveal [data-reveal]{transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal [data-reveal]:not(.is-in){opacity:0;transform:translateY(34px)}
+}

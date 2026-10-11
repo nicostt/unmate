@@ -1,7 +1,7 @@
 "use client";
 
 // Botón de modo claro / oscuro. El tema es un atributo data-theme en <html>
-// (lo lee globals.css) y la elección se guarda en el navegador. Si el
+// (lo lee src/styles/base.css) y la elección se guarda en el navegador. Si el
 // visitante nunca eligió, se usa el modo de su dispositivo.
 // Al recargar, la elección guardada la aplica THEME_SCRIPT (src/lib/theme.ts).
 

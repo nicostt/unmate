@@ -1,0 +1,79 @@
+/* Controles que se repiten en toda la web y en el panel: botones, filtros,
+   opciones, campos de texto y selector de cantidad. */
+
+/* ---------- botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:.65rem 1.4rem;border-radius:999px;border:1px solid transparent;font-weight:600;font-size:.97rem;cursor:pointer;text-decoration:none;transition:var(--t-hover)}
+.btn:active{transform:scale(.98)}
+/* tamaños */
+.btn.wide{width:100%}
+.btn.small{min-height:40px;padding:.45rem 1rem;font-size:.9rem}
+.btn.big{min-height:58px;padding:.9rem 2.2rem;font-size:1.12rem;margin-top:8px;box-shadow:0 16px 36px -16px var(--accent)}
+/* principal: claro sobre oscuro (o al revés en tema claro) */
+.btn.primary{background:var(--btn-bg);color:var(--btn-fg)}
+.btn.primary:hover{background:color-mix(in srgb,var(--btn-bg) 86%,var(--accent))}
+/* secundario: solo borde */
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--fg)}
+.btn.ghost:hover{border-color:var(--fg)}
+/* del color de marca: para llamados que tienen que verse */
+.btn.accent{background:var(--accent);color:var(--accent-fg)}
+.btn.accent:hover{transform:translateY(-2px);box-shadow:0 12px 26px -14px var(--accent)}
+/* acciones que borran (panel) */
+.btn.danger:hover{border-color:#e0705a;color:#e0705a}
+/* apagado o trabajando */
+.btn:disabled,.btn.is-busy{opacity:.6;cursor:default}
+
+/* WhatsApp e Instagram, con los colores de cada aplicación (íconos en BrandIcons.tsx) */
+.brand-icon{width:1.35em;height:1.35em;flex:none}
+/* WhatsApp: su verde, con texto oscuro para que se lea bien */
+.btn.wa{background:#25d366;color:#06301a;border-color:transparent}
+.btn.wa:hover:not(:disabled){background:#1fbe5b;transform:translateY(-2px);box-shadow:0 12px 26px -12px #25d366}
+/* versión de borde, para cuando ya hay otro botón principal al lado */
+.btn.wa.outline{background:transparent;color:#25d366;border-color:#25d366}
+.btn.wa.outline:hover:not(:disabled){background:#25d366;color:#06301a}
+/* en tema claro el verde de borde necesita más contraste */
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]) .btn.wa.outline{color:#0d7a3b;border-color:#0d7a3b}}
+:root[data-theme="light"] .btn.wa.outline{color:#0d7a3b;border-color:#0d7a3b}
+/* Instagram: su degradé, con texto blanco */
+.btn.ig{background:linear-gradient(45deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888);color:#fff;border-color:transparent}
+.btn.ig:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px #dc2743;filter:saturate(1.15)}
+
+/* botón redondo de ícono (cerrar, tema) */
+.icon-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:1.4rem;line-height:1;display:grid;place-items:center;transition:var(--t-hover)}
+.icon-btn:hover{border-color:var(--fg)}
+
+/* ---------- filtros (catálogo) y pestañas (panel) ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:.4rem 1rem;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer;font-weight:500;transition:var(--t-hover)}
+.chip:hover{border-color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg);border-color:transparent}
+
+/* ---------- opciones chicas (cuánta yerba llevar) ---------- */
+.weight{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{min-height:34px;padding:.25rem .7rem;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer;font-size:.86rem;font-weight:500;transition:var(--t-hover)}
+.opt:hover:not(:disabled){border-color:var(--fg)}
+.opt[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg);border-color:transparent}
+.opt:disabled{opacity:.35;cursor:default}
+
+/* ---------- cantidad: menos, número, más ---------- */
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px}
+.qty button{width:36px;height:36px;border:0;background:none;cursor:pointer;font-size:1.1rem;border-radius:50%}
+.qty button:hover{background:var(--surface-2)}
+.qty button:disabled{opacity:.35;cursor:default}
+.qty span{min-width:24px;padding-inline:6px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+
+/* ---------- campos de texto y desplegables ---------- */
+.field-in,.toolbar input,.toolbar select,.drawer input,.drawer textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.6rem .85rem;min-height:44px;width:100%}
+.toolbar input::placeholder,.drawer input::placeholder,.drawer textarea::placeholder{color:var(--muted)}
+
+/* ---------- vida al pasar el mouse (solo en dispositivos con mouse) ----------
+   Tiene que quedar al final del archivo: pisa los colores de borde de arriba. */
+@media(hover:hover){
+  .chip:hover,.opt:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px)}
+  .btn.primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 26px -14px var(--accent)}
+  .btn.ghost:hover:not(:disabled),.icon-btn:hover,.cart-btn:hover{border-color:var(--accent);transform:translateY(-2px)}
+  /* las opciones se "llenan" de verde de izquierda a derecha, como si se estuvieran eligiendo */
+  .chip,.opt,.btn.ghost,.cart-btn,.icon-btn{background-image:linear-gradient(90deg,color-mix(in srgb,var(--accent) 26%,transparent),color-mix(in srgb,var(--accent) 26%,transparent));background-repeat:no-repeat;background-size:0% 100%;transition:background-size .28s ease-out,transform .22s,border-color .22s,box-shadow .22s,color .22s}
+  .chip:hover,.opt:hover:not(:disabled),.btn.ghost:hover:not(:disabled),.cart-btn:hover,.icon-btn:hover{background-size:100% 100%}
+  .chip[aria-pressed="true"],.opt[aria-pressed="true"]{background-image:none}
+}

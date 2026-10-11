@@ -58,7 +58,7 @@ administrador.
 
 ## 3. Tecnología
 
-- **Next.js** (App Router, TypeScript). CSS plano en un solo `globals.css`
+- **Next.js** (App Router, TypeScript). CSS plano repartido por zona en `src/styles/`
   con variables de color; sin Tailwind ni librerías de componentes.
 - **Supabase**: Postgres (datos), Auth (login del administrador) y Storage
   (fotos de productos).
@@ -226,7 +226,7 @@ Pestañas:
 
 | Qué | Dónde |
 |---|---|
-| Colores y fuentes | `src/app/globals.css` (variables de `:root`) y `src/app/layout.tsx` |
+| Colores y fuentes | `src/styles/base.css` (variables de `:root`) y `src/app/layout.tsx` |
 | Logo y favicon | `public/logo-mark.png`, `src/app/icon.png`, `src/app/apple-icon.png` |
 | WhatsApp, Instagram y texto del pedido | `src/lib/site.ts` |
 | Portada | `src/components/site/Hero.tsx`; videos en `public/hero/` |

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminApp } from "@/components/admin/AdminApp";
+import "@/styles/admin.css";
 
 // Panel de administración. Esta página en sí no tiene nada secreto: todo lo
 // que muestra y modifica pasa por las reglas de seguridad de Supabase, que

@@ -1,0 +1,38 @@
+/* Portada con video (o fotos) de fondo y los tres pasos de "cómo comprar".
+   Componentes: src/components/site/Hero.tsx y HeroMedia.tsx.
+   Qué videos se muestran lo decide src/lib/hero.ts (carpeta public/hero/). */
+
+/* ---------- portada ---------- */
+.hero-video{position:relative;min-height:min(88vh,820px);display:grid;place-items:center;overflow:hidden;isolation:isolate;background:#160a06}
+/* los fondos están apilados; el que toca se hace visible y los demás se apagan */
+.hero-media{position:absolute;inset:0;z-index:-2}
+.hero-layer{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease}
+.hero-layer.is-on{opacity:1}
+.hero-layer video,.hero-layer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* las fotos se acercan muy despacio, para que el fondo no quede quieto */
+@media(prefers-reduced-motion:no-preference){
+  .hero-layer img{animation:acercar 16s ease-in-out infinite alternate}
+}
+@keyframes acercar{from{transform:scale(1)}to{transform:scale(1.14)}}
+/* velo oscuro del color de marca: más cerrado arriba y abajo, para que se lea el texto */
+.hero-video::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(22,10,6,.82),rgba(22,10,6,.55) 45%,rgba(22,10,6,.9))}
+/* el texto de la portada va siempre claro, también en tema claro: está sobre el video */
+.hero-video-copy{display:grid;justify-items:center;text-align:center;gap:6px;padding-block:clamp(64px,10vw,120px);color:#f6efe9}
+.hero-video .eyebrow{color:#e2d6cc}
+.hero-video h1{font-size:clamp(2.7rem,7.4vw,5.4rem);font-weight:700;line-height:1;letter-spacing:-.03em;margin-block:14px 18px}
+.hero-video h1 span{color:#aac56b}
+.hero-video .lead{color:#e2d6cc;font-size:clamp(1.05rem,1.6vw,1.25rem);max-width:38rem}
+.hero-video .cta-row{justify-content:center;margin-top:28px}
+.hero-video .btn.accent{background:#aac56b;color:#220f09}
+
+/* ---------- cómo comprar ----------
+   Se ve solo el título de cada paso; la explicación se despliega al pasar el
+   mouse (o al tocar, en el celular). */
+.hero-video+.steps{padding-top:clamp(32px,5vw,56px)}
+.steps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px 28px;counter-reset:s}
+.steps li{counter-increment:s;border-top:1px solid var(--line);padding-top:16px;display:grid;gap:4px;cursor:default;outline-offset:6px}
+.steps li::before{content:counter(s);width:28px;height:28px;border:1px solid var(--ring);border-radius:50%;display:grid;place-items:center;font:600 .85rem var(--f-display);margin-bottom:8px;transition:var(--t-hover)}
+.steps strong{font:600 1.05rem var(--f-display)}
+.steps span{color:var(--muted);font-size:.95rem;max-height:0;opacity:0;overflow:hidden;transition:max-height .3s,opacity .3s}
+.steps li:hover span,.steps li:focus span{max-height:6em;opacity:1}
+.steps li:hover::before,.steps li:focus::before{background:var(--accent);color:var(--accent-fg);border-color:transparent}

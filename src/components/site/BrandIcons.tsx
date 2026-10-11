@@ -1,5 +1,5 @@
 // Íconos de WhatsApp e Instagram para los botones que llevan a esas
-// aplicaciones. Los colores de cada botón están en globals.css (.btn.wa y
+// aplicaciones. Los colores de cada botón están en src/styles/controls.css (.btn.wa y
 // .btn.ig); el ícono toma el color del texto del botón.
 
 export function WhatsAppIcon() {

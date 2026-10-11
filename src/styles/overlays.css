@@ -1,0 +1,17 @@
+/* Lo que se abre encima de la página: ventanas (ficha de producto, elegir
+   equipo), el fondo oscurecido y el aviso que aparece abajo al agregar algo. */
+
+/* fondo oscurecido detrás del carrito */
+.scrim{position:fixed;inset:0;background:rgba(10,4,2,.6);z-index:50}
+
+/* ventana centrada: por defecto dos columnas (foto y datos) */
+.modal{position:fixed;inset:0;z-index:70;background:rgba(10,4,2,.65);display:grid;place-items:center;padding:16px;overflow-y:auto}
+.modal-card{position:relative;width:min(780px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;animation:slide .2s ease-out}
+.modal .icon-btn{position:absolute;top:10px;right:10px;background:var(--surface);z-index:2}
+@media(max-width:700px){.modal-card{grid-template-columns:1fr}}
+/* entrada suave de ventanas y carrito */
+@keyframes slide{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+
+/* aviso breve ("Agregado al carrito") */
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--btn-bg);color:var(--btn-fg);padding:.65rem 1.2rem;border-radius:999px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}

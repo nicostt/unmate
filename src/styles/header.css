@@ -1,0 +1,53 @@
+/* Encabezado fijo (src/components/site/Header.tsx) y pie (Footer.tsx). */
+
+/* ---------- encabezado ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-right:auto}
+/* el emblema es una máscara: toma el color del texto, así sirve en tema oscuro y claro */
+.badge{width:50px;height:50px;flex:none;background:var(--fg);-webkit-mask:url("/logo-mark.png") center/contain no-repeat;mask:url("/logo-mark.png") center/contain no-repeat}
+.brand-name{font:700 1.55rem var(--f-display);letter-spacing:-.03em;line-height:1}
+.brand-name b{font-weight:700;color:var(--accent)}
+
+/* navegación: en pantallas angostas va en un renglón propio que se desliza */
+.nav{display:flex;gap:4px 22px;order:3;width:100%;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:500;padding-block:6px;transition:var(--t-hover)}
+.nav a:hover{color:var(--fg)}
+@media(hover:hover){
+  /* subrayado que crece de izquierda a derecha */
+  .nav a{position:relative}
+  .nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--accent);transition:right .22s}
+  .nav a:hover::after{right:0}
+}
+
+/* botón del carrito y botón de tema */
+.cart-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600;transition:var(--t-hover)}
+.cart-btn:hover{border-color:var(--fg)}
+.cart-btn svg{width:20px;height:20px}
+#cart-count{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--btn-bg);color:var(--btn-fg);font-size:.8rem;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.theme-btn{flex:none}
+.theme-btn svg{width:20px;height:20px}
+.theme-btn .sun{display:var(--icon-sun)}
+.theme-btn .moon{display:var(--icon-moon)}
+
+/* pantallas anchas: todo en un solo renglón */
+@media(min-width:1000px){.nav{order:0;width:auto}.bar{flex-wrap:nowrap}.brand{margin-right:0}.nav{margin-right:auto;margin-left:28px}}
+/* celulares: logo, tema y carrito en un solo renglón; el carrito muestra solo ícono y número */
+@media(max-width:560px){
+  .bar{gap:8px 10px}
+  .badge{width:42px;height:42px}
+  .brand{gap:8px}
+  .brand-name{font-size:1.3rem}
+  .cart-btn{padding:0 12px;gap:6px}
+  .cart-label{display:none}
+}
+
+/* ---------- pie ---------- */
+footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px))}
+.foot{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:center;justify-content:space-between}
+.foot .brand{margin:0}
+.foot nav{display:flex;gap:8px 22px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}
+.foot nav a{text-decoration:none}
+.foot nav a:hover{color:var(--fg);text-decoration:underline}
+.foot-ig{display:inline-flex;align-items:center;gap:6px}

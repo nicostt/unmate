@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Figtree, Outfit } from "next/font/google";
 import Script from "next/script";
 import { THEME_SCRIPT } from "@/lib/theme";
-import "./globals.css";
+import "@/styles/index.css";
 
 // next/font descarga las fuentes al compilar y las sirve desde nuestro propio
 // sitio (no se le pide nada a Google cuando alguien entra). Cada una queda
-// disponible como variable CSS, que usa globals.css.
+// disponible como variable CSS, que usa src/styles/base.css.
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
