@@ -27,7 +27,16 @@ export function HeroMedia({ media }: { media: string[] }) {
       {media.map((src, i) => (
         <div key={src} className={i === current ? "hero-layer is-on" : "hero-layer"}>
           {isVideo(src) ? (
-            <video src={src} autoPlay muted loop playsInline preload={i === 0 ? "auto" : "metadata"} />
+            <video
+              src={src}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload={i === 0 ? "auto" : "metadata"}
+              // por si el navegador no lo arrancó solo al cargar la página
+              onCanPlay={(e) => void e.currentTarget.play().catch(() => {})}
+            />
           ) : (
             // la primera se carga con prioridad; las demás también de entrada,
             // para que estén listas cuando les toque aparecer
