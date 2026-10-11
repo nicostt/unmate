@@ -21,6 +21,7 @@ export function orderMessage(
   name: string,
   note: string,
   orderNumber: number | null,
+  saving = 0, // descuento por armar equipo, en pesos (ya restado de `total`)
 ): string {
   let t = orderNumber
     ? `Hola unmate.es! Quiero hacer este pedido (Pedido #${orderNumber}):\n\n`
@@ -31,6 +32,7 @@ export function orderMessage(
     // foto del diseño elegido, para que no haya dudas de cuál es.
     if (line.design) t += `   Foto: ${line.design.images[0]}\n`;
   }
+  if (saving > 0) t += `\nDescuento por armar equipo: −${money(saving)}`;
   t += `\nTotal: ${money(total)}\n`;
   if (name.trim()) t += `\nNombre: ${name.trim()}`;
   if (note.trim()) t += `\nAclaraciones: ${note.trim()}`;

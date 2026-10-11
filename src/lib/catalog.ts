@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { photoUrl, supabase } from "./supabase";
-import { weightTiers, type Catalog, type Review, type Shape } from "./types";
+import { weightTiers, type Catalog, type KitDiscount, type Review, type Shape } from "./types";
 
 // Forma en que llega cada producto de la base.
 type ProductRow = {
@@ -30,6 +30,16 @@ type ReviewRow = {
   featured: boolean;
 };
 
+// El descuento por armar equipo, tal como lo guardó el panel. Solo vale si
+// está prendido (más de 0 %) y con números razonables.
+function readKit(value: unknown): KitDiscount | null {
+  const { percent, min } = (value ?? {}) as { percent?: unknown; min?: unknown };
+  const ok =
+    Number.isInteger(percent) && Number.isInteger(min) &&
+    (percent as number) >= 1 && (percent as number) <= 90 && (min as number) >= 2;
+  return ok ? { percent: percent as number, min: min as number } : null;
+}
+
 // Único lugar de donde la web saca lo que muestra: catálogo (`categories`,
 // `products`, `product_designs`, `product_media`) y reseñas (`reviews`).
 // Solo llegan los productos y reseñas visibles, porque así lo deciden las
@@ -43,7 +53,7 @@ export async function getCatalog(): Promise<Catalog> {
   cacheLife("minutes");
   cacheTag("catalog");
 
-  const [categories, products, reviews] = await Promise.all([
+  const [categories, products, reviews, kit] = await Promise.all([
     supabase.from("categories").select("slug, name").order("sort_order"),
     supabase
       .from("products")
@@ -55,15 +65,18 @@ export async function getCatalog(): Promise<Catalog> {
       .order("sort_order")
       .overrideTypes<ProductRow[]>(),
     supabase.from("reviews").select("id, name, text, photos, avatar, featured").order("sort_order"),
+    supabase.from("settings").select("value").eq("key", "kit_discount").maybeSingle(),
   ]);
   if (categories.error) throw new Error(`No se pudieron leer las categorías: ${categories.error.message}`);
   if (products.error) throw new Error(`No se pudieron leer los productos: ${products.error.message}`);
 
-  // Las reseñas son un extra: si fallan, la tienda sigue andando sin ellas.
+  // Las reseñas y el descuento por equipo son extras: si fallan, la tienda
+  // sigue andando sin ellos.
   const reviewRows = (reviews.data ?? []) as ReviewRow[];
 
   return {
     categories: categories.data,
+    kit: readKit(kit.data?.value),
     reviews: reviewRows.map(
       (r): Review => ({ ...r, photos: r.photos.map(photoUrl), avatar: r.avatar && photoUrl(r.avatar) }),
     ),

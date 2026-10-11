@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 import { COUNT_ME_KEY } from "@/lib/track";
+import { HoldButton } from "./HoldButton";
 import { compute, fetchRaw, type Bar, type Computed, type Raw } from "./stats-data";
 import type { AdminProduct } from "./types";
 
@@ -33,7 +34,6 @@ export function Stats({ products }: { products: AdminProduct[] }) {
 
   // Borra todo lo juntado (eventos y carritos). No toca pedidos ni ventas.
   async function reset() {
-    if (!confirm("¿Borrar todas las estadísticas juntadas hasta ahora? Los pedidos y las ventas no se tocan.")) return;
     const events = await supabase.from("events").delete().gte("id", 0);
     const carts = await supabase.from("carts").delete().neq("visitor", "");
     const failed = events.error ?? carts.error;
@@ -72,9 +72,12 @@ export function Stats({ products }: { products: AdminProduct[] }) {
         <button className="btn ghost small" type="button" onClick={() => setReload((n) => n + 1)}>
           Actualizar
         </button>
-        <button className="btn ghost small danger" type="button" onClick={reset}>
+        <HoldButton
+          onConfirm={reset}
+          title="Mantené apretado para borrar todo lo juntado. Los pedidos y las ventas no se tocan."
+        >
           Borrar estadísticas
-        </button>
+        </HoldButton>
       </div>
       {error ? (
         <p className="admin-error">{error}</p>

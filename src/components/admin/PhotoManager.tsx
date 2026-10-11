@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { DropZone } from "./DropZone";
+import { HoldButton } from "./HoldButton";
 import { uploadPhoto } from "./photos";
 import { photosOf, type AdminMedia, type AdminProduct } from "./types";
 
@@ -48,7 +49,6 @@ export function PhotoManager({
   }
 
   function remove(photo: AdminMedia) {
-    if (!confirm("¿Borrar esta foto?")) return;
     return work(async () => {
       await supabase.storage.from(PHOTOS_BUCKET).remove([photo.path]);
       const { error } = await supabase.from("product_media").delete().eq("id", photo.id);
@@ -90,9 +90,9 @@ export function PhotoManager({
               >
                 →
               </button>
-              <button type="button" disabled={busy} onClick={() => remove(photo)}>
+              <HoldButton className="" disabled={busy} onConfirm={() => remove(photo)} title="Mantené apretado para borrar la foto">
                 Borrar
-              </button>
+              </HoldButton>
             </div>
           </div>
         ))}

@@ -3,18 +3,20 @@
 import Image from "next/image";
 import { useState } from "react";
 import { money } from "@/lib/format";
-import { cartKey, isSoldOut, type Product, type Shape } from "@/lib/types";
+import { cartKey, isSoldOut, kitSaving, type Product, type Shape } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 import { useOverlay } from "./useOverlay";
 
-// Las tres partes del equipo. `none` es el texto de "no quiero esta parte";
-// el mate no lo tiene porque es obligatorio. `art` es el dibujo que muestra
-// el casillero mientras no se eligió nada.
+// Las cuatro partes del equipo (las mismas de KIT_PARTS, en src/lib/types.ts,
+// que es lo que usa el descuento). `none` es el texto de "no quiero esta
+// parte"; el mate no lo tiene porque es obligatorio. `art` es el dibujo que
+// muestra el casillero mientras no se eligió nada.
 const STEPS = [
   { id: "mate", label: "Mate", category: "mates", none: null, art: "camionero" },
   { id: "bombilla", label: "Bombilla", category: "bombillas", none: "Sin bombilla", art: "loro" },
   { id: "termo", label: "Termo", category: "termos", none: "Sin termo", art: "termo" },
+  { id: "yerba", label: "Yerba", category: "yerba", none: "Sin yerba", art: "yerba" },
 ] as const;
 
 type Step = (typeof STEPS)[number];
@@ -23,6 +25,7 @@ type StepId = Step["id"];
 // Una opción para elegir: un producto, o un diseño puntual de un mate.
 type Option = {
   key: string; // lo que va al carrito
+  product: Product;
   name: string;
   price: number;
   image: string | null;
@@ -32,20 +35,32 @@ type Option = {
 
 // Opciones de una categoría: una por producto, o una por cada diseño si el
 // producto va por diseños (así el cliente elige la pieza por su foto).
+// La yerba suelta no entra: al equipo va el paquete.
 function optionsOf(products: Product[], category: string): Option[] {
   return products
-    .filter((p) => p.category === category && !isSoldOut(p))
+    .filter((p) => p.category === category && !p.byWeight && !isSoldOut(p))
     .flatMap((p): Option[] =>
       p.byDesign
         ? p.designs.map((d) => ({
             key: cartKey(p, d),
+            product: p,
             name: p.name,
             price: p.price,
             image: d.images[0],
             shape: p.shape,
             unique: true,
           }))
-        : [{ key: cartKey(p, null), name: p.name, price: p.price, image: p.images[0] ?? null, shape: p.shape, unique: false }],
+        : [
+            {
+              key: cartKey(p, null),
+              product: p,
+              name: p.name,
+              price: p.price,
+              image: p.images[0] ?? null,
+              shape: p.shape,
+              unique: false,
+            },
+          ],
     );
 }
 
@@ -53,31 +68,38 @@ function OptionArt({ option }: { option: Option }) {
   return option.image ? <Image src={option.image} alt="" fill sizes="180px" /> : <ProductArt shape={option.shape} />;
 }
 
-// "Armá tu equipo": tres casilleros (mate, bombilla, termo). Al tocar uno se
+// "Armá tu equipo": cuatro casilleros (mate, bombilla, termo y yerba). Al tocar uno se
 // abre una ventana encima de la página con las fotos de todas las opciones;
 // se elige una y la ventana se cierra. Así la sección ocupa lo mismo haya 5
 // mates o 50.
 export function KitBuilder() {
-  const { products, addMany, openCart, notify } = useShop();
-  const options: Record<StepId, Option[]> = {
-    mate: optionsOf(products, "mates"),
-    bombilla: optionsOf(products, "bombillas"),
-    termo: optionsOf(products, "termos"),
-  };
+  const { products, kit, addMany, openCart, notify } = useShop();
+  const options = Object.fromEntries(STEPS.map((s) => [s.id, optionsOf(products, s.category)])) as Record<
+    StepId,
+    Option[]
+  >;
 
   const [open, setOpen] = useState<Step | null>(null); // qué ventana está abierta
   // qué se eligió en cada parte (key de la opción); null = ninguna
-  const [picked, setPicked] = useState<Record<StepId, string | null>>({ mate: null, bombilla: null, termo: null });
+  const [picked, setPicked] = useState<Record<StepId, string | null>>({
+    mate: null,
+    bombilla: null,
+    termo: null,
+    yerba: null,
+  });
 
   // si lo elegido dejó de existir (se vendió), esa parte queda sin elegir
   const chosen = (id: StepId) => options[id].find((o) => o.key === picked[id]) ?? null;
   const all = STEPS.map((s) => chosen(s.id)).filter((o) => o !== null);
-  const total = all.reduce((sum, o) => sum + o.price, 0);
+  const subtotal = all.reduce((sum, o) => sum + o.price, 0);
+  // descuento por armar equipo: misma cuenta que hace después el carrito
+  const saving = kitSaving(all.map((o) => o.product), kit).amount;
+  const total = subtotal - saving;
 
   function addKit() {
     if (!all.length) return notify("Elegí al menos un mate para armar tu equipo");
     if (addMany(all.map((o) => o.key))) {
-      notify("Equipo agregado al carrito");
+      notify("¡Equipo armado! Ya está en tu carrito");
       openCart();
     } else {
       notify("Esos productos ya están en tu carrito");
@@ -86,11 +108,18 @@ export function KitBuilder() {
 
   return (
     <section className="wrap block" id="equipo" data-reveal>
-      <div className="kit">
+      <div className="kit grain">
         <div className="kit-intro">
           <p className="eyebrow">Combo a tu medida</p>
           <h2>Armá tu equipo</h2>
           <p className="muted">Tocá cada parte, elegí la que te guste mirando las fotos y sumá todo al carrito de una vez.</p>
+          {kit && (
+            <p className="kit-offer">
+              <span className="off">−{kit.percent}%</span>
+              Llevando {kit.min === STEPS.length ? `las ${kit.min} partes` : `${kit.min} partes o más`}, el equipo te sale
+              más barato.
+            </p>
+          )}
         </div>
 
         <div className="kit-slots">
@@ -114,7 +143,9 @@ export function KitBuilder() {
         <div className="kit-foot">
           <div className="kit-total">
             <span className="muted">Total del equipo</span>
+            {saving > 0 && <s className="was">{money(subtotal)}</s>}
             <strong>{money(total)}</strong>
+            {saving > 0 && kit && <span className="off">−{kit.percent}%</span>}
           </div>
           <button className="btn primary" type="button" onClick={addKit}>
             Agregar equipo al carrito

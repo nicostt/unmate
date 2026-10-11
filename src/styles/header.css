@@ -1,7 +1,11 @@
 /* Encabezado fijo (src/components/site/Header.tsx) y pie (Footer.tsx). */
 
 /* ---------- encabezado ---------- */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);transition:transform .3s ease}
+/* se esconde al bajar y vuelve al subir (la clase la pone HideOnScroll.tsx).
+   Si alguien navega con el teclado y entra al encabezado, se queda a la vista. */
+.top.is-away{transform:translateY(-101%)}
+.top.is-away:focus-within{transform:none}
 .bar{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding-block:10px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-right:auto}
 /* el emblema es una máscara: toma el color del texto, así sirve en tema oscuro y claro */
@@ -25,6 +29,9 @@
 .cart-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:600;transition:var(--t-hover)}
 .cart-btn:hover{border-color:var(--fg)}
 .cart-btn svg{width:20px;height:20px}
+/* rebote al recibir un producto (src/lib/fly.ts) */
+.cart-btn.bump{animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes bump{40%{transform:scale(1.2)}}
 #cart-count{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--btn-bg);color:var(--btn-fg);font-size:.8rem;display:grid;place-items:center;font-variant-numeric:tabular-nums}
 .theme-btn{flex:none}
 .theme-btn svg{width:20px;height:20px}
@@ -43,8 +50,29 @@
   .cart-label{display:none}
 }
 
-/* ---------- pie ---------- */
-footer{margin-top:clamp(44px,7vw,84px);border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px))}
+/* ---------- final de la página (Footer.tsx) ----------
+   Ocupa toda la pantalla: foto de fondo, los links de siempre y el nombre de
+   la marca en gigante. Como va sobre una foto, los colores son siempre los
+   claros, también en tema claro: por eso se redefinen las variables acá. */
+.end{position:relative;isolation:isolate;overflow:hidden;min-height:100svh;display:grid;margin-top:clamp(44px,7vw,84px);background:#160a06;color:#f6efe9;--fg:#f6efe9;--muted:#d9cbbf;--line:rgba(246,239,233,.24);--accent:#aac56b}
+.end-media{position:absolute;inset:0;z-index:-2}
+.end-media img{object-fit:cover}
+/* velo oscuro, y encima el grano */
+.end::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(22,10,6,.86),rgba(22,10,6,.5) 45%,rgba(22,10,6,.92))}
+.end::after{content:"";position:absolute;inset:0;z-index:-1;background-image:var(--noise);mix-blend-mode:overlay;opacity:.5;pointer-events:none}
+.end-inner{display:grid;grid-template-rows:auto 1fr auto;gap:24px;width:100%;padding-block:clamp(28px,5vw,48px) calc(28px + env(safe-area-inset-bottom,0px))}
+.end .fine{text-align:center}
+/* el nombre en gigante: cada letra salta al pasarle por arriba y suelta yerba (FooterName.tsx) */
+.end-name-wrap{align-self:center;display:grid;justify-items:center;gap:12px;text-align:center;min-width:0}
+.end-name{display:flex;justify-content:center;font:700 clamp(3.4rem,17.5vw,15rem)/.95 var(--f-display);letter-spacing:-.05em;user-select:none;-webkit-user-select:none;cursor:default}
+.end-name span{position:relative;display:inline-block;transition:color .3s}
+.end-name span.is-accent,.end-name span:hover{color:var(--accent)}
+.end-name span.is-accent:hover{color:var(--fg)}
+.end-name b{display:inline-block;font-weight:inherit}
+.end-name b.is-jumping{animation:salto .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes salto{40%{transform:translateY(-16%)}}
+.end-speck{position:absolute;left:50%;top:.12em;width:max(6px,.06em);height:max(6px,.06em);border-radius:50% 0 50% 50%;background:var(--accent);pointer-events:none}
+.end-game{font-size:.92rem;color:var(--muted);min-height:1.6em}
 .foot{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:center;justify-content:space-between}
 .foot .brand{margin:0}
 .foot nav{display:flex;gap:8px 22px;flex-wrap:wrap;color:var(--muted);font-size:.92rem}

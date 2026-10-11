@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { DropZone } from "./DropZone";
+import { HoldButton } from "./HoldButton";
 import { storePhoto } from "./photos";
 
 type ReviewRow = {
@@ -90,7 +91,6 @@ export function ReviewsAdmin({ onChanged }: { onChanged: () => Promise<void> }) 
   }
 
   const remove = (review: ReviewRow) =>
-    confirm(`¿Eliminar la reseña de ${review.name}?`) &&
     work(async () => {
       const files = [...review.photos, ...(review.avatar ? [review.avatar] : [])];
       if (files.length) await supabase.storage.from(PHOTOS_BUCKET).remove(files);
@@ -204,9 +204,9 @@ export function ReviewsAdmin({ onChanged }: { onChanged: () => Promise<void> }) 
               >
                 {review.is_active ? "Ocultar" : "Mostrar"}
               </button>
-              <button className="btn ghost small danger" type="button" disabled={busy} onClick={() => remove(review)}>
+              <HoldButton disabled={busy} onConfirm={() => remove(review)} title="Mantené apretado para eliminar la reseña">
                 Eliminar
-              </button>
+              </HoldButton>
             </div>
           </div>
         ))}

@@ -37,6 +37,9 @@
 /* yerba: aviso de que llevando más sale más barato */
 .deal{font-size:.84rem;font-weight:600;color:var(--accent)}
 
+/* aviso que ocupa todo el ancho de la grilla ("Capaz buscabas esto:") */
+.grid-note{grid-column:1/-1;font-size:1.05rem}
+
 /* ---------- búsqueda sin resultados: cartel que invita a preguntar ---------- */
 .empty{grid-column:1/-1;display:grid;gap:12px;justify-items:center;text-align:center;padding:clamp(32px,6vw,64px) 24px;border:2px solid var(--accent);border-radius:22px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,var(--surface)),var(--surface));color:var(--muted)}
 .empty strong{font:700 clamp(1.6rem,3.6vw,2.4rem)/1.1 var(--f-display);letter-spacing:-.02em;color:var(--fg)}
@@ -59,7 +62,12 @@
 .gallery-dots span.on{opacity:1}
 
 /* ---------- ficha de producto (va dentro de una ventana, ver overlays.css) ---------- */
-.m-art{background:var(--surface-2);display:grid;place-items:center;padding:28px;min-height:260px}
+/* view-transition-name: al abrir y cerrar, la foto de la tarjeta se transforma
+   en esta (lo maneja Catalog.tsx; la tarjeta lleva el mismo nombre un instante) */
+.m-art{background:var(--surface-2);display:grid;place-items:center;padding:28px;min-height:260px;view-transition-name:ficha-foto}
+::view-transition-group(ficha-foto){animation-duration:.42s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+/* las dos fotos tienen proporciones distintas: que recorten en vez de estirarse */
+::view-transition-old(ficha-foto),::view-transition-new(ficha-foto){height:100%;object-fit:cover}
 .m-art svg{width:84%;height:auto}
 .m-art.has-photos{position:relative;padding:0}
 .m-info{padding:clamp(20px,3vw,32px);display:grid;gap:12px;align-content:start;min-width:0}

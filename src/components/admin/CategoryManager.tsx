@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { HoldButton } from "./HoldButton";
 import { slugify, type AdminCategory, type AdminProduct } from "./types";
 
 // Categorías de la tienda: agregar, cambiar el nombre y borrar.
@@ -102,13 +103,9 @@ function CategoryRow({
         <button className="btn ghost small" type="button" disabled={!changed} onClick={() => onRename(name.trim())}>
           Guardar nombre
         </button>
-        <button
-          className="btn ghost small danger"
-          type="button"
-          onClick={() => confirm(`¿Borrar la categoría "${category.name}"?`) && onDelete()}
-        >
+        <HoldButton onConfirm={onDelete} title="Mantené apretado para borrar la categoría">
           Borrar
-        </button>
+        </HoldButton>
       </div>
     </div>
   );

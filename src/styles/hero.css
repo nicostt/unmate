@@ -15,12 +15,21 @@
 }
 @keyframes acercar{from{transform:scale(1)}to{transform:scale(1.14)}}
 /* velo oscuro del color de marca: más cerrado arriba y abajo, para que se lea el texto */
-.hero-video::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(22,10,6,.82),rgba(22,10,6,.55) 45%,rgba(22,10,6,.9))}
+.hero-video::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(22,10,6,.82),rgba(22,10,6,.55) 45%,rgba(22,10,6,.9))}
+/* y encima del velo, el grano de película */
+.hero-video::after{content:"";position:absolute;inset:0;z-index:-1;background-image:var(--noise);mix-blend-mode:overlay;opacity:.45;pointer-events:none}
 /* el texto de la portada va siempre claro, también en tema claro: está sobre el video */
 .hero-video-copy{display:grid;justify-items:center;text-align:center;gap:6px;padding-block:clamp(64px,10vw,120px);color:#f6efe9}
 .hero-video .eyebrow{color:#e2d6cc}
 .hero-video h1{font-size:clamp(2.7rem,7.4vw,5.4rem);font-weight:700;line-height:1;letter-spacing:-.03em;margin-block:14px 18px}
-.hero-video h1 span{color:#aac56b}
+/* la palabra que va cambiando (RotatingWord.tsx): las palabras están apiladas
+   en un hueco que tapa lo que sobra; la que toca sube desde abajo y la
+   anterior se va por arriba. Las que esperan no tienen transición, así
+   vuelven abajo de golpe sin que se vea. */
+.rw{display:block;position:relative;height:1.2em;overflow:hidden;color:#aac56b}
+.rw span{position:absolute;left:0;right:0;top:0;line-height:1.2;white-space:nowrap;transform:translateY(110%)}
+.rw .is-on{transform:none;transition:transform .6s cubic-bezier(.6,0,.2,1)}
+.rw .is-out{transform:translateY(-110%);transition:transform .6s cubic-bezier(.6,0,.2,1)}
 .hero-video .lead{color:#e2d6cc;font-size:clamp(1.05rem,1.6vw,1.25rem);max-width:38rem}
 .hero-video .cta-row{justify-content:center;margin-top:28px}
 .hero-video .btn.accent{background:#aac56b;color:#220f09}

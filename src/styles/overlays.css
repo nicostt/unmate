@@ -5,13 +5,28 @@
 .scrim{position:fixed;inset:0;background:rgba(10,4,2,.6);z-index:50}
 
 /* ventana centrada: por defecto dos columnas (foto y datos) */
-.modal{position:fixed;inset:0;z-index:70;background:rgba(10,4,2,.65);display:grid;place-items:center;padding:16px;overflow-y:auto}
-.modal-card{position:relative;width:min(780px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;animation:slide .2s ease-out}
+/* La ventana se centra con margin:auto y no con "centrar todo": así, si es más
+   alta que la pantalla, arranca desde arriba y se puede recorrer entera. */
+.modal{position:fixed;inset:0;z-index:70;background:rgba(10,4,2,.65);display:flex;padding:16px;overflow-y:auto;overscroll-behavior:contain}
+.modal-card{position:relative;margin:auto;width:min(780px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;animation:slide .2s ease-out}
 .modal .icon-btn{position:absolute;top:10px;right:10px;background:var(--surface);z-index:2}
-@media(max-width:700px){.modal-card{grid-template-columns:1fr}}
+@media(max-width:700px){
+  /* en el celular entra con un fundido (sin moverse) y la X queda fija arriba a
+     la derecha de la pantalla, siempre a mano aunque la ficha sea larga */
+  .modal-card{grid-template-columns:1fr;animation-name:fundido}
+  .modal .icon-btn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+}
+@keyframes fundido{from{opacity:0}to{opacity:1}}
 /* entrada suave de ventanas y carrito */
 @keyframes slide{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
 
 /* aviso breve ("Agregado al carrito") */
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--btn-bg);color:var(--btn-fg);padding:.65rem 1.2rem;border-radius:999px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+/* con el carrito abierto sale arriba, para no tapar el total ni el botón de pedir */
+.toast.at-top{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px))}
+
+/* miniatura que vuela al carrito al sumar un producto (src/lib/fly.ts) */
+.fly{position:fixed;z-index:95;width:56px;height:56px;pointer-events:none}
+.fly>div,.fly-ghost{width:100%;height:100%}
+.fly-ghost{border-radius:14px;background:var(--accent) center/cover no-repeat;border:2px solid var(--accent);box-shadow:0 10px 24px -8px rgba(0,0,0,.55)}

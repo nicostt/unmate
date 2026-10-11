@@ -8,9 +8,8 @@ import { MateTypes } from "./MateTypes";
 export function ChooseGuide() {
   return (
     <section className="wrap block" id="elegir" data-reveal>
-      <div className="feature">
+      <div className="feature grain">
         <div className="feature-head">
-          <p className="eyebrow">Guía rápida</p>
           <h2>¿Cuál es tu tipo de mate?</h2>
           <p className="lead">
             Cada tipo tiene su forma, su material y su manera de tomar. Pasá por los nombres y encontrá el tuyo.
@@ -35,9 +34,8 @@ export function ChooseGuide() {
 export function CureGuide() {
   return (
     <section className="wrap block" id="curado" data-reveal>
-      <div className="feature feature-cure">
+      <div className="feature feature-cure grain">
         <div className="feature-head">
-          <p className="eyebrow">Antes del primer mate</p>
           <h2>Cómo curarlo</h2>
           <p className="lead">
             Un mate bien curado dura más y ceba mejor. Son tres pasos y un poco de paciencia.

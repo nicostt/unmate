@@ -20,6 +20,12 @@
   /* --font-outfit y --font-figtree las define next/font en src/app/layout.tsx */
   --f-display:var(--font-outfit),'Avenir Next','Segoe UI',sans-serif;
   --f-body:var(--font-figtree),'Segoe UI',system-ui,sans-serif;
+  /* verde claro de los detalles: texto seleccionado, barra de scroll y lo resaltado al buscar */
+  --mark:#aac56b;
+  --mark-fg:#220f09;
+  /* grano de película: una textura de ruido muy fino, dibujada con SVG (pesa casi nada).
+     Se usa con la clase .grain, y en la portada y el final de la página. */
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   /* transición común de todo lo que reacciona al mouse (tarjetas, botones, filtros) */
   --t-hover:transform .22s,border-color .22s,box-shadow .22s,background-color .22s,color .22s,padding .22s;
   color-scheme:dark;
@@ -48,8 +54,16 @@ p{margin:0}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-/* quien pidió menos movimiento en su dispositivo no ve animaciones */
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* ---------- detalles con el color de la marca ---------- */
+/* texto seleccionado con el mouse */
+::selection{background:var(--mark);color:var(--mark-fg)}
+/* barra de scroll */
+html{scrollbar-color:var(--mark) transparent}
+/* cursor de escritura, y casillas y controles del navegador */
+:root{caret-color:var(--accent);accent-color:var(--accent)}
+/* lo que coincide con una búsqueda */
+mark{background:var(--mark);color:var(--mark-fg);border-radius:3px;padding:0 .1em;margin:0 -.1em}
 
 /* ---------- utilidades ---------- */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -60,6 +74,12 @@ button,input,select,textarea{font:inherit;color:inherit}
 .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
 .note{margin-top:14px;font-size:.92rem;color:var(--muted);border-left:2px solid var(--accent);padding-left:12px}
 .fine{font-size:.85rem;color:var(--muted)}
+/* dibujo redondo para los estados vacíos (carrito vacío, búsqueda sin resultados) */
+.empty-art{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 16%,var(--surface-2));color:var(--accent)}
+.empty-art svg{width:62%;height:auto}
+/* grano de película sobre un fondo liso o un degradado: se agrega la clase al elemento */
+.grain{position:relative;isolation:isolate}
+.grain::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background-image:var(--noise);mix-blend-mode:overlay;opacity:.5;pointer-events:none}
 
 /* ---------- armazón de una sección ---------- */
 section[id]{scroll-margin-top:96px}
@@ -72,3 +92,8 @@ section[id]{scroll-margin-top:96px}
   .reveal [data-reveal]{transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
   .reveal [data-reveal]:not(.is-in){opacity:0;transform:translateY(34px)}
 }
+
+/* ---------- cambios de pantalla animados (View Transitions, ver src/lib/motion.ts) ---------- */
+/* cambio de tema: el tema nuevo se abre en círculo desde el botón (ThemeToggle.tsx).
+   Mientras tanto se apaga el fundido que trae el navegador. */
+.theme-switch::view-transition-old(root),.theme-switch::view-transition-new(root){animation:none;mix-blend-mode:normal}

@@ -7,8 +7,11 @@ import { money } from "@/lib/format";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { YERBA_CATEGORY } from "@/lib/types";
 import { CategoryManager } from "./CategoryManager";
+import { HoldButton } from "./HoldButton";
+import { KitDiscountForm } from "./KitDiscountForm";
 import { Orders } from "./Orders";
 import { ReviewsAdmin } from "./ReviewsAdmin";
+import { SortableList } from "./SortableList";
 import { Stats } from "./Stats";
 import { ProductForm, type FormKind } from "./ProductForm";
 import {
@@ -86,7 +89,6 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
   }
 
   async function removeProduct(product: AdminProduct) {
-    if (!confirm(`¿Eliminar "${product.name}"? No se puede deshacer.`)) return;
     const paths = product.product_media.map((m) => m.path);
     if (paths.length) await supabase.storage.from(PHOTOS_BUCKET).remove(paths);
     await run(supabase.from("products").delete().eq("id", product.id));
@@ -111,29 +113,43 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
   const packs = inYerba.filter((p) => !p.by_weight); // paquetes, por unidad
   const others = products.filter((p) => p.category_id !== yerbaCategory?.id);
 
-  // Mueve un producto un lugar dentro de su lista (-1 arriba, +1 abajo).
-  // Los números de orden de esa lista se reparten de nuevo en la secuencia
-  // nueva, así no cambia cómo se intercalan productos y yerbas en la tienda.
-  async function move(list: AdminProduct[], index: number, by: -1 | 1) {
+  // Lleva un producto de una posición a otra dentro de su lista (lo llama
+  // SortableList al soltar una fila). Los números de orden de esa lista se
+  // reparten de nuevo en la secuencia nueva, así no cambia cómo se
+  // intercalan productos y yerbas en la tienda.
+  async function move(list: AdminProduct[], from: number, to: number) {
     const slots = list.map((p) => p.sort_order);
     const next = [...list];
-    [next[index], next[index + by]] = [next[index + by], next[index]];
+    next.splice(to, 0, ...next.splice(from, 1));
+    const order = new Map(next.map((product, i) => [product.id, slots[i]]));
+
+    // primero en pantalla, para que la fila no vuelva a su lugar mientras se guarda
+    setData({
+      categories,
+      products: products
+        .map((p) => ({ ...p, sort_order: order.get(p.id) ?? p.sort_order }))
+        .sort((a, b) => a.sort_order - b.sort_order),
+    });
+
     setError("");
-    for (const [i, product] of next.entries()) {
-      if (product.sort_order === slots[i]) continue;
-      const { error } = await supabase.from("products").update({ sort_order: slots[i] }).eq("id", product.id);
+    for (const product of next) {
+      if (product.sort_order === order.get(product.id)) continue;
+      const { error } = await supabase
+        .from("products")
+        .update({ sort_order: order.get(product.id) })
+        .eq("id", product.id);
       if (error) setError(error.message);
     }
     await changed();
   }
 
-  const rows = (list: AdminProduct[], kind: FormKind) =>
-    list.map((p, i) => (
+  // Una lista de productos que se ordena arrastrando cada fila de su manija.
+  const rows = (list: AdminProduct[], kind: FormKind) => (
+    <SortableList onMove={(from, to) => move(list, from, to)}>
+      {list.map((p) => (
       <Row
         key={p.id}
         product={p}
-        onUp={i > 0 ? () => move(list, i, -1) : undefined}
-        onDown={i < list.length - 1 ? () => move(list, i, 1) : undefined}
         byWeight={kind === "yerba"}
         category={categories.find((c) => c.id === p.category_id)?.name ?? ""}
         onEdit={() => setView({ screen: "form", kind, id: p.id })}
@@ -141,7 +157,9 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
         onToggle={() => run(supabase.from("products").update({ is_active: !p.is_active }).eq("id", p.id))}
         onStock={(stock) => run(supabase.from("products").update({ stock }).eq("id", p.id))}
       />
-    ));
+      ))}
+    </SortableList>
+  );
 
   return (
     <div className="wrap admin">
@@ -229,9 +247,11 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
               + Agregar producto
             </button>
           </div>
-          <div className="admin-list">{rows(others, "product")}</div>
+          {rows(others, "product")}
         </section>
       )}
+
+      {view.screen === "list" && <KitDiscountForm onChanged={changed} />}
 
       {view.screen === "yerba" && (
         <>
@@ -245,9 +265,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
                 + Agregar yerba suelta
               </button>
             </div>
-            <div className="admin-list">
-              {loose.length ? rows(loose, "yerba") : <p className="muted">Todavía no cargaste yerba suelta.</p>}
-            </div>
+            {loose.length ? rows(loose, "yerba") : <p className="muted">Todavía no cargaste yerba suelta.</p>}
           </section>
 
           <section className="admin-section">
@@ -258,9 +276,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
                 + Agregar paquete
               </button>
             </div>
-            <div className="admin-list">
-              {packs.length ? rows(packs, "pack") : <p className="muted">Todavía no cargaste paquetes.</p>}
-            </div>
+            {packs.length ? rows(packs, "pack") : <p className="muted">Todavía no cargaste paquetes.</p>}
           </section>
         </>
       )}
@@ -272,8 +288,6 @@ function Row({
   product,
   byWeight,
   category,
-  onUp,
-  onDown,
   onEdit,
   onDelete,
   onToggle,
@@ -282,8 +296,6 @@ function Row({
   product: AdminProduct;
   byWeight: boolean;
   category: string;
-  onUp: (() => void) | undefined; // undefined = ya es el primero
-  onDown: (() => void) | undefined; // undefined = ya es el último
   onEdit: () => void;
   onDelete: () => void;
   onToggle: () => void;
@@ -304,14 +316,15 @@ function Row({
 
   return (
     <div className={product.is_active ? "admin-row" : "admin-row is-hidden"}>
-      <div className="admin-move">
-        <button type="button" disabled={!onUp} onClick={onUp} aria-label="Subir en la lista" title="Subir">
-          ↑
-        </button>
-        <button type="button" disabled={!onDown} onClick={onDown} aria-label="Bajar en la lista" title="Bajar">
-          ↓
-        </button>
-      </div>
+      {/* manija para ordenar: el arrastre lo maneja SortableList */}
+      <button
+        className="admin-grip"
+        type="button"
+        aria-label={`Mover ${product.name}: arrastrá, o usá las flechas arriba y abajo`}
+        title="Arrastrá para cambiar el orden"
+      >
+        ⠿
+      </button>
       <div className="admin-thumb">
         {cover && <Image src={photoUrl(cover.path)} alt="" fill sizes="56px" />}
       </div>
@@ -349,9 +362,9 @@ function Row({
         <button className="btn ghost small" type="button" onClick={onEdit}>
           Editar
         </button>
-        <button className="btn ghost small danger" type="button" onClick={onDelete}>
+        <HoldButton onConfirm={onDelete} title="Mantené apretado para eliminar. No se puede deshacer.">
           Eliminar
-        </button>
+        </HoldButton>
       </div>
     </div>
   );

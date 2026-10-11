@@ -47,7 +47,9 @@ src/
     catalog.ts           Lee el catálogo de la base
     orders.ts            Registra un pedido
     site.ts              Número de WhatsApp, Instagram y texto del pedido
-    hero.ts              Qué videos o fotos van en la portada
+    hero.ts              Qué videos o fotos van en la portada y al final
+    search.ts            Buscador: sin tildes, con resaltado y "parecidos"
+    motion.ts, fly.ts    Animaciones hechas desde JavaScript
     track.ts             Estadísticas anónimas
     cart-store.ts        El carrito, guardado en el navegador del cliente
     supabase.ts          La conexión a la base
@@ -55,6 +57,7 @@ src/
   styles/              Los estilos, un archivo por zona (ver abajo)
 public/
   hero/                Videos de la portada (1.mp4, 2.mp4...)
+  final.jpg            Foto de fondo del final de la página (todavía no está)
   logo-mark.png        El emblema del logo
 supabase/migrations/   Los cambios de la base, numerados en el orden en que se ejecutaron
 referencia/            El diseño original en un solo HTML (solo para consultar)
@@ -74,7 +77,9 @@ referencia/            El diseño original en un solo HTML (solo para consultar)
 | `catalog.css` | Catálogo, tarjetas, galería y ficha de producto |
 | `cart.css` | Carrito |
 | `sections.css` | Tipos de mate, equipo, curado, reseñas y contacto |
+| `motion.css` | Qué cambia para quien pidió "menos movimiento" en su dispositivo |
 | `admin.css` | Todo el panel. Solo se carga en `/admin` |
+| `not-found.css` | La página de error 404. Solo se carga ahí |
 
 El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
 
@@ -82,6 +87,10 @@ El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
 
 - **Productos, yerba, categorías, precios, stock, fotos, pedidos y reseñas:** desde el panel, en `/admin`. Entrás con el email y la contraseña del usuario de Supabase. Los cambios se ven en la tienda al instante.
 - **Videos de la portada:** copiarlos a `public/hero/` como `.mp4` o `.webm`. Aparecen solos, en orden de nombre.
+- **Foto del final de la página:** guardarla como `public/final.jpg` (o `.webp` / `.png`). Mientras no esté, va la foto de un producto.
+- Después de agregar o quitar esos archivos hay que reiniciar `npm run dev`: la lista se arma al arrancar (`next.config.ts`).
+- **Descuento por armar equipo:** en el panel, pestaña Productos, abajo de la lista.
+- **Palabras que rotan en el título de la portada:** la lista `FOR` en `src/components/site/Hero.tsx`.
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
 - **Textos de la portada o de las guías:** `src/components/site/`.
 - **Orden de las secciones:** `src/app/page.tsx`.
@@ -90,6 +99,8 @@ El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
 ## Cambios en la base de datos
 
 Cada cambio de estructura es un archivo nuevo en `supabase/migrations/`, con el número siguiente. Se ejecuta una sola vez, entero, en el SQL Editor de Supabase. Los archivos ya ejecutados no se modifican.
+
+El descuento por armar equipo necesita la migración 0007: hasta ejecutarla, la tienda funciona igual pero sin descuento.
 
 La tabla `product_variants` (migración 0002) y la fila `yerba_tiers` de `settings` (0004) quedaron sin uso: la tienda no las lee.
 

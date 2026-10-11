@@ -28,7 +28,8 @@ Tienda online de mates, bombillas, yerba y termos. El cliente arma un carrito y 
 - Dominio: `unmatees.lat` (Namecheap, con Netlify DNS). Quería el `.com` y compró `.lat` por error; decidió usarlo. `unmate.es` lo tiene registrado un conocido suyo.
 - Para verificar una publicación, mirar directamente https://unmatees.lat (la dirección `shiny-hamster-7b8446.netlify.app` ya no responde y la consulta pública de deploys devuelve 401).
 - Publicado: `main` = commit `2471ba1` (9/10/2026), 7.ª publicación del mes (105 créditos como mínimo).
-- EN `dev` SIN PUBLICAR (Nicolás pidió esperar a terminar los cambios de diseño y el material pendiente): botones de estadísticas (contarme, actualizar, borrar), catálogo arriba de los tipos de mate, fotos de reseñas a 150 px, portada con video, encabezado compacto en celulares, estilos repartidos por zona.
+- EN `dev` SIN PUBLICAR (Nicolás pidió esperar a terminar los cambios de diseño y el material pendiente): botones de estadísticas (contarme, actualizar, borrar), catálogo arriba de los tipos de mate, fotos de reseñas a 150 px, portada con video, encabezado compacto en celulares, estilos repartidos por zona, y la tanda de ideas del 11/10/2026 (ver abajo).
+- Respaldo de antes de esa tanda: etiqueta `respaldo-antes-de-ideas` y rama `respaldo/antes-de-ideas` (commit `560ed7b`). Si algo no gusta, se vuelve desde ahí.
 
 ## Cómo está armado
 Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el código:
@@ -43,13 +44,19 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 - **Avisos de stock:** "Últimas 3", "Últimas 2", "Última unidad", "Agotado"; con más de 3 no dice nada.
 - **Pedidos:** `create_order` (la llama `src/lib/orders.ts`) recalcula precios y rechaza lo que no tiene stock con `SIN_STOCK:<producto>`; la tienda avisa y no abre WhatsApp. Estados (`set_order_status`): CONFIRMAR baja el stock (un diseño queda apartado con `is_hidden`). ENTREGAR es definitivo: los diseños se eliminan, el pedido pasa a Vendidos y ya no cambia de estado. CANCELAR un confirmado devuelve el stock; un cancelado se puede reabrir como confirmado o como pendiente. El pedido se titula "Pedido de <nombre>" y se puede renombrar.
 - **Estadísticas anónimas:** tablas `events` y `carts`, funciones `track` y `save_cart` (`src/lib/track.ts`). Cuentan personas distintas, no clics. No cuentan `localhost` ni el navegador con sesión de admin, salvo que se active "Contar también lo que hago yo" (`COUNT_ME_KEY`). El clic en "¿No encontrás lo que buscabas?" se anota como `search` con `value: -1`.
-- **Portada:** `src/lib/hero.ts` usa los videos de `public/hero/*.mp4|webm` en orden de nombre; si no hay, las fotos de los dos primeros productos. Se funden cada 7 s. Aprobada por Nicolás el 10/10/2026. Hoy hay un solo video de prueba (`1.mp4`: 4 segundos, 832 × 464, llegó comprimido por WhatsApp). En esta compu no hay ffmpeg.
+- **Portada:** videos de `public/hero/*.mp4|webm` en orden de nombre; si no hay, las fotos de los dos primeros productos. Se funden cada 7 s. Aprobada por Nicolás el 10/10/2026. Hoy hay un solo video de prueba (`1.mp4`: 4 segundos, 832 × 464, llegó comprimido por WhatsApp). En esta compu no hay ffmpeg. OJO: la lista de archivos la arma `next.config.ts` AL COMPILAR (variables `HERO_VIDEOS` y `END_IMAGE`), porque en Netlify la carpeta `public/` no está a mano mientras la web corre; tras agregar un archivo hay que reiniciar el servidor de desarrollo. El título es "Un mate para" + una palabra que rota (`RotatingWord.tsx`, lista `FOR` en `Hero.tsx`).
+- **Final de la página:** `Footer.tsx` ocupa toda la pantalla con una foto de fondo (`public/final.jpg|webp|png`; mientras no exista, la foto de un producto), los links y el nombre gigante cuyas letras saltan y sueltan yerba, con un contador de "mates cebados" (`FooterName.tsx`).
+- **Descuento por armar equipo:** el equipo son 4 partes (`KIT_PARTS` en `src/lib/types.ts`: categorías `mates`, `bombillas`, `termos` y `yerba` en paquete; la yerba suelta no cuenta). Si el carrito trae productos de `min` partes o más, se descuenta `percent` % sobre UN producto de cada parte (el más caro), redondeado a $ 10 (`kitSaving`). Vale también si se suman sueltos al carrito, no solo desde "Armá tu equipo". El ajuste vive en la fila `kit_discount` de `settings` y se cambia en el panel (pestaña Productos, `KitDiscountForm.tsx`); la base hace la misma cuenta en `create_order` y guarda `orders.discount`. Fue decisión de Claude (Nicolás solo pidió "un descuento al armar un paquete de 3, configurable, y a partir de cuántos"): confirmar con él que la regla le sirve.
+- **Buscador** (`src/lib/search.ts`): sin tildes ni mayúsculas, todas las palabras en cualquier orden, resalta lo que coincide con `<mark>`. Si nada coincide muestra "parecidos" (tolera errores de tipeo). El cartel "¿No encontrás lo que buscabas?" aparece solo si no hay ni parecidos y la persona dejó de escribir (900 ms).
+- **Animaciones** (tanda del 11/10/2026, tomadas del "Muestrario de interfaces" que pasó Nicolás): encabezado que se esconde al bajar (`HideOnScroll.tsx`), producto que vuela al carrito (`src/lib/fly.ts`), foto que viaja de la tarjeta a la ficha y cambio de tema en círculo (View Transitions, `src/lib/motion.ts`), filtro con FLIP (`useFlip.ts`), carrito como hoja arrastrable en celular (`CartDrawer.tsx`), título de la pestaña que llama al irse con carrito cargado, grano de película (clase `.grain`), página 404 con ojos (`src/app/not-found.tsx`). Quien pidió "menos movimiento" ve fundidos (`src/styles/motion.css` y `reducedMotion()`).
+- **Panel:** borrar pide MANTENER APRETADO un segundo (`HoldButton.tsx`) en vez de un "¿Estás seguro?"; marcar un pedido como entregado sigue preguntando con una ventana porque tiene advertencias. Los productos se ordenan arrastrando de una manija (`SortableList.tsx`), o con las flechas del teclado.
+- **En el navegador de prueba de Claude** (panel oculto) las transiciones, los requestAnimationFrame y los eventos de scroll no avanzan solos: las animaciones se verifican por estado del DOM, y a Nicolás hay que pedirle que las mire.
 - **Efecto de aparecer al bajar:** atributo `data-reveal` + `Reveal.tsx`, que revisa posiciones al hacer scroll (no usa IntersectionObserver). El catálogo no lo lleva, a pedido.
 - **Orden de la página** (`src/app/page.tsx`): portada, catálogo, tipos de mate, equipo, curado, reseñas, contacto.
 - **Solo local:** `src/app/stats-preview/page.tsx` muestra las estadísticas con datos inventados. Está excluida en `.git/info/exclude`; NO commitear ni publicar.
 
 ## Base de datos
-- Migraciones en `supabase/migrations/`, de 0001 a 0006, TODAS ejecutadas por Nicolás y verificadas. No queda SQL pendiente. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
+- Migraciones en `supabase/migrations/`. De 0001 a 0006: ejecutadas por Nicolás y verificadas. PENDIENTE DE EJECUTAR: `0007_descuento_por_equipo.sql` (columna `orders.discount`, fila `kit_discount` en `settings`, `create_order` con el descuento). Hasta que la corra, la tienda anda igual pero sin descuento, y el panel avisa que falta. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
 - Sin uso: tabla `product_variants` (0002; Nicolás descartó las "presentaciones" por engorrosas) y la fila `yerba_tiers` de `settings` (0004).
 - Datos de prueba que dejó Claude y Nicolás tiene que borrar: Pedido #14 "PRUEBA estadisticas Claude (borrar)", quizá "PRUEBA de Claude (borrar)", y en estadísticas el visitante `prueba-claude-0001`, orígenes `prueba`/`prueba-claude` y la búsqueda "prueba claude".
 
@@ -64,12 +71,15 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 - Tema claro: fondo #ece5de, texto #220f09, acento #4d6820.
 - Fuentes: Outfit (títulos) y Figtree (texto).
 - Estilo: moderno, líneas finas, precios grandes y claros, descuentos con badge. Referencia que le gusta a Nicolás: nebenstudio.com.ar (animaciones, portada con video).
+- Etiquetita arriba de los títulos ("eyebrow"): Nicolás pidió dejarla en una o dos secciones como mucho. Quedó solo en la portada y en "Armá tu equipo".
 - Preferencias ya dichas: brillo y zoom originales en las tarjetas al pasar el mouse; sin destello verde en las secciones destacadas; reseñas con fuente normal, sin huecos, tipo comentario; botones de WhatsApp e Instagram con los colores de cada app.
 - `referencia/unmate.html`: el diseño original, solo para consultar. La web ya se alejó bastante de él.
 
 ## Pendiente de Nicolás
 Preguntarle cada tanto; listarlo cuando pregunte qué quedó pendiente.
 - Videos de la portada definitivos: alguien tomando mate y un mate cebándose. 8 a 15 segundos, horizontales, archivo original (no reenviado por WhatsApp).
+- Foto de fondo del final de la página: una buena imagen horizontal; va en `public/final.jpg`.
+- Ejecutar el SQL 0007 y después elegir el descuento por equipo en el panel.
 - Textos y fotos de los tipos de mate (`MateTypes.tsx` tiene dibujos y textos provisorios).
 - Descripciones nuevas de los productos.
 - Videos de curado (links de YouTube) para `CureGuide`. A futuro: mandar el video de curado después de la compra.

@@ -9,7 +9,7 @@ import { Hero } from "@/components/site/Hero";
 import { Reveal } from "@/components/site/Reveal";
 import { Reviews } from "@/components/site/Reviews";
 import { getCatalog } from "@/lib/catalog";
-import { getHeroMedia } from "@/lib/hero";
+import { getEndImage, getHeroMedia } from "@/lib/hero";
 
 // Página de inicio. Se arma en el servidor: busca el catálogo y se lo pasa a
 // ShopProvider, que lo comparte con el carrito y las secciones interactivas.
@@ -29,7 +29,7 @@ export default async function Home() {
         <Reviews reviews={catalog.reviews} />
         <Contact />
       </main>
-      <Footer />
+      <Footer image={getEndImage(catalog.products)} />
       <Reveal />
     </ShopProvider>
   );

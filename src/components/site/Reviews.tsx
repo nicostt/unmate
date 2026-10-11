@@ -29,10 +29,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   return (
     <section className="wrap block" id="resenas" data-reveal>
       <div className="sec-head">
-        <div>
-          <p className="eyebrow">Reseñas</p>
-          <h2>Ya toman mate con nosotros</h2>
-        </div>
+        <h2>Ya toman mate con nosotros</h2>
         <p className="muted">
           {reviews.length} {reviews.length === 1 ? "reseña" : "reseñas"}
         </p>

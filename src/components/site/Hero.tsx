@@ -1,6 +1,10 @@
 import { CONSULTA_LINK } from "@/lib/site";
 import { WhatsAppIcon } from "./BrandIcons";
 import { HeroMedia } from "./HeroMedia";
+import { RotatingWord } from "./RotatingWord";
+
+// Para qué es el mate: la última palabra del título va rotando entre estas.
+const FOR = ["regalar", "la facu", "la oficina", "el finde", "vos"];
 
 // Portada + los tres pasos de "cómo comprar".
 // La portada ocupa casi toda la pantalla: de fondo van los videos (o fotos,
@@ -13,10 +17,9 @@ export function Hero({ media }: { media: string[] }) {
         <HeroMedia media={media} />
         <div className="wrap hero-video-copy" data-reveal>
           <p className="eyebrow">Mates · Bombillas · Yerba · Termos</p>
-          <h1>
-            Todo para tu mate
-            <br />
-            <span>de cada día.</span>
+          <h1 aria-label={`Un mate para ${FOR.join(", para ")}`}>
+            Un mate para
+            <RotatingWord words={FOR} />
           </h1>
           <p className="lead">
             Calabaza y algarrobo, bombillas de acero, alpaca y bronce. Elegí lo que te gusta, armá tu pedido y

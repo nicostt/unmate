@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PHOTOS_BUCKET, supabase } from "@/lib/supabase";
 import { DropZone } from "./DropZone";
+import { HoldButton } from "./HoldButton";
 import { PhotoManager } from "./PhotoManager";
 import { uploadPhoto } from "./photos";
 import { designsOf, photosOf, type AdminDesign, type AdminProduct } from "./types";
@@ -68,9 +69,6 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
   }
 
   function remove(design: AdminDesign) {
-    const orders = requested[design.id];
-    const warning = orders?.length ? ` Está pedido en el pedido #${orders.join(", #")}.` : "";
-    if (!confirm(`¿Eliminar el diseño #${design.number}? Desaparece de la tienda.${warning}`)) return;
     return work(async () => {
       const paths = photosOf(product, design.id).map((m) => m.path);
       if (paths.length) await supabase.storage.from(PHOTOS_BUCKET).remove(paths);
@@ -98,9 +96,17 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
             {requested[design.id]?.length ? (
               <span className="admin-status">Pedido #{requested[design.id].join(", #")}</span>
             ) : null}
-            <button className="btn ghost small danger" type="button" disabled={busy} onClick={() => remove(design)}>
+            <HoldButton
+              disabled={busy}
+              onConfirm={() => remove(design)}
+              title={
+                requested[design.id]?.length
+                  ? `Mantené apretado para eliminarlo. Ojo: está en el pedido #${requested[design.id].join(", #")}.`
+                  : "Mantené apretado para eliminarlo. Desaparece de la tienda."
+              }
+            >
               Eliminar diseño
-            </button>
+            </HoldButton>
           </header>
           <PhotoManager product={product} designId={design.id} limit={PHOTOS_PER_DESIGN} onChanged={onChanged} />
         </article>

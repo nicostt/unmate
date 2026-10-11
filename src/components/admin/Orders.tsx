@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { money } from "@/lib/format";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { weightLabel } from "@/lib/types";
+import { HoldButton } from "./HoldButton";
 
 type Status = "pendiente" | "confirmado" | "entregado" | "cancelado";
 
@@ -25,7 +26,8 @@ type Order = {
   customer_name: string | null;
   note: string | null;
   status: Status;
-  total: number;
+  total: number; // con el descuento ya restado
+  discount?: number; // descuento por armar equipo (falta si no se ejecutó el SQL 0007)
   order_items: OrderItem[];
 };
 
@@ -136,11 +138,6 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
   }
 
   async function remove(order: Order) {
-    const text =
-      mode === "sold"
-        ? `¿Borrar "${orderName(order)}" del historial? No devuelve stock y deja de contar en las estadísticas.`
-        : `¿Eliminar "${orderName(order)}"? No se puede deshacer.`;
-    if (!confirm(text)) return;
     // las fotos de diseños ya eliminados solo vivían para este historial
     const orphans = order.order_items.filter((i) => i.design_id === null && i.design_photo).map((i) => i.design_photo!);
     if (orphans.length) await supabase.storage.from(PHOTOS_BUCKET).remove(orphans);
@@ -216,6 +213,9 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
                 </li>
               ))}
             </ul>
+            {(order.discount ?? 0) > 0 && (
+              <p className="admin-order-discount">Descuento por armar equipo: −{money(order.discount ?? 0)}</p>
+            )}
             {order.note && <p className="note">{order.note}</p>}
             <div className="admin-actions">
               {NEXT_STEPS[order.status].map(([status, label]) => (
@@ -231,9 +231,17 @@ export function Orders({ mode, onStockChanged }: { mode: "open" | "sold"; onStoc
               ))}
               {/* un pedido confirmado tiene cosas apartadas: primero se cancela o se entrega */}
               {order.status !== "confirmado" && (
-                <button className="btn ghost small danger" type="button" disabled={busy} onClick={() => remove(order)}>
+                <HoldButton
+                  disabled={busy}
+                  onConfirm={() => remove(order)}
+                  title={
+                    mode === "sold"
+                      ? "Mantené apretado para borrarlo del historial. No devuelve stock y deja de contar en las estadísticas."
+                      : "Mantené apretado para eliminar el pedido. No se puede deshacer."
+                  }
+                >
                   {mode === "sold" ? "Borrar del historial" : "Eliminar"}
-                </button>
+                </HoldButton>
               )}
             </div>
           </article>

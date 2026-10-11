@@ -6,6 +6,7 @@ import { saveCart, track, trackVisit } from "@/lib/track";
 import {
   cartKey,
   isSoldOut,
+  kitSaving,
   lineTotal,
   maxQty,
   productLabel,
@@ -15,6 +16,8 @@ import {
   type Catalog,
   type Category,
   type Design,
+  type KitDiscount,
+  type KitPart,
   type Product,
 } from "@/lib/types";
 import { CartDrawer } from "./CartDrawer";
@@ -32,7 +35,10 @@ type Shop = {
   products: Product[];
   lines: CartLine[]; // lo que hay en el carrito, con su cantidad
   count: number; // cuántas cosas hay (cada yerba cuenta como una)
-  total: number; // en pesos
+  subtotal: number; // en pesos, antes del descuento por equipo
+  kit: KitDiscount | null; // el descuento por armar equipo, si hay uno prendido
+  saving: { parts: KitPart[]; amount: number }; // partes del equipo que hay en el carrito y cuánto se descuenta
+  total: number; // en pesos, con el descuento ya restado
   add: (key: string, amount?: number) => boolean; // false si no alcanza el stock
   addMany: (keys: string[]) => number; // devuelve cuántos pudo sumar
   decrement: (key: string) => void;
@@ -55,7 +61,7 @@ export function useShop(): Shop {
 type Found = { product: Product; design: Design | null };
 
 export function ShopProvider({ catalog, children }: { catalog: Catalog; children: React.ReactNode }) {
-  const { categories, products } = catalog;
+  const { categories, products, kit } = catalog;
   const cart = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState({ text: "", show: false });
@@ -81,7 +87,25 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     return qty > 0 ? [{ key, ...found, qty }] : [];
   });
   const count = lines.reduce((sum, line) => sum + (line.product.byWeight ? 1 : line.qty), 0);
-  const total = lines.reduce((sum, line) => sum + lineTotal(line.product, line.qty), 0);
+  const subtotal = lines.reduce((sum, line) => sum + lineTotal(line.product, line.qty), 0);
+  const saving = kitSaving(lines.map((line) => line.product), kit);
+  const total = subtotal - saving.amount;
+
+  // "La pestaña te llama": si alguien se va a otra pestaña con cosas en el
+  // carrito, el título cambia para que la encuentre; al volver, se restaura.
+  const hasItems = lines.length > 0;
+  useEffect(() => {
+    if (!hasItems) return;
+    const original = document.title;
+    const onChange = () => {
+      document.title = document.hidden ? "¡Volvé! Tu carrito te espera" : original;
+    };
+    document.addEventListener("visibilitychange", onChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onChange);
+      document.title = original;
+    };
+  }, [hasItems]);
 
   // Estadísticas: la visita se anota una vez; el carrito, un rato después de
   // cada cambio (así no se manda un aviso por cada clic).
@@ -112,7 +136,7 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     const { product, design } = found;
     const name = productLabel(product, design);
     if (isSoldOut(product)) {
-      notify(`"${name}" está agotado`);
+      notify(`"${name}" se agotó. Escribinos y te avisamos cuando vuelva.`);
       return false;
     }
     const plus = amount ?? stepOf(product);
@@ -122,17 +146,17 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     if (qty + plus > max) {
       notify(
         design
-          ? `"${name}" ya está en tu carrito: es una pieza única`
+          ? `"${name}" ya está en tu carrito: es una pieza única, hay una sola`
           : product.byWeight
-            ? `De "${name}" quedan ${weightLabel(max)}`
+            ? `De "${name}" quedan ${weightLabel(max)} y ya los tenés en el carrito`
             : product.stock === 1
-              ? `De "${name}" queda una sola unidad`
-              : `No queda más stock de "${name}"`,
+              ? `De "${name}" queda una sola, y ya es tuya`
+              : `Ya tenés en el carrito todo lo que queda de "${name}"`,
       );
       return false;
     }
     setCart({ ...current, [key]: qty + plus });
-    notify(product.byWeight ? `Agregado: ${weightLabel(plus)} de ${name}` : `Agregado: ${name}`);
+    notify(product.byWeight ? `Sumaste ${weightLabel(plus)} de ${name}` : `Sumaste ${name} al carrito`);
     track("add", { slug: product.slug, design: design?.id });
     return true;
   }
@@ -173,6 +197,9 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     products,
     lines,
     count,
+    subtotal,
+    kit,
+    saving,
     total,
     add,
     addMany,
@@ -189,7 +216,12 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     <ShopContext.Provider value={shop}>
       {children}
       <CartDrawer />
-      <div className={toast.show ? "toast show" : "toast"} role="status" aria-live="polite">
+      {/* con el carrito abierto el aviso sale arriba, para no tapar el total ni el botón de pedir */}
+      <div
+        className={`toast${toast.show ? " show" : ""}${cartOpen ? " at-top" : ""}`}
+        role="status"
+        aria-live="polite"
+      >
         {toast.text}
       </div>
     </ShopContext.Provider>

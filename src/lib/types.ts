@@ -82,11 +82,53 @@ export type Product = {
   images: string[]; // fotos generales, en el orden en que se muestran
 };
 
+// Descuento por armar equipo. Lo define el admin en el panel (pestaña
+// Productos): un `percent` % cuando el carrito trae productos de `min`
+// partes del equipo o más.
+export type KitDiscount = { percent: number; min: number };
+
 export type Catalog = {
   categories: Category[];
   products: Product[];
   reviews: Review[];
+  kit: KitDiscount | null; // null = no hay descuento por equipo
 };
+
+// Las partes de un equipo. `category` es el slug de la categoría donde viven
+// esos productos. La base usa la misma lista (función create_order).
+export const KIT_PARTS = [
+  { id: "mate", label: "Mate", category: "mates" },
+  { id: "bombilla", label: "Bombilla", category: "bombillas" },
+  { id: "termo", label: "Termo", category: "termos" },
+  { id: "yerba", label: "Yerba", category: "yerba" },
+] as const;
+
+export type KitPart = (typeof KIT_PARTS)[number];
+
+// De qué parte del equipo es un producto, si es de alguna. La yerba suelta
+// no cuenta: al equipo va el paquete.
+export function kitPartOf(product: Product): KitPart | undefined {
+  return product.byWeight ? undefined : KIT_PARTS.find((part) => part.category === product.category);
+}
+
+// Cuánto se ahorra por armar equipo con estos productos.
+// Regla: si hay productos de `min` partes o más, se descuenta el `percent` %
+// sobre UN producto de cada parte (el más caro), redondeado a $ 10.
+// La base de datos hace la misma cuenta al registrar el pedido.
+export function kitSaving(
+  products: Product[],
+  kit: KitDiscount | null,
+): { parts: KitPart[]; amount: number } {
+  const best = new Map<KitPart, number>();
+  for (const product of products) {
+    const part = kitPartOf(product);
+    if (part) best.set(part, Math.max(best.get(part) ?? 0, product.price));
+  }
+  const parts = [...best.keys()];
+  if (!kit || parts.length < kit.min) return { parts, amount: 0 };
+  const sum = [...best.values()].reduce((a, b) => a + b, 0);
+  return { parts, amount: Math.round((sum * kit.percent) / 1000) * 10 };
+}
 
 // Un renglón del carrito. `key` es lo que se guarda en el navegador: el slug
 // del producto, o "slug#idDeDiseño" cuando se eligió un diseño puntual.

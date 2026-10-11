@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { flyToCart } from "@/lib/fly";
 import { discountPercent, money } from "@/lib/format";
+import { highlightParts } from "@/lib/search";
 import {
   betterDeal,
   cartKey,
@@ -38,7 +40,7 @@ export function PriceRow({ price, compareAtPrice }: { price: number; compareAtPr
 // Cantidades de yerba que se ofrecen con un toque; con + y − se sigue de a 250 g.
 const QUICK_WEIGHTS = [250, 500, 750, 1000];
 
-// Zona de compra de un producto: precio y botón "Agregar al carrito".
+// Zona de compra de un producto: precio y botón "Sumar al carrito".
 //  - Si va por peso (yerba), antes del botón se elige cuánto llevar y el
 //    precio se calcula para esa cantidad.
 //  - Si va por diseños, el botón agrega el diseño que se está mirando.
@@ -69,7 +71,7 @@ export function BuyBox({
       disabled={soldOut}
       onClick={() => onAdd(cartKey(product, design), product.byWeight ? grams : 1)}
     >
-      {soldOut ? "Agotado" : "Agregar al carrito"}
+      {soldOut ? "Agotado" : "Sumar al carrito"}
     </button>
   );
 
@@ -134,14 +136,22 @@ export function BuyBox({
   );
 }
 
+// Un texto con lo que se buscó resaltado.
+function Marked({ text, words }: { text: string; words: string[] }) {
+  return highlightParts(text, words).map((part, i) => (part.hit ? <mark key={i}>{part.text}</mark> : part.text));
+}
+
 export function ProductCard({
   product,
+  highlight,
   onOpen,
 }: {
   product: Product;
+  highlight: string[]; // palabras del buscador, para resaltarlas en el nombre
   onOpen: (design: Design | null) => void; // abre la ficha, en el diseño que se estaba mirando
 }) {
   const { add, categories } = useShop();
+  const card = useRef<HTMLElement>(null);
   const categoryName = categories.find((c) => c.slug === product.category)?.name;
   const images = coverImages(product);
 
@@ -154,8 +164,16 @@ export function ProductCard({
   const [index, setIndex] = useState(0);
   const design = product.byDesign ? (product.designs[index] ?? product.designs[0] ?? null) : null;
 
+  // Al sumar desde la tarjeta, la foto que se está viendo vuela al carrito.
+  function addFromCard(key: string, amount: number) {
+    if (!add(key, amount)) return;
+    const art = card.current?.querySelector(".card-art") ?? null;
+    flyToCart(art, art?.querySelectorAll("img")[index]?.currentSrc || null);
+  }
+
   return (
-    <article className="card">
+    // data-flip: para que el catálogo la deslice a su lugar nuevo al filtrar
+    <article className="card" ref={card} data-flip={product.slug}>
       {images.length ? (
         <div
           className="card-art"
@@ -189,16 +207,22 @@ export function ProductCard({
       )}
       <div className="card-body">
         <div className="tags">
-          <span className="tag">{product.byWeight ? perKiloLabel(product) : (product.material ?? categoryName)}</span>
+          <span className="tag">
+            {product.byWeight ? (
+              perKiloLabel(product)
+            ) : (
+              <Marked text={product.material ?? categoryName ?? ""} words={highlight} />
+            )}
+          </span>
           {product.byDesign && <span className="tag">Pieza única</span>}
           {stockLabel(product) && <span className="tag hot">{stockLabel(product)}</span>}
         </div>
         <h3>
           <button type="button" onClick={() => onOpen(design)}>
-            {product.name}
+            <Marked text={product.name} words={highlight} />
           </button>
         </h3>
-        <BuyBox product={product} design={design} small showUnitPrice onAdd={add} />
+        <BuyBox product={product} design={design} small showUnitPrice onAdd={addFromCard} />
       </div>
     </article>
   );

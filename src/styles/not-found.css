@@ -1,0 +1,17 @@
+/* Página de error 404 (src/app/not-found.tsx). Solo se carga ahí. */
+.lost{min-height:100svh;display:grid;place-content:center;justify-items:center;gap:16px;text-align:center;padding:32px 20px}
+.lost h1{font-size:clamp(1.7rem,5vw,2.8rem);font-weight:700;line-height:1.1}
+.lost .lead{margin-bottom:8px}
+
+/* el 404: dos cuatros y, en el medio, el mate con ojos */
+.lost-number{display:flex;align-items:center;gap:clamp(8px,2vw,18px);font:700 clamp(6rem,26vw,13rem)/1 var(--f-display);letter-spacing:-.04em;color:var(--accent)}
+
+/* el "0" es un mate visto de frente: panza redonda, virola arriba y bombilla */
+.lost-face{position:relative;display:flex;align-items:center;justify-content:center;gap:.09em;width:.74em;height:.88em;border:.07em solid var(--fg);border-radius:46% 46% 50% 50% / 38% 38% 62% 62%;background:var(--surface)}
+/* bombilla */
+.lost-face::before{content:"";position:absolute;right:.1em;bottom:86%;width:.05em;height:.36em;border-radius:99px;background:var(--fg);transform:rotate(24deg);transform-origin:bottom}
+/* virola */
+.lost-face::after{content:"";position:absolute;left:-.07em;right:-.07em;top:-.07em;height:.15em;border-radius:99px;background:var(--fg)}
+.lost-eye{position:relative;width:.2em;height:.2em;border-radius:50%;background:var(--fg);display:grid;place-items:center}
+/* la pupila la mueve LostFace.tsx hacia donde está el puntero */
+.lost-pupil{width:46%;height:46%;border-radius:50%;background:var(--bg);transition:transform .08s linear}

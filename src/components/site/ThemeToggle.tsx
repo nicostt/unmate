@@ -4,10 +4,16 @@
 // (lo lee src/styles/base.css) y la elección se guarda en el navegador. Si el
 // visitante nunca eligió, se usa el modo de su dispositivo.
 // Al recargar, la elección guardada la aplica THEME_SCRIPT (src/lib/theme.ts).
+//
+// El cambio no aparece de golpe: el tema nuevo se abre en círculo desde el
+// botón. Se hace con la View Transitions API: el navegador saca una foto de
+// la página con el tema viejo y otra con el nuevo, y acá se recorta la nueva
+// con un círculo que crece.
 
+import { reducedMotion, viewTransition } from "@/lib/motion";
 import { THEME_KEY } from "@/lib/theme";
 
-function toggleTheme() {
+function applyNextTheme() {
   const root = document.documentElement;
   const current =
     root.dataset.theme ?? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
@@ -20,12 +26,36 @@ function toggleTheme() {
   }
 }
 
+function toggleTheme(button: HTMLElement) {
+  const root = document.documentElement;
+  // con "menos movimiento" queda el fundido simple que trae el navegador
+  if (reducedMotion()) return void viewTransition(applyNextTheme);
+
+  const box = button.getBoundingClientRect();
+  const x = box.left + box.width / 2;
+  const y = box.top + box.height / 2;
+  // radio para que el círculo llegue hasta la esquina más lejana
+  const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+  // la clase apaga el fundido de fábrica mientras dura el círculo (base.css)
+  root.classList.add("theme-switch");
+  const transition = viewTransition(applyNextTheme, () => root.classList.remove("theme-switch"));
+  transition?.ready
+    .then(() => {
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 650, easing: "cubic-bezier(.7,0,.2,1)", pseudoElement: "::view-transition-new(root)" },
+      );
+    })
+    .catch(() => {});
+}
+
 export function ThemeToggle() {
   return (
     <button
       className="icon-btn theme-btn"
       type="button"
-      onClick={toggleTheme}
+      onClick={(e) => toggleTheme(e.currentTarget)}
       aria-label="Cambiar entre modo claro y oscuro"
       title="Modo claro / oscuro"
     >

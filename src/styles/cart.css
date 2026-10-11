@@ -6,7 +6,11 @@
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
 .drawer-head h2{font-size:1.3rem;font-weight:600}
 .drawer-body{flex:1;overflow-y:auto;padding:8px 20px}
-.empty-cart{display:grid;gap:14px;justify-items:start;padding-block:32px;color:var(--muted)}
+/* carrito vacío: dibujo, frase y un botón para ir a llenarlo */
+.empty-cart{display:grid;gap:12px;justify-items:center;text-align:center;padding-block:40px;color:var(--muted)}
+.empty-cart strong{font:700 1.45rem var(--f-display);color:var(--fg)}
+.empty-cart p{max-width:24rem}
+.empty-cart .btn{margin-top:6px}
 
 /* ---------- cada producto del carrito ---------- */
 .line{display:grid;grid-template-columns:64px 1fr;gap:14px;padding-block:16px;border-bottom:1px solid var(--line)}
@@ -21,6 +25,9 @@
 /* "Quitar" */
 .rm{background:none;border:0;padding:0;color:var(--muted);cursor:pointer;font-size:.85rem;text-decoration:underline;text-underline-offset:3px;justify-self:start}
 .rm:hover{color:var(--fg)}
+/* empujón para completar el equipo y llegar al descuento */
+.kit-nudge{margin:14px 0;padding:12px 14px;border:1px dashed var(--accent);border-radius:12px;font-size:.92rem;color:var(--muted)}
+.kit-nudge b{color:var(--accent)}
 
 /* ---------- pie: nombre, nota, total y botón de pedir ---------- */
 .drawer-foot{padding:16px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:12px}
@@ -28,3 +35,23 @@
 .drawer textarea{resize:vertical;min-height:64px}
 .total-row{display:flex;justify-content:space-between;align-items:baseline}
 .total-row strong{font:700 1.7rem var(--f-display);font-variant-numeric:tabular-nums}
+.total-row .was{font:400 .95rem var(--f-body);margin-right:6px}
+/* renglón del descuento por armar equipo */
+.saving-row{gap:12px;align-items:center;color:var(--accent);font-weight:600;font-size:.95rem}
+
+/* ---------- en el celular: una hoja que sube desde abajo ----------
+   Arranca a medias (74 % del alto) y se arrastra de la manija para llevarla
+   a pantalla completa o cerrarla; el alto lo va cambiando CartDrawer.tsx. */
+.sheet-handle{display:none}
+@media(max-width:700px){
+  .drawer{top:auto;bottom:0;left:0;width:100%;height:74dvh;max-height:94dvh;border-left:0;border-top:1px solid var(--line);border-radius:22px 22px 0 0;padding-top:0;animation:sheet-in .3s cubic-bezier(.2,.8,.2,1);transition:height .3s cubic-bezier(.2,.8,.2,1)}
+  .drawer.is-empty{height:auto}
+  .drawer.is-dragging{transition:none}
+  /* toda la cabecera sirve para agarrar la hoja */
+  .drawer-head{position:relative;padding-top:24px;touch-action:none;cursor:grab}
+  .sheet-handle{display:block;position:absolute;top:0;left:0;right:0;height:24px;border:0;background:none;padding:0;cursor:grab}
+  .sheet-handle::before{content:"";position:absolute;left:50%;top:10px;width:44px;height:5px;margin-left:-22px;border-radius:99px;background:var(--ring)}
+  .drawer-foot{gap:10px;padding-top:12px}
+  .drawer textarea{min-height:44px}
+}
+@keyframes sheet-in{from{transform:translateY(100%)}to{transform:none}}

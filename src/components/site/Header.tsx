@@ -1,4 +1,5 @@
 import { CartButton } from "@/components/shop/CartButton";
+import { HideOnScroll } from "./HideOnScroll";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
@@ -21,6 +22,7 @@ export function Header() {
         <ThemeToggle />
         <CartButton />
       </div>
+      <HideOnScroll />
     </header>
   );
 }

@@ -1,0 +1,37 @@
+/* Movimiento reducido.
+   Si alguien activó "reducir movimiento" en su sistema (a algunas personas el
+   movimiento les da mareo de verdad), los movimientos grandes de la página se
+   cambian por fundidos suaves. No se apaga todo: lo que aparece sigue
+   apareciendo, pero sin desplazarse.
+
+   Va último en index.css porque pisa reglas de los demás archivos. Lo que se
+   anima desde JavaScript (el producto que vuela al carrito, el filtro del
+   catálogo, el cambio de tema) pregunta lo mismo con reducedMotion(), en
+   src/lib/motion.ts. */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+
+  /* nada se desliza ni cambia de tamaño de a poco: solo se funden el color y la opacidad */
+  *,*::before,*::after{transition-property:opacity,color,background-color,border-color,box-shadow,filter!important}
+
+  /* aparecer al bajar: queda el fundido, sin subir */
+  .reveal [data-reveal]:not(.is-in){transform:none}
+
+  /* ventanas, carrito y hoja del celular: entran con un fundido en vez de deslizarse */
+  .modal-card,.drawer{animation-name:fundido}
+
+  /* portada: las fotos no hacen zoom, y la palabra del título se funde en vez de subir */
+  .hero-layer img{animation:none}
+  .rw span{transform:none!important;opacity:0}
+  .rw .is-on{opacity:1}
+
+  /* el encabezado no se esconde */
+  .top.is-away{transform:none}
+
+  /* nada late, rebota ni salta */
+  .empty .btn.big,.cart-btn.bump,.end-name b.is-jumping{animation:none}
+
+  /* lo que se levanta al pasar el mouse se queda en su lugar; el cambio de color sigue */
+  .card:hover,.chip:hover,.opt:hover,.btn:hover,.icon-btn:hover,.cart-btn:hover,.kit-slot:hover,.kit-option:hover,
+  .review:hover,.review-photos a:hover,.design-thumbs button:hover,.card-art:hover svg{transform:none!important}
+}
