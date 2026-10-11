@@ -132,7 +132,13 @@ Se trabaja en la rama `dev`. Netlify publica lo que llega a `main`, y cada publi
 
 ## Seguridad
 
+Es prioridad del proyecto: antes de dar por terminado un cambio se repasa esta lista.
+
 - Las claves van en `.env.local`, que **nunca** se sube al repositorio (ya está en `.gitignore`). El modelo está en `.env.example`.
 - La clave secreta de Supabase (service role) no se usa en el navegador ni se comparte por chat.
 - El panel no tiene nada secreto en sí: lo que protege los datos son las reglas de la base (Row Level Security). El público solo lee el catálogo; solo el administrador escribe.
 - Los precios y el stock de un pedido los calcula la base, no el navegador.
+- Las funciones que usa el público tienen un freno: si una misma conexión las llama demasiadas veces en un rato, se la ignora (migración 0008).
+- `next.config.ts` manda cabeceras de seguridad con cada página. La más importante es la Content-Security-Policy: la lista de lugares de donde la web puede cargar cosas. **Si algún día se suma algo de afuera** (un video de YouTube, Mercado Pago, un mapa) y no aparece, es porque falta agregarlo ahí.
+- Las cuentas (GitHub, Supabase, Netlify, Namecheap) tienen que tener verificación en dos pasos: quien entra a una de ellas controla la web.
+- `npm audit` revisa si alguna de las piezas que usa el proyecto tiene fallas conocidas.

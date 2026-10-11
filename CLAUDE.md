@@ -59,14 +59,28 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 - **Solo local:** `src/app/stats-preview/page.tsx` muestra las estadísticas con datos inventados. Está excluida en `.git/info/exclude`; NO commitear ni publicar.
 
 ## Base de datos
-- Migraciones en `supabase/migrations/`, de 0001 a 0007, TODAS ejecutadas por Nicolás y verificadas (la 0007, del descuento por equipo, el 11/10/2026: existe la fila `kit_discount` y la columna `orders.discount`). No queda SQL pendiente. El descuento arranca apagado (0 %): lo prende Nicolás desde el panel. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
+- Migraciones en `supabase/migrations/`. De 0001 a 0007: ejecutadas por Nicolás y verificadas (la 0007, del descuento por equipo, el 11/10/2026). PENDIENTE DE EJECUTAR: `0008_refuerzos_de_seguridad.sql` (ver Seguridad). El descuento arranca apagado (0 %): lo prende Nicolás desde el panel. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
 - Sin uso: tabla `product_variants` (0002; Nicolás descartó las "presentaciones" por engorrosas) y la fila `yerba_tiers` de `settings` (0004).
 - Datos de prueba que dejó Claude y Nicolás tiene que borrar: Pedido #14 "PRUEBA estadisticas Claude (borrar)", quizá "PRUEBA de Claude (borrar)", y en estadísticas el visitante `prueba-claude-0001`, orígenes `prueba`/`prueba-claude` y la búsqueda "prueba claude".
 
 ## Seguridad
-- Row Level Security activada en todas las tablas: el público solo lee el catálogo, solo el admin escribe.
-- La clave secreta (service role) nunca va en el repositorio ni en el navegador. `.env.local` va en `.gitignore`.
+ES PRIORIDAD (pedido de Nicolás, 11/10/2026): en cada cambio se repasa esta lista antes de darlo por terminado, y se le cuenta qué se revisó.
+
+Reglas:
+- Row Level Security activada en todas las tablas: el público solo lee el catálogo, solo el admin escribe. Tabla nueva = RLS + reglas explícitas.
+- La clave secreta (service role) nunca va en el repositorio ni en el navegador. `.env.local` va en `.gitignore`. Solo se usa la clave "publishable".
 - Nunca manejar datos de tarjeta. Los pagos van por el checkout de Mercado Pago.
+- Funciones públicas de la base: `security definer` con `search_path = ''`, validan y recortan lo que llega, calculan ellas los precios y el stock, y llevan freno de abusos (`too_many`).
+- Nada de HTML crudo con datos (`dangerouslySetInnerHTML`, `innerHTML`). Links externos con `rel="noopener"`.
+- Cualquier recurso de afuera (YouTube, Mercado Pago, mapas) hay que sumarlo a la Content-Security-Policy de `next.config.ts`; si no, el navegador lo bloquea.
+- Dependencias: las mínimas, y `npm audit` al sumar una.
+
+Revisión completa del 11/10/2026:
+- Estaba bien: RLS en todas las tablas, registro de usuarios apagado, sin secretos en el repo ni en el historial, sin HTML crudo, `npm audit` sin vulnerabilidades, fotos optimizadas solo desde el servidor de Supabase, panel sin indexar.
+- Se agregó en el código (en `dev`): cabeceras de seguridad en `next.config.ts` (Content-Security-Policy, HSTS, nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy; sin `X-Powered-By`). Probadas en la tienda sin bloqueos; el panel con login lo tiene que probar Nicolás.
+- Se escribió `supabase/migrations/0008_refuerzos_de_seguridad.sql`, PENDIENTE DE QUE NICOLÁS LA EJECUTE: freno de abusos por IP (`rate_limits` + `too_many`) en `track`, `save_cart` y `create_order`; tope de tamaño del carrito guardado; las fotos de productos ocultos y diseños apartados dejan de ser consultables; el bucket solo acepta imágenes de hasta 8 MB. Sin ejecutarla todo sigue andando como antes. Después de que la corra, verificar como visitante que el catálogo sigue trayendo fotos.
+- Queda en manos de Nicolás: verificación en dos pasos en GitHub, Supabase, Netlify y Namecheap, y contraseña larga y única para el panel. Es el riesgo más grande que queda.
+- Límites conocidos: la CSP usa `'unsafe-inline'` (Next lo necesita sin nonces); el freno de abusos no se pudo probar sin crear pedidos reales.
 
 ## Marca y diseño
 - Logo: arco con un mate y bombilla adentro. El emblema (`public/logo-mark.png`) se usa como máscara CSS y toma el color del texto.
@@ -83,6 +97,7 @@ Preguntarle cada tanto; listarlo cuando pregunte qué quedó pendiente.
 - Portada: ya mandó un video (el del mate cebándose) y dijo que más adelante manda otro para que se alternen. Si quiere más calidad, que pase el archivo original del celular (cable, Drive o mail), filmado más de lejos.
 - Texto y foto suya para la sección "Quién soy" (dijo que los manda). Foto vertical, si puede.
 - Foto de fondo del final de la página: una buena imagen horizontal; va en `public/final.jpg`.
+- Seguridad: ejecutar el SQL 0008, activar la verificación en dos pasos en GitHub, Supabase, Netlify y Namecheap, y probar el panel con login después del cambio de cabeceras.
 - Elegir el descuento por armar equipo en el panel (pestaña Productos); hoy está en 0 %.
 - Textos y fotos de los tipos de mate (`MateTypes.tsx` tiene dibujos y textos provisorios).
 - Descripciones nuevas de los productos.
