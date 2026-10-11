@@ -169,6 +169,9 @@ export function KitBuilder() {
   );
 }
 
+// Cuánto dura la salida de la ventana (igual que en src/styles/overlays.css).
+const PICKER_EXIT_MS = 200;
+
 // Ventana para elegir una parte del equipo, con la foto de cada opción.
 function KitPicker({
   step,
@@ -183,25 +186,33 @@ function KitPicker({
   onPick: (key: string | null) => void;
   onClose: () => void;
 }) {
-  useOverlay(true, onClose);
+  // Al cerrarla (o al elegir) no desaparece de golpe: primero se va con su
+  // animación (clase "is-closing") y recién después se avisa.
+  const [closing, setClosing] = useState(false);
+  function leave(then: () => void) {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(then, PICKER_EXIT_MS);
+  }
+  useOverlay(true, () => leave(onClose));
 
   return (
     <div
-      className="modal"
+      className={closing ? "modal is-closing" : "modal"}
       role="dialog"
       aria-modal="true"
       aria-labelledby="kit-picker-title"
       // clic en el fondo oscuro = cerrar sin cambiar nada
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && leave(onClose)}
     >
       <div className="modal-card kit-picker">
-        <button className="icon-btn" type="button" onClick={onClose} aria-label="Cerrar" autoFocus>
+        <button className="icon-btn" type="button" onClick={() => leave(onClose)} aria-label="Cerrar" autoFocus>
           ×
         </button>
         <h3 id="kit-picker-title">Elegí tu {step.label.toLowerCase()}</h3>
         <div className="kit-options">
           {step.none && (
-            <button className="kit-option is-none" type="button" aria-pressed={picked === null} onClick={() => onPick(null)}>
+            <button className="kit-option is-none" type="button" aria-pressed={picked === null} onClick={() => leave(() => onPick(null))}>
               <span className="kit-option-art">—</span>
               <strong>{step.none}</strong>
             </button>
@@ -212,7 +223,7 @@ function KitPicker({
               className="kit-option"
               type="button"
               aria-pressed={picked === option.key}
-              onClick={() => onPick(option.key)}
+              onClick={() => leave(() => onPick(option.key))}
             >
               <span className="kit-option-art">
                 <OptionArt option={option} />

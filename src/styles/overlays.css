@@ -2,18 +2,28 @@
    equipo), el fondo oscurecido y el aviso que aparece abajo al agregar algo. */
 
 /* fondo oscurecido detrás del carrito */
-.scrim{position:fixed;inset:0;background:rgba(10,4,2,.6);z-index:50}
+.scrim{position:fixed;inset:0;background:rgba(10,4,2,.6);z-index:50;animation:fundido .25s ease-out}
+
+/* ---------- salidas ----------
+   Lo que se abre con una animación también se va con una: mientras se cierra
+   lleva la clase "is-closing" (la ponen usePresence.ts y KitBuilder.tsx), y
+   recién cuando termina se saca de la página. */
+.scrim.is-closing,.modal.is-closing{animation:desvanecer .26s ease-in forwards;pointer-events:none}
+.modal.is-closing .modal-card{animation:slide-out .2s ease-in forwards}
+@keyframes desvanecer{to{opacity:0}}
+@keyframes slide-out{to{transform:translateX(24px);opacity:0}}
 
 /* ventana centrada: por defecto dos columnas (foto y datos) */
 /* La ventana se centra con margin:auto y no con "centrar todo": así, si es más
    alta que la pantalla, arranca desde arriba y se puede recorrer entera. */
-.modal{position:fixed;inset:0;z-index:70;background:rgba(10,4,2,.65);display:flex;padding:16px;overflow-y:auto;overscroll-behavior:contain}
+.modal{position:fixed;inset:0;z-index:70;background:rgba(10,4,2,.65);display:flex;padding:16px;overflow-y:auto;overscroll-behavior:contain;animation:fundido .2s ease-out}
 .modal-card{position:relative;margin:auto;width:min(780px,100%);background:var(--surface);border:1px solid var(--line);border-radius:18px;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;animation:slide .2s ease-out}
 .modal .icon-btn{position:absolute;top:10px;right:10px;background:var(--surface);z-index:2}
 @media(max-width:700px){
   /* en el celular entra con un fundido (sin moverse) y la X queda fija arriba a
      la derecha de la pantalla, siempre a mano aunque la ficha sea larga */
   .modal-card{grid-template-columns:1fr;animation-name:fundido}
+  .modal.is-closing .modal-card{animation-name:desvanecer}
   .modal .icon-btn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 }
 @keyframes fundido{from{opacity:0}to{opacity:1}}

@@ -9,7 +9,9 @@ import { orderMessage, whatsappLink } from "@/lib/site";
 import { KIT_PARTS, lineTotal, productLabel, weightLabel, type KitPart } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
+import { useFlip } from "./useFlip";
 import { useOverlay } from "./useOverlay";
+import { usePresence } from "./usePresence";
 
 // En el celular el carrito es una "hoja" que sube desde abajo. Tiene dos
 // alturas, como porción del alto de la pantalla: a medias y completa.
@@ -18,6 +20,9 @@ const SHEET_FULL = 0.94;
 // Velocidad (px por milisegundo) a partir de la cual un arrastre cuenta como
 // "tirón": manda la dirección del gesto y no dónde quedó la hoja.
 const FLICK = 0.6;
+
+// Cuánto dura la animación de salida del carrito (igual que en src/styles/cart.css).
+const EXIT_MS = 260;
 
 const isSheet = () => matchMedia("(max-width: 700px)").matches;
 
@@ -40,6 +45,10 @@ export function CartDrawer() {
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
   useOverlay(cartOpen, closeCart);
+  // al cerrarlo no desaparece de golpe: se queda un instante para irse deslizando
+  const { shown, closing } = usePresence(cartOpen, EXIT_MS);
+  // al quitar un producto, el renglón se desvanece y los de abajo suben a su lugar
+  const { ref: list, snapshot } = useFlip<HTMLDivElement>(65);
 
   // --- hoja del celular: arrastrar de la manija ---
   const sheet = useRef<HTMLElement>(null);
@@ -150,7 +159,7 @@ export function CartDrawer() {
     setSending(false);
   }
 
-  if (!cartOpen) return null;
+  if (!shown) return null;
 
   // Empujón para completar el equipo: aparece cuando falta una sola parte
   // para llegar al descuento.
@@ -159,9 +168,9 @@ export function CartDrawer() {
 
   return (
     <>
-      <div className="scrim" onClick={closeCart} />
+      <div className={closing ? "scrim is-closing" : "scrim"} onClick={closeCart} />
       <aside
-        className={lines.length ? "drawer" : "drawer is-empty"}
+        className={`drawer${lines.length ? "" : " is-empty"}${closing ? " is-closing" : ""}`}
         ref={sheet}
         role="dialog"
         aria-modal="true"
@@ -187,9 +196,9 @@ export function CartDrawer() {
           </button>
         </div>
 
-        <div className="drawer-body">
+        <div className="drawer-body" ref={list}>
           {lines.length === 0 && (
-            <div className="empty-cart">
+            <div className="empty-cart" data-flip="vacio">
               <span className="empty-art" aria-hidden="true">
                 <ProductArt shape="camionero" />
               </span>
@@ -201,7 +210,7 @@ export function CartDrawer() {
             </div>
           )}
           {lines.map(({ key, product, design, qty }) => (
-            <div className="line" key={key}>
+            <div className="line" key={key} data-flip={key}>
               <div className="thumb">
                 {(design?.images[0] ?? product.images[0]) ? (
                   <Image src={design?.images[0] ?? product.images[0]} alt="" fill sizes="64px" />
@@ -219,7 +228,10 @@ export function CartDrawer() {
                     <div className="qty">
                       <button
                         type="button"
-                        onClick={() => decrement(key)}
+                        onClick={() => {
+                          snapshot();
+                          decrement(key);
+                        }}
                         aria-label={product.byWeight ? "Quitar 250 gramos" : "Quitar una unidad"}
                       >
                         −
@@ -236,14 +248,21 @@ export function CartDrawer() {
                   )}
                   <span className="line-price">{money(lineTotal(product, qty))}</span>
                 </div>
-                <button className="rm" type="button" onClick={() => remove(key)}>
+                <button
+                  className="rm"
+                  type="button"
+                  onClick={() => {
+                    snapshot();
+                    remove(key);
+                  }}
+                >
                   Quitar
                 </button>
               </div>
             </div>
           ))}
           {oneAway && kit && (
-            <p className="kit-nudge">
+            <p className="kit-nudge" data-flip="aviso-equipo">
               Sumá {missing.map((part) => PART_NAME[part.id]).join(" o ")} y tenés <b>{kit.percent} % de descuento</b> por
               armar equipo.
             </p>

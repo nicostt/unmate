@@ -165,7 +165,7 @@ export function Catalog() {
       <div className="grid" ref={grid}>
         {/* no hubo coincidencia exacta, pero hay productos parecidos */}
         {guessing && visible.length > 0 && (
-          <p className="grid-note" role="status">
+          <p className="grid-note" role="status" data-flip="aviso-parecidos">
             No tenemos nada que se llame <b>“{query.trim()}”</b>. Capaz buscabas esto:
           </p>
         )}
@@ -183,11 +183,11 @@ export function Catalog() {
         {/* nada de nada: mientras escribe, un aviso chico; cuando terminó, el cartel */}
         {visible.length === 0 &&
           (typing ? (
-            <p className="grid-note muted" role="status">
+            <p className="grid-note muted" role="status" data-flip="aviso-buscando">
               Buscando “{query.trim()}”…
             </p>
           ) : (
-            <div className="empty grain">
+            <div className="empty grain" data-flip="aviso-nada">
               <span className="empty-art" aria-hidden="true">
                 <ProductArt shape="camionero" />
               </span>

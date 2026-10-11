@@ -19,6 +19,8 @@
 
   /* ventanas, carrito y hoja del celular: entran con un fundido en vez de deslizarse */
   .modal-card,.drawer{animation-name:fundido}
+  /* ...y se van igual, desvaneciéndose */
+  .drawer.is-closing,.modal.is-closing .modal-card{animation-name:desvanecer}
 
   /* portada: las fotos no hacen zoom, y la palabra del título se funde en vez de subir */
   .hero-layer img{animation:none}

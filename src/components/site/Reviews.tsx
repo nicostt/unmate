@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useFlip } from "@/components/shop/useFlip";
 import type { Review } from "@/lib/types";
 
 // Cuántas reseñas se ven de entrada, como máximo. Si el admin marcó más que
@@ -19,6 +20,8 @@ const COVER_DEFAULT = 3;
 // Si no hay ninguna reseña, la sección directamente no aparece.
 export function Reviews({ reviews }: { reviews: Review[] }) {
   const [expanded, setExpanded] = useState(false);
+  // al desplegar o guardar, las reseñas aparecen y se van de a poco, no de golpe
+  const { ref: section, snapshot } = useFlip<HTMLElement>();
   if (reviews.length === 0) return null;
 
   const featured = reviews.filter((r) => r.featured);
@@ -27,7 +30,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   const visible = expanded ? [...cover, ...rest] : cover;
 
   return (
-    <section className="wrap block" id="resenas" data-reveal>
+    <section className="wrap block" id="resenas" data-reveal ref={section}>
       <div className="sec-head">
         <h2>Ya toman mate con nosotros</h2>
         <p className="muted">
@@ -46,7 +49,11 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
           className="btn ghost reviews-more"
           type="button"
           aria-expanded={expanded}
-          onClick={() => setExpanded(!expanded)}
+          data-flip="ver-todas"
+          onClick={() => {
+            snapshot();
+            setExpanded(!expanded);
+          }}
         >
           {expanded ? "Ver menos" : `Ver todas las reseñas (${reviews.length})`}
         </button>
@@ -57,7 +64,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
 
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <figure className="review">
+    <figure className="review" data-flip={review.id}>
       <figcaption>
         {review.avatar ? (
           <span className="review-avatar">
