@@ -35,5 +35,5 @@
 
   /* lo que se levanta al pasar el mouse se queda en su lugar; el cambio de color sigue */
   .card:hover,.chip:hover,.opt:hover,.btn:hover,.icon-btn:hover,.cart-btn:hover,.kit-slot:hover,.kit-option:hover,
-  .review:hover,.review-photos a:hover,.design-thumbs button:hover,.card-art:hover svg{transform:none!important}
+  .review:hover,.review-photos button:hover,.design-thumbs button:hover,.card-art:hover svg{transform:none!important}
 }

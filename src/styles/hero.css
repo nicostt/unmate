@@ -14,10 +14,13 @@
   .hero-layer img{animation:acercar 16s ease-in-out infinite alternate}
 }
 @keyframes acercar{from{transform:scale(1)}to{transform:scale(1.14)}}
-/* velo oscuro del color de marca: más cerrado arriba y abajo, para que se lea el texto */
-.hero-video::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(22,10,6,.82),rgba(22,10,6,.55) 45%,rgba(22,10,6,.9))}
-/* y encima del velo, el grano de película */
-.hero-video::after{content:"";position:absolute;inset:0;z-index:-1;background-image:var(--noise);mix-blend-mode:overlay;opacity:.45;pointer-events:none}
+/* Velo oscuro del color de marca, más cerrado arriba y abajo para que se lea
+   el texto. Encima lleva otra capa que, en el último tramo, va tiñendo el
+   video del color de la página (--bg): así el video no se corta de golpe en
+   una línea, sino que se funde con lo que sigue. */
+.hero-video::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,transparent 68%,color-mix(in srgb,var(--bg) 60%,transparent) 86%,var(--bg) 100%),linear-gradient(180deg,rgba(22,10,6,.82),rgba(22,10,6,.55) 45%,rgba(22,10,6,.9))}
+/* y encima del velo, el grano de película, que también se apaga hacia abajo */
+.hero-video::after{content:"";position:absolute;inset:0;z-index:-1;background-image:var(--noise);mix-blend-mode:overlay;opacity:.45;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,#000 68%,transparent 96%);mask-image:linear-gradient(to bottom,#000 68%,transparent 96%)}
 /* el texto de la portada va siempre claro, también en tema claro: está sobre el video */
 .hero-video-copy{display:grid;justify-items:center;text-align:center;gap:6px;padding-block:clamp(64px,10vw,120px);color:#f6efe9;text-shadow:0 1px 16px rgba(22,10,6,.65)}
 /* la sombra es para que el texto se lea aunque el video sea claro; los botones no la llevan */

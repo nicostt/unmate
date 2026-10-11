@@ -1,9 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useFlip } from "@/components/shop/useFlip";
+import { reducedMotion, viewTransition } from "@/lib/motion";
 import type { Review } from "@/lib/types";
+import { PhotoZoom, type ZoomPhoto } from "./PhotoZoom";
 
 // Cuántas reseñas se ven de entrada, como máximo. Si el admin marcó más que
 // esto "en portada", las que sobran pasan abajo con el resto.
@@ -12,17 +15,53 @@ const COVER_MAX = 5;
 // Cuántas se ven de entrada si el admin no marcó ninguna.
 const COVER_DEFAULT = 3;
 
+// Nombre que comparten la miniatura y la foto ampliada mientras una se
+// transforma en la otra (ver .zoom-photo en src/styles/sections.css).
+const ZOOM = "resena-foto";
+
 // Reseñas de clientes, cargadas desde el panel (pestaña Reseñas).
 // De entrada se ve una portada corta; el resto aparece al tocar "Ver todas"
 // y se vuelve a guardar con "Ver menos".
 // Cada tarjeta se parece a un comentario: quién lo dijo arriba, lo que dijo
-// en una letra distinta, y abajo las fotos que mandó, en miniatura.
+// en una letra distinta, y abajo las fotos que mandó, en miniatura. Al tocar
+// una foto se amplía ahí mismo, encima de la página (PhotoZoom.tsx).
 // Si no hay ninguna reseña, la sección directamente no aparece.
 export function Reviews({ reviews }: { reviews: Review[] }) {
   const [expanded, setExpanded] = useState(false);
   // al desplegar o guardar, las reseñas aparecen y se van de a poco, no de golpe
   const { ref: section, snapshot } = useFlip<HTMLElement>();
+  // foto ampliada: las de esa reseña y cuál se está viendo
+  const [zoom, setZoom] = useState<{ photos: ZoomPhoto[]; index: number; alt: string } | null>(null);
+  // las miniaturas de esa reseña, para que al cerrar la foto vuelva a la suya
+  const thumbs = useRef<HTMLElement[]>([]);
   if (reviews.length === 0) return null;
+
+  // Abrir y cerrar: la miniatura "crece" hasta ser la foto grande, y vuelve.
+  // Durante el cambio las dos llevan el mismo view-transition-name.
+  function openZoom(review: Review, index: number, thumb: HTMLElement) {
+    thumbs.current = [...(thumb.parentElement?.children ?? [])] as HTMLElement[];
+    // la forma de cada foto se saca de su miniatura, que ya está cargada
+    const photos = review.photos.map((src, i) => {
+      const img = thumbs.current[i]?.querySelector("img");
+      return { src, ratio: img?.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1 };
+    });
+    if (!reducedMotion()) thumb.style.setProperty("view-transition-name", ZOOM);
+    viewTransition(() => {
+      thumb.style.removeProperty("view-transition-name"); // en la pantalla nueva el nombre lo lleva la foto grande
+      flushSync(() => setZoom({ photos, index, alt: `Foto que nos mandó ${review.name}` }));
+    });
+  }
+
+  function closeZoom() {
+    const thumb = zoom && !reducedMotion() ? thumbs.current[zoom.index] : undefined;
+    viewTransition(
+      () => {
+        flushSync(() => setZoom(null));
+        thumb?.style.setProperty("view-transition-name", ZOOM);
+      },
+      () => thumb?.style.removeProperty("view-transition-name"),
+    );
+  }
 
   const featured = reviews.filter((r) => r.featured);
   const cover = featured.length ? featured.slice(0, COVER_MAX) : reviews.slice(0, COVER_DEFAULT);
@@ -40,7 +79,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
 
       <div className="reviews">
         {visible.map((review) => (
-          <ReviewCard key={review.id} review={review} />
+          <ReviewCard key={review.id} review={review} onZoom={(index, thumb) => openZoom(review, index, thumb)} />
         ))}
       </div>
 
@@ -58,11 +97,27 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
           {expanded ? "Ver menos" : `Ver todas las reseñas (${reviews.length})`}
         </button>
       )}
+
+      {zoom && (
+        <PhotoZoom
+          photos={zoom.photos}
+          index={zoom.index}
+          alt={zoom.alt}
+          onIndex={(index) => setZoom({ ...zoom, index })}
+          onClose={closeZoom}
+        />
+      )}
     </section>
   );
 }
 
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({
+  review,
+  onZoom,
+}: {
+  review: Review;
+  onZoom: (index: number, thumb: HTMLElement) => void; // amplía esa foto
+}) {
   return (
     <figure className="review" data-flip={review.id}>
       <figcaption>
@@ -82,15 +137,15 @@ function ReviewCard({ review }: { review: Review }) {
       {review.photos.length > 0 && (
         <div className="review-photos">
           {review.photos.map((src, i) => (
-            // la miniatura abre la foto completa en otra pestaña
-            <a key={src} href={src} target="_blank" rel="noopener">
-              <Image
-                src={src}
-                alt={`Foto que nos mandó ${review.name}${review.photos.length > 1 ? ` (${i + 1})` : ""}`}
-                fill
-                sizes="96px"
-              />
-            </a>
+            // al tocar la miniatura, la foto se amplía sin salir de la página
+            <button
+              key={src}
+              type="button"
+              aria-label={`Ampliar la foto${review.photos.length > 1 ? ` ${i + 1}` : ""} que nos mandó ${review.name}`}
+              onClick={(e) => onZoom(i, e.currentTarget)}
+            >
+              <Image src={src} alt="" fill sizes="150px" />
+            </button>
           ))}
         </div>
       )}

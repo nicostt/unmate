@@ -88,6 +88,17 @@ El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
 
 - **Productos, yerba, categorías, precios, stock, fotos, pedidos y reseñas:** desde el panel, en `/admin`. Entrás con el email y la contraseña del usuario de Supabase. Los cambios se ven en la tienda al instante.
 - **Videos de la portada:** copiarlos a `public/hero/` como `.mp4` o `.webm`. Aparecen solos, en orden de nombre.
+- **Preparar un video para la portada** (hace falta [ffmpeg](https://ffmpeg.org), un programa gratuito para convertir video). El primer comando lo achica y le saca el sonido; el segundo saca la foto fija que se ve mientras carga:
+
+  ```bash
+  ffmpeg -i original.mp4 -an -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p -movflags +faststart public/hero/1.mp4
+  ```
+
+  ```bash
+  ffmpeg -i public/hero/1.mp4 -frames:v 1 -q:v 9 public/hero/1.jpg
+  ```
+
+  Con `-crf` más alto pesa menos y se ve peor (23 es buena calidad; 28 ya se nota).
 - **Foto del final de la página:** guardarla como `public/final.jpg` (o `.webp` / `.png`). Mientras no esté, va la foto de un producto.
 - Después de agregar o quitar esos archivos hay que reiniciar `npm run dev`: la lista se arma al arrancar (`next.config.ts`).
 - **"Quién soy":** el texto está en `src/components/site/About.tsx`; la foto se guarda como `public/quien-soy.jpg`. Mientras `ready` esté en `false` la sección no aparece en la web publicada.

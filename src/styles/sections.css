@@ -90,10 +90,23 @@
 .review-avatar img{object-fit:cover}
 .review blockquote{margin:0;line-height:1.5}
 .review-photos{display:flex;gap:6px;flex-wrap:wrap}
-.review-photos a{position:relative;width:150px;height:150px;border-radius:10px;overflow:hidden;background:var(--surface-2);transition:transform .2s}
-.review-photos a:hover{transform:scale(1.05)}
+.review-photos button{position:relative;width:150px;height:150px;padding:0;border:0;border-radius:10px;overflow:hidden;background:var(--surface-2);cursor:zoom-in;transition:transform .2s}
+.review-photos button:hover{transform:scale(1.05)}
 .review-photos img{object-fit:cover}
 .reviews-more{margin:8px auto 0;display:flex}
+
+/* foto de una reseña ampliada (PhotoZoom.tsx): es una ventana más (ver .modal en
+   overlays.css), con el fondo más oscuro y la foto sola en el medio */
+.zoom{background:rgba(10,4,2,.9);cursor:zoom-out}
+/* el recuadro toma la forma de la foto (--ratio = ancho / alto) y entra entero en la pantalla.
+   view-transition-name: al abrir y cerrar, la miniatura se transforma en esta foto (Reviews.tsx) */
+.zoom-photo{position:relative;margin:auto;aspect-ratio:var(--ratio,1);width:min(92vw,calc(86dvh * var(--ratio,1)));border-radius:14px;overflow:hidden;background:var(--surface-2);view-transition-name:resena-foto}
+.zoom-photo img{object-fit:contain;animation:fundido .25s ease-out}
+.zoom .icon-btn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:3}
+.zoom .gallery-arrow{position:fixed;width:44px;height:44px}
+.zoom-count{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-size:.85rem;font-weight:600;color:#fff;background:rgba(0,0,0,.55);padding:.2rem .7rem;border-radius:999px;pointer-events:none}
+::view-transition-group(resena-foto){animation-duration:.38s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(resena-foto),::view-transition-new(resena-foto){height:100%;object-fit:cover}
 
 /* ---------- quién soy (About.tsx): foto a un lado, texto al otro ---------- */
 .about{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(28px,6vw,72px);align-items:center}

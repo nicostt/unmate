@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 // Cada cuánto se pasa al fondo siguiente.
 const SWITCH_MS = 7000;
 
-const isVideo = (src: string) => /\.(mp4|webm)$/i.test(src);
+const VIDEO = /\.(mp4|webm)$/i;
+const isVideo = (src: string) => VIDEO.test(src);
 
 // Fondo de la portada: videos (o fotos) que ocupan toda la sección y se van
 // fundiendo uno en otro. Todos están apilados; el que toca se hace visible y
@@ -29,6 +30,8 @@ export function HeroMedia({ media }: { media: string[] }) {
           {isVideo(src) ? (
             <video
               src={src}
+              // foto fija que se ve mientras el video carga: mismo nombre, terminado en .jpg
+              poster={src.replace(VIDEO, ".jpg")}
               autoPlay
               muted
               loop

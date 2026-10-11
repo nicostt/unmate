@@ -9,7 +9,9 @@ import { coverImages, type Product } from "./types";
 // (formato .mp4 o .webm) y aparecen solos, en orden de nombre (1.mp4,
 // 2.mp4...), fundiéndose uno en otro. Conviene que sean cortos (8 a 15
 // segundos), sin sonido y livianos (2 o 3 MB cada uno), porque los baja cada
-// visitante.
+// visitante. Al lado de cada video va una foto con el mismo nombre (1.jpg):
+// es su primer cuadro, y se ve mientras el video carga.
+// Los dos se preparan con ffmpeg (los comandos están en el README).
 // Mientras esa carpeta esté vacía, se usan como relleno las fotos de los
 // primeros productos que tengan foto.
 const HERO_VIDEOS: string[] = JSON.parse(process.env.HERO_VIDEOS || "[]");
