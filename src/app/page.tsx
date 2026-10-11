@@ -1,6 +1,7 @@
 import { Catalog } from "@/components/shop/Catalog";
 import { KitBuilder } from "@/components/shop/KitBuilder";
 import { ShopProvider } from "@/components/shop/ShopProvider";
+import { About } from "@/components/site/About";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { ChooseGuide, CureGuide } from "@/components/site/Guide";
@@ -27,6 +28,7 @@ export default async function Home() {
         <KitBuilder />
         <CureGuide />
         <Reviews reviews={catalog.reviews} />
+        <About />
         <Contact />
       </main>
       <Footer image={getEndImage(catalog.products)} />

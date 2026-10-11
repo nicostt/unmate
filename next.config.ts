@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import type { NextConfig } from "next";
 
-// Videos de la portada y foto del final de la página.
+// Videos de la portada, foto del final de la página y foto de "Quién soy".
 // Se buscan en la carpeta public/ UNA vez, al compilar (o al arrancar
 // `npm run dev`), y quedan anotados en la versión que se publica: en el
 // servidor esa carpeta no está a mano mientras la web corre.
@@ -22,12 +22,17 @@ const endImage = ["final.webp", "final.jpg", "final.jpeg", "final.png"].find((fi
   existsSync(path.join(PUBLIC, file)),
 );
 
+const aboutPhoto = ["quien-soy.webp", "quien-soy.jpg", "quien-soy.jpeg", "quien-soy.png"].find((file) =>
+  existsSync(path.join(PUBLIC, file)),
+);
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   env: {
     HERO_VIDEOS: JSON.stringify(heroVideos),
     END_IMAGE: endImage ? `/${endImage}` : "",
+    ABOUT_PHOTO: aboutPhoto ? `/${aboutPhoto}` : "",
   },
   images: {
     // Las fotos de productos viven en Supabase Storage: hay que autorizar

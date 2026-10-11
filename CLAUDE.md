@@ -53,7 +53,8 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 - **Panel:** borrar pide MANTENER APRETADO un segundo (`HoldButton.tsx`) en vez de un "¿Estás seguro?"; marcar un pedido como entregado sigue preguntando con una ventana porque tiene advertencias. Los productos se ordenan arrastrando de una manija (`SortableList.tsx`), o con las flechas del teclado.
 - **En el navegador de prueba de Claude** (panel oculto) las transiciones, los requestAnimationFrame y los eventos de scroll no avanzan solos: las animaciones se verifican por estado del DOM, y a Nicolás hay que pedirle que las mire.
 - **Efecto de aparecer al bajar:** atributo `data-reveal` + `Reveal.tsx`, que revisa posiciones al hacer scroll (no usa IntersectionObserver). El catálogo no lo lleva, a pedido.
-- **Orden de la página** (`src/app/page.tsx`): portada, catálogo, tipos de mate, equipo, curado, reseñas, contacto.
+- **Orden de la página** (`src/app/page.tsx`): portada, catálogo, tipos de mate, equipo, curado, reseñas, quién soy, contacto.
+- **"Quién soy"** (`About.tsx`, pedida el 11/10/2026): foto a un lado y texto al otro. Hoy tiene texto de relleno entre corchetes y un recuadro donde va la foto. Tiene un seguro: mientras `ABOUT.ready` sea `false`, la sección se ve en `npm run dev` pero NO en la web publicada. Cuando Nicolás mande el texto y la foto: cargar el texto en `ABOUT`, guardar la foto como `public/quien-soy.jpg` (la detecta `next.config.ts`, hay que reiniciar el servidor) y pasar `ready` a `true`.
 - **Solo local:** `src/app/stats-preview/page.tsx` muestra las estadísticas con datos inventados. Está excluida en `.git/info/exclude`; NO commitear ni publicar.
 
 ## Base de datos
@@ -79,6 +80,7 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 ## Pendiente de Nicolás
 Preguntarle cada tanto; listarlo cuando pregunte qué quedó pendiente.
 - Videos de la portada definitivos: alguien tomando mate y un mate cebándose. 8 a 15 segundos, horizontales, archivo original (no reenviado por WhatsApp).
+- Texto y foto suya para la sección "Quién soy" (dijo que los manda). Foto vertical, si puede.
 - Foto de fondo del final de la página: una buena imagen horizontal; va en `public/final.jpg`.
 - Elegir el descuento por armar equipo en el panel (pestaña Productos); hoy está en 0 %.
 - Textos y fotos de los tipos de mate (`MateTypes.tsx` tiene dibujos y textos provisorios).

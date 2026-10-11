@@ -1,6 +1,7 @@
 import { coverImages, type Product } from "./types";
 
-// Fondos grandes de la página: el de la portada y el del final.
+// Imágenes fijas de la página que se guardan en la carpeta public/: el fondo
+// de la portada, el del final y la foto de "Quién soy".
 // La lista de archivos la arma next.config.ts mirando la carpeta public/ al
 // compilar; acá solo se decide qué mostrar.
 
@@ -34,4 +35,10 @@ export function getEndImage(products: Product[]): string | null {
   if (END_IMAGE) return END_IMAGE;
   const covers = products.map((p) => coverImages(p)[0]).filter(Boolean);
   return covers[FALLBACK_PHOTOS] ?? covers[0] ?? null;
+}
+
+// QUIÉN SOY. La foto de Nicolás para esa sección (src/components/site/About.tsx).
+// Se guarda como public/quien-soy.jpg (o .webp / .png). null = todavía no está.
+export function getAboutPhoto(): string | null {
+  return process.env.ABOUT_PHOTO || null;
 }

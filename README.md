@@ -58,6 +58,7 @@ src/
 public/
   hero/                Videos de la portada (1.mp4, 2.mp4...)
   final.jpg            Foto de fondo del final de la página (todavía no está)
+  quien-soy.jpg        Foto de la sección "Quién soy" (todavía no está)
   logo-mark.png        El emblema del logo
 supabase/migrations/   Los cambios de la base, numerados en el orden en que se ejecutaron
 referencia/            El diseño original en un solo HTML (solo para consultar)
@@ -89,6 +90,7 @@ El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
 - **Videos de la portada:** copiarlos a `public/hero/` como `.mp4` o `.webm`. Aparecen solos, en orden de nombre.
 - **Foto del final de la página:** guardarla como `public/final.jpg` (o `.webp` / `.png`). Mientras no esté, va la foto de un producto.
 - Después de agregar o quitar esos archivos hay que reiniciar `npm run dev`: la lista se arma al arrancar (`next.config.ts`).
+- **"Quién soy":** el texto está en `src/components/site/About.tsx`; la foto se guarda como `public/quien-soy.jpg`. Mientras `ready` esté en `false` la sección no aparece en la web publicada.
 - **Descuento por armar equipo:** en el panel, pestaña Productos, abajo de la lista.
 - **Palabras que rotan en el título de la portada:** la lista `FOR` en `src/components/site/Hero.tsx`.
 - **Número de WhatsApp o Instagram:** `src/lib/site.ts`.
