@@ -22,6 +22,22 @@
 /* apagado o trabajando */
 .btn:disabled,.btn.is-busy{opacity:.6;cursor:default}
 
+/* botón que cuenta lo que pasa (StateButton.tsx): tiene tres contenidos apilados
+   en el mismo lugar (el texto, un circulito girando y un tilde) y según el
+   momento (data-state) se ve uno solo. Al terminar se pone del color de marca. */
+.btn.state{display:inline-grid;place-items:center}
+.state>span:not(.sr){grid-area:1/1;display:inline-flex;align-items:center;gap:8px;transition:opacity .25s,transform .25s}
+.state .s-load,.state .s-ok{opacity:0;transform:scale(.6)}
+.state[data-state="load"] .s-idle,.state[data-state="ok"] .s-idle{opacity:0;transform:scale(.6)}
+.state[data-state="load"] .s-load,.state[data-state="ok"] .s-ok{opacity:1;transform:none}
+.btn.state[data-state="ok"]{background:var(--accent);color:var(--accent-fg)}
+.state .s-load i{width:18px;height:18px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:girar .7s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+/* el tilde se dibuja de punta a punta */
+.state .s-ok svg{width:18px;height:18px}
+.state .s-ok path{stroke-dasharray:24;stroke-dashoffset:24}
+.state[data-state="ok"] .s-ok path{stroke-dashoffset:0;transition:stroke-dashoffset .35s .12s}
+
 /* WhatsApp e Instagram, con los colores de cada aplicación (íconos en BrandIcons.tsx) */
 .brand-icon{width:1.35em;height:1.35em;flex:none}
 /* WhatsApp: su verde, con texto oscuro para que se lea bien */

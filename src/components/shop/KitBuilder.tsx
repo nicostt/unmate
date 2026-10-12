@@ -6,6 +6,7 @@ import { money } from "@/lib/format";
 import { cartKey, isSoldOut, kitSaving, type Product, type Shape } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
+import { StateButton } from "./StateButton";
 import { useOverlay } from "./useOverlay";
 
 // Las cuatro partes del equipo (las mismas de KIT_PARTS, en src/lib/types.ts,
@@ -96,14 +97,17 @@ export function KitBuilder() {
   const saving = kitSaving(all.map((o) => o.product), kit).amount;
   const total = subtotal - saving;
 
-  function addKit() {
-    if (!all.length) return notify("Elegí al menos un mate para armar tu equipo");
-    if (addMany(all.map((o) => o.key))) {
-      notify("¡Equipo armado! Ya está en tu carrito");
-      openCart();
-    } else {
-      notify("Esos productos ya están en tu carrito");
+  // Devuelve si se pudo sumar: el botón muestra el tilde y después abre el carrito.
+  function addKit(): boolean {
+    if (!all.length) {
+      notify("Elegí al menos un mate para armar tu equipo");
+      return false;
     }
+    if (!addMany(all.map((o) => o.key))) {
+      notify("Esos productos ya están en tu carrito");
+      return false;
+    }
+    return true;
   }
 
   return (
@@ -147,9 +151,9 @@ export function KitBuilder() {
             <strong>{money(total)}</strong>
             {saving > 0 && kit && <span className="off">−{kit.percent}%</span>}
           </div>
-          <button className="btn primary" type="button" onClick={addKit}>
+          <StateButton className="btn primary" done="¡Equipo armado!" onAct={addKit} onDone={openCart}>
             Agregar equipo al carrito
-          </button>
+          </StateButton>
         </div>
       </div>
 

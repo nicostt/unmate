@@ -14,6 +14,8 @@
   /* nada se desliza ni cambia de tamaño de a poco: solo se funden el color y la opacidad */
   *,*::before,*::after{transition-property:opacity,color,background-color,border-color,box-shadow,filter!important}
 
+  /* el tilde del botón de compra aparece ya dibujado */
+  .state .s-ok path{stroke-dashoffset:0}
   /* aparecer al bajar: queda el fundido, sin subir */
   .reveal [data-reveal]:not(.is-in){transform:none}
 

@@ -21,6 +21,7 @@ import {
 import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
+import { StateButton } from "./StateButton";
 
 // Precio grande + precio anterior tachado + badge de descuento.
 export function PriceRow({ price, compareAtPrice }: { price: number; compareAtPrice: number | null }) {
@@ -50,12 +51,14 @@ export function BuyBox({
   small,
   showUnitPrice,
   onAdd,
+  onAdded,
 }: {
   product: Product;
   design?: Design | null; // diseño elegido, si el producto va por diseños
   small?: boolean; // botón más chico, para la tarjeta
   showUnitPrice?: boolean; // mostrar el precio de los productos por unidad
-  onAdd: (key: string, amount: number) => void; // amount: unidades, o gramos si va por peso
+  onAdd: (key: string, amount: number) => boolean; // amount: unidades, o gramos si va por peso. Devuelve si se pudo sumar
+  onAdded?: () => void; // qué hacer después de mostrar que se sumó
 }) {
   const max = maxQty(product);
   const [chosen, setChosen] = useState(500);
@@ -65,14 +68,15 @@ export function BuyBox({
   const deal = product.byWeight ? betterDeal(product, grams) : null;
 
   const button = (
-    <button
+    <StateButton
       className={small ? "btn primary small" : "btn primary"}
-      type="button"
       disabled={soldOut}
-      onClick={() => onAdd(cartKey(product, design), product.byWeight ? grams : 1)}
+      done="Sumado"
+      onAct={() => onAdd(cartKey(product, design), product.byWeight ? grams : 1)}
+      onDone={onAdded}
     >
       {soldOut ? "Agotado" : "Sumar al carrito"}
-    </button>
+    </StateButton>
   );
 
   if (!product.byWeight) {
@@ -166,9 +170,10 @@ export function ProductCard({
 
   // Al sumar desde la tarjeta, la foto que se está viendo vuela al carrito.
   function addFromCard(key: string, amount: number) {
-    if (!add(key, amount)) return;
+    if (!add(key, amount)) return false;
     const art = card.current?.querySelector(".card-art") ?? null;
     flyToCart(art, art?.querySelectorAll("img")[index]?.currentSrc || null);
+    return true;
   }
 
   return (

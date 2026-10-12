@@ -40,11 +40,10 @@ export function ProductModal({
     track("view", { slug: product.slug, design: design?.id });
   }, [product.slug, design?.id]);
 
-  function addAndGoToCart(key: string, amount: number) {
-    if (add(key, amount)) {
-      onClose();
-      openCart();
-    }
+  // Después de que el botón muestra "Sumado", la ficha se cierra y se abre el carrito.
+  function goToCart() {
+    onClose();
+    openCart();
   }
 
   return (
@@ -128,7 +127,7 @@ export function ProductModal({
             )}
           </dl>
           <div className="m-actions">
-            <BuyBox product={product} design={design} onAdd={addAndGoToCart} />
+            <BuyBox product={product} design={design} onAdd={add} onAdded={goToCart} />
             <a
               className="btn wa outline"
               target="_blank"
