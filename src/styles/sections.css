@@ -81,9 +81,11 @@
 .feature-cure .note{margin-top:0}
 
 /* ---------- reseñas (Reviews.tsx): tarjetas chicas, tipo comentario ---------- */
-/* las tarjetas se reparten el ancho entre todas: la última fila también se estira, así nunca queda un hueco */
-.reviews{display:flex;flex-wrap:wrap;gap:14px}
-.review{flex:1 1 240px;margin:0;display:grid;gap:10px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .25s,border-color .25s}
+/* Las tarjetas se reparten el ancho de la fila. Tienen un ancho máximo: si en
+   la última fila queda una sola, no se estira de punta a punta sino que queda
+   centrada. La portada muestra solo filas completas (lo calcula Reviews.tsx). */
+.reviews{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.review{flex:1 1 240px;max-width:440px;margin:0;display:grid;gap:10px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .25s,border-color .25s}
 @media(hover:hover){.review:hover{transform:translateY(-4px);border-color:var(--accent)}}
 .review figcaption{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
 .review-avatar{position:relative;overflow:hidden;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font:700 .95rem var(--f-display);flex:none}

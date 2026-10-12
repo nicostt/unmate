@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { useFlip } from "@/components/shop/useFlip";
 import { reducedMotion, viewTransition } from "@/lib/motion";
@@ -14,6 +14,11 @@ const COVER_MAX = 5;
 
 // Cuántas se ven de entrada si el admin no marcó ninguna.
 const COVER_DEFAULT = 3;
+
+// Ancho mínimo de una tarjeta y separación entre tarjetas, en px. Tienen que
+// coincidir con .review y .reviews en src/styles/sections.css.
+const CARD_MIN = 240;
+const GAP = 14;
 
 // Nombre que comparten la miniatura y la foto ampliada mientras una se
 // transforma en la otra (ver .zoom-photo en src/styles/sections.css).
@@ -34,6 +39,21 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   const [zoom, setZoom] = useState<{ photos: ZoomPhoto[]; index: number; alt: string } | null>(null);
   // las miniaturas de esa reseña, para que al cerrar la foto vuelva a la suya
   const thumbs = useRef<HTMLElement[]>([]);
+
+  // Cuántas tarjetas entran por fila con el ancho que hay ahora. Sirve para
+  // que la portada muestre solo filas completas: si no, la que sobra queda
+  // sola en la fila de abajo, estirada de punta a punta.
+  const list = useRef<HTMLDivElement>(null);
+  const [perRow, setPerRow] = useState<number | null>(null);
+  useEffect(() => {
+    const el = list.current;
+    if (!el) return;
+    const measure = () => setPerRow(Math.max(1, Math.floor((el.clientWidth + GAP) / (CARD_MIN + GAP))));
+    const watcher = new ResizeObserver(measure);
+    watcher.observe(el);
+    return () => watcher.disconnect();
+  }, []);
+
   if (reviews.length === 0) return null;
 
   // Abrir y cerrar: la miniatura "crece" hasta ser la foto grande, y vuelve.
@@ -64,7 +84,11 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   }
 
   const featured = reviews.filter((r) => r.featured);
-  const cover = featured.length ? featured.slice(0, COVER_MAX) : reviews.slice(0, COVER_DEFAULT);
+  const wanted = featured.length ? featured.slice(0, COVER_MAX) : reviews.slice(0, COVER_DEFAULT);
+  // De la portada se muestran filas enteras: con 5 elegidas y 4 por fila, van
+  // 4 y la quinta pasa a "Ver todas". (En una sola columna van todas.)
+  const full = perRow && perRow > 1 && wanted.length > perRow ? Math.floor(wanted.length / perRow) * perRow : wanted.length;
+  const cover = wanted.slice(0, full);
   const rest = reviews.filter((r) => !cover.includes(r));
   const visible = expanded ? [...cover, ...rest] : cover;
 
@@ -77,7 +101,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
         </p>
       </div>
 
-      <div className="reviews">
+      <div className="reviews" ref={list}>
         {visible.map((review) => (
           <ReviewCard key={review.id} review={review} onZoom={(index, thumb) => openZoom(review, index, thumb)} />
         ))}
