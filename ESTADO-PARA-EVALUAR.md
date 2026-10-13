@@ -44,7 +44,7 @@ Hay tres modos de venta:
 | Código | GitHub, ramas `dev` (trabajo) y `main` (publicado) |
 | Dependencias | 4 en total: next, react, react-dom, supabase-js |
 
-Tamaño: unos 60 archivos de código propio, 8 migraciones de base de datos.
+Tamaño: unos 80 archivos de código propio, 8 migraciones de base de datos.
 
 ## 4. Qué está hecho
 
