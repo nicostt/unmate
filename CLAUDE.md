@@ -69,7 +69,7 @@ ES PRIORIDAD (pedido de Nicolás, 11/10/2026): en cada cambio se repasa esta lis
 
 Reglas:
 - Row Level Security activada en todas las tablas: el público solo lee el catálogo, solo el admin escribe. Tabla nueva = RLS + reglas explícitas.
-- La clave secreta (service role) nunca va en el repositorio ni en el navegador. `.env.local` va en `.gitignore`. Solo se usa la clave "publishable".
+- La clave secreta (service role) nunca va en el repositorio ni en el navegador. `.env.local` va en `.gitignore`. Solo se usa la clave "publishable". Excepción acordada (16/10/2026, rama `cloudflare`): `.env.production` SÍ se commitea con la URL y la clave publishable (públicas por diseño), porque Cloudflare no le pasaba las variables cargadas en su panel al armado.
 - Nunca manejar datos de tarjeta. Los pagos van por el checkout de Mercado Pago.
 - Funciones públicas de la base: `security definer` con `search_path = ''`, validan y recortan lo que llega, calculan ellas los precios y el stock, y llevan freno de abusos (`too_many`).
 - Nada de HTML crudo con datos (`dangerouslySetInnerHTML`, `innerHTML`). Links externos con `rel="noopener"`.

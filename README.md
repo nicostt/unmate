@@ -143,7 +143,8 @@ npm run preview
 
 En Cloudflare se publica sola con cada `git push` a la rama configurada (Workers Builds, conectado a GitHub). Lo que hay que tener cargado en Cloudflare:
 - Un espacio de Workers KV llamado `unmate-cache` (Storage & Databases > Workers KV > Create). Su ID va en `wrangler.jsonc` (`kv_namespaces`). R2 no se usa porque pide pago.
-- En el Worker, Settings > Build: comando de construcción `npx opennextjs-cloudflare build`, comando de publicación `npx opennextjs-cloudflare deploy`, y las variables `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (las mismas de `.env.local`; son públicas). La clave secreta de Supabase NO va.
+- En el Worker, Settings > Build: rama de producción `cloudflare`, comando de construcción `npx opennextjs-cloudflare build` y comando de publicación `npx opennextjs-cloudflare deploy`. ("Retry" repite una publicación vieja tal cual; una nueva arranca sola con cada `git push`.)
+- Las variables de Supabase NO se cargan en Cloudflare: van en `.env.production`, que sí está en el repositorio porque son los dos datos públicos (la dirección y la clave "publishable"). La clave secreta de Supabase nunca va ahí.
 
 Para que la caché del catálogo funcione, Cloudflare usa tres cosas gratis: KV (el "disco" con las páginas armadas; el plan gratis permite 1000 escrituras por día, por eso el catálogo se renueva solo una vez por hora), Durable Objects (la fila de regeneraciones y las etiquetas que vence el panel) y el servicio de fotos (`IMAGES`, achica las fotos de Supabase).
 
