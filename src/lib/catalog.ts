@@ -46,11 +46,15 @@ function readKit(value: unknown): KitDiscount | null {
 // reglas de la base.
 //
 // "use cache" guarda el resultado para no consultar la base en cada visita.
-// Se renueva solo cada pocos minutos, y al instante cuando se cambia algo
-// desde el panel (ver refreshCatalog en src/lib/admin-actions.ts).
+// Se renueva al instante cuando se cambia algo desde el panel (ver
+// refreshCatalog en src/lib/admin-actions.ts; también al cambiar el estado de
+// un pedido, que mueve el stock) y, por las dudas, solo una vez por hora: lo
+// que se edite directo en Supabase, sin pasar por el panel, tarda hasta eso.
+// Una hora y no minutos porque en Cloudflare cada renovación es una escritura
+// en KV, y el plan gratis permite 1000 por día.
 export async function getCatalog(): Promise<Catalog> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("hours");
   cacheTag("catalog");
 
   const [categories, products, reviews, kit] = await Promise.all([

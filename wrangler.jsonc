@@ -25,8 +25,10 @@
   // ------------------------------------------------------------ caché
   // Dónde se guarda el catálogo ya armado ("use cache" en src/lib/catalog.ts),
   // para no consultar Supabase ni rearmar la página en cada visita.
-  //  - R2: el "disco" con las páginas y datos guardados.
-  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "unmate-cache" }],
+  //  - KV: el "disco" con las páginas y datos guardados. Es gratis sin
+  //    tarjeta (R2, la opción que recomienda la guía, pide pago). El id lo da
+  //    Cloudflare al crear el espacio "unmate-cache" (no es secreto).
+  "kv_namespaces": [{ "binding": "NEXT_INC_CACHE_KV", "id": "PENDIENTE" }],
   //  - Durable Objects: la fila de regeneraciones pendientes y la lista de
   //    "etiquetas" vencidas (cuando el panel llama a refreshCatalog).
   "durable_objects": {

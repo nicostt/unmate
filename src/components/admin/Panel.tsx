@@ -75,7 +75,7 @@ export function Panel({ accessToken, email }: { accessToken: string; email: stri
   // Después de cualquier cambio: avisarle a la web pública y recargar la lista.
   async function changed() {
     await refreshCatalog(accessToken).catch(() => {
-      // si el aviso falla no es grave: la web se actualiza sola en unos minutos
+      // si el aviso falla no es grave: la web se actualiza sola en menos de una hora
     });
     await fetchAll().then(setData, fail);
   }
