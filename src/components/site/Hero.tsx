@@ -4,7 +4,19 @@ import { HeroMedia } from "./HeroMedia";
 import { RotatingWord } from "./RotatingWord";
 
 // Para qué es el mate: la última palabra del título va rotando entre estas.
-const FOR = ["regalar", "la facu", "el laburo", "la oficina", "la vieja", "el finde", "tu viejo", "vos"];
+const FOR = [
+  "regalar",
+  "la facu",
+  "el laburo",
+  "la oficina",
+  "tu mamá",
+  "el finde",
+  "todos los días",
+  "la cancha",
+  "entrenar",
+  "tu viejo",
+  "vos",
+];
 
 // Portada + los tres pasos de "cómo comprar".
 // La portada ocupa casi toda la pantalla: de fondo van los videos (o fotos,
