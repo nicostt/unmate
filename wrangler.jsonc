@@ -8,6 +8,9 @@
   "name": "unmate",
   // Lo que arma `opennextjs-cloudflare build` a partir de la web de Next.
   "main": ".open-next/worker.js",
+  // Dirección gratis de Cloudflare (unmate.<subdominio>.workers.dev), prendida
+  // siempre aunque más adelante se sume un dominio propio.
+  "workers_dev": true,
   "compatibility_date": "2026-10-01",
   "compatibility_flags": [
     "nodejs_compat", // Next necesita partes de Node.js
