@@ -25,10 +25,9 @@ Tienda online de mates, bombillas, yerba y termos. El cliente arma un carrito y 
 - Ramas: se trabaja y se sube a `dev`. `main` es lo que publica Netlify y SOLO se actualiza cuando Nicolás dice "publicá".
 - Netlify Free (permite uso comercial; Vercel Hobby lo prohíbe): 300 créditos por mes, 15 por publicación; si se agotan el sitio se pausa. Por eso se publica de a tandas.
 - `netlify.toml` declara `@netlify/plugin-nextjs`. Sin eso el adaptador no se activa y todo da 404.
-- Dominio: `unmatees.lat` (Namecheap, con Netlify DNS). Quería el `.com` y compró `.lat` por error; decidió usarlo. `unmate.es` lo tiene registrado un conocido suyo.
-- Para verificar una publicación, mirar directamente https://unmatees.lat (la dirección `shiny-hamster-7b8446.netlify.app` ya no responde y la consulta pública de deploys devuelve 401).
-- Publicado: `main` = commit `2471ba1` (9/10/2026), 7.ª publicación del mes (105 créditos como mínimo).
-- EN `dev` SIN PUBLICAR (Nicolás pidió esperar a terminar los cambios de diseño y el material pendiente): botones de estadísticas (contarme, actualizar, borrar), catálogo arriba de los tipos de mate, fotos de reseñas a 150 px, portada con video, encabezado compacto en celulares, estilos repartidos por zona, y la tanda de ideas del 11/10/2026 (ver abajo).
+- Dirección: https://unmatees.netlify.app (gratis, de Netlify). El dominio `unmatees.lat` (Namecheap) lo canceló y reembolsó el registrador en octubre de 2026 porque no se respondió el mail de verificación: ya no existe. Si Nicolás compra otro, se agrega en Netlify > Domain management y verifica el mail del registrador el mismo día. `unmate.es` lo tiene registrado un conocido suyo.
+- Para verificar una publicación, mirar directamente https://unmatees.netlify.app (la consulta pública de deploys devuelve 401).
+- Publicado: `main` = `dev` al 16/10/2026 (8.ª publicación del mes): incluye todo lo de abajo. Lo que siga en `dev` espera otro "publicá".
 - Respaldo de antes de esa tanda: etiqueta `respaldo-antes-de-ideas` y rama `respaldo/antes-de-ideas` (commit `560ed7b`). Si algo no gusta, se vuelve desde ahí.
 
 ## Cómo está armado
@@ -60,7 +59,7 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 - **Solo local:** `src/app/stats-preview/page.tsx` muestra las estadísticas con datos inventados. Está excluida en `.git/info/exclude`; NO commitear ni publicar.
 
 ## Base de datos
-- Migraciones en `supabase/migrations/`. De 0001 a 0007: ejecutadas por Nicolás y verificadas (la 0007, del descuento por equipo, el 11/10/2026). PENDIENTE DE EJECUTAR: `0008_refuerzos_de_seguridad.sql` (ver Seguridad). El descuento arranca apagado (0 %): lo prende Nicolás desde el panel. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
+- Migraciones en `supabase/migrations/`. De 0001 a 0008: ejecutadas por Nicolás y verificadas (la 0008, refuerzos de seguridad, el 12/10/2026). El descuento arranca apagado (0 %): lo prende Nicolás desde el panel. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
 - Sin uso: tabla `product_variants` (0002; Nicolás descartó las "presentaciones" por engorrosas) y la fila `yerba_tiers` de `settings` (0004).
 - Datos de prueba que dejó Claude y Nicolás tiene que borrar: Pedido #14 "PRUEBA estadisticas Claude (borrar)", quizá "PRUEBA de Claude (borrar)", y en estadísticas el visitante `prueba-claude-0001`, orígenes `prueba`/`prueba-claude` y la búsqueda "prueba claude".
 
@@ -79,8 +78,8 @@ Reglas:
 Revisión completa del 11/10/2026:
 - Estaba bien: RLS en todas las tablas, registro de usuarios apagado, sin secretos en el repo ni en el historial, sin HTML crudo, `npm audit` sin vulnerabilidades, fotos optimizadas solo desde el servidor de Supabase, panel sin indexar.
 - Se agregó en el código (en `dev`): cabeceras de seguridad en `next.config.ts` (Content-Security-Policy, HSTS, nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy; sin `X-Powered-By`). Probadas en la tienda sin bloqueos; el panel con login lo tiene que probar Nicolás.
-- Se escribió `supabase/migrations/0008_refuerzos_de_seguridad.sql`, PENDIENTE DE QUE NICOLÁS LA EJECUTE: freno de abusos por IP (`rate_limits` + `too_many`) en `track`, `save_cart` y `create_order`; tope de tamaño del carrito guardado; las fotos de productos ocultos y diseños apartados dejan de ser consultables; el bucket solo acepta imágenes de hasta 8 MB. Sin ejecutarla todo sigue andando como antes. Después de que la corra, verificar como visitante que el catálogo sigue trayendo fotos.
-- Queda en manos de Nicolás: verificación en dos pasos en GitHub, Supabase, Netlify y Namecheap, y contraseña larga y única para el panel. Es el riesgo más grande que queda.
+- Se escribió `supabase/migrations/0008_refuerzos_de_seguridad.sql`, ejecutada y verificada como visitante: freno de abusos por IP (`rate_limits` + `too_many`) en `track`, `save_cart` y `create_order`; tope de tamaño del carrito guardado; las fotos de productos ocultos y diseños apartados dejan de ser consultables; el bucket solo acepta imágenes de hasta 8 MB.
+- Queda en manos de Nicolás: verificación en dos pasos en GitHub, Supabase, Netlify y el registrador de dominio que use, y contraseña larga y única para el panel. Es el riesgo más grande que queda.
 - Límites conocidos: la CSP usa `'unsafe-inline'` (Next lo necesita sin nonces); el freno de abusos no se pudo probar sin crear pedidos reales.
 
 ## Marca y diseño
@@ -98,12 +97,13 @@ Preguntarle cada tanto; listarlo cuando pregunte qué quedó pendiente.
 - Portada: ya mandó un video (el del mate cebándose) y dijo que más adelante manda otro para que se alternen. Si quiere más calidad, que pase el archivo original del celular (cable, Drive o mail), filmado más de lejos.
 - Texto y foto suya para la sección "Quién soy" (dijo que los manda). Foto vertical, si puede.
 - Foto de fondo del final de la página: una buena imagen horizontal; va en `public/final.jpg`.
-- Seguridad: ejecutar el SQL 0008, activar la verificación en dos pasos en GitHub, Supabase, Netlify y Namecheap, y probar el panel con login después del cambio de cabeceras.
+- Seguridad: activar la verificación en dos pasos en GitHub, Supabase y Netlify, y probar el panel con login en https://unmatees.netlify.app/admin (primera publicación con las cabeceras de seguridad).
+- Sacar `unmatees.lat` de Netlify (Domain management) y, si quiere, comprar un dominio nuevo.
 - Elegir el descuento por armar equipo en el panel (pestaña Productos); hoy está en 0 %.
 - Textos y fotos de los tipos de mate (`MateTypes.tsx` tiene dibujos y textos provisorios).
 - Descripciones nuevas de los productos.
 - Videos de curado (links de YouTube) para `CureGuide`. A futuro: mandar el video de curado después de la compra.
 - En el panel: fotos y reseñas reales, porcentajes de cada yerba, borrar los datos de prueba, probar el circuito de pedidos.
 - Sin definir todavía: condiciones de envío, medios de pago y cuotas; si hace personalizados, regalos o venta por mayor.
-- Más adelante: Mercado Pago, envíos y facturación, renovación del dominio.
+- Más adelante: Mercado Pago, envíos y facturación, dominio propio.
 - Dato: en Tiendanube el termo figura con el nombre de una marca; en la web se llama "Termo 1,2 L".

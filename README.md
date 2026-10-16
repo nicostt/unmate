@@ -2,7 +2,7 @@
 
 Tienda online de mates, bombillas, yerba y termos. El cliente arma el carrito y manda el pedido por WhatsApp; el pedido queda registrado y se maneja desde un panel de administración.
 
-Hecha con [Next.js](https://nextjs.org/docs) (la web) y [Supabase](https://supabase.com/docs) (base de datos, login y fotos). Publicada en Netlify: https://unmatees.lat
+Hecha con [Next.js](https://nextjs.org/docs) (la web) y [Supabase](https://supabase.com/docs) (base de datos, login y fotos). Publicada en Netlify: https://unmatees.netlify.app
 
 ## Cómo correrla en tu compu
 
@@ -140,5 +140,5 @@ Es prioridad del proyecto: antes de dar por terminado un cambio se repasa esta l
 - Los precios y el stock de un pedido los calcula la base, no el navegador.
 - Las funciones que usa el público tienen un freno: si una misma conexión las llama demasiadas veces en un rato, se la ignora (migración 0008).
 - `next.config.ts` manda cabeceras de seguridad con cada página. La más importante es la Content-Security-Policy: la lista de lugares de donde la web puede cargar cosas. **Si algún día se suma algo de afuera** (un video de YouTube, Mercado Pago, un mapa) y no aparece, es porque falta agregarlo ahí.
-- Las cuentas (GitHub, Supabase, Netlify, Namecheap) tienen que tener verificación en dos pasos: quien entra a una de ellas controla la web.
+- Las cuentas (GitHub, Supabase, Netlify y el registrador del dominio) tienen que tener verificación en dos pasos: quien entra a una de ellas controla la web.
 - `npm audit` revisa si alguna de las piezas que usa el proyecto tiene fallas conocidas.
