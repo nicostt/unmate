@@ -30,7 +30,16 @@ const aboutPhoto = ["quien-soy.webp", "quien-soy.jpg", "quien-soy.jpeg", "quien-
 // Cabeceras que el servidor manda con cada página. Le dicen al navegador qué
 // tiene permitido hacer la web, para que un error nuestro (o un intento de
 // ataque) no pase a mayores.
-const SUPABASE = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).origin;
+// Sin estas dos variables la web no puede armarse. En la compu salen de
+// .env.local; en el hosting se cargan en su panel (en Cloudflare, en
+// Settings > Build > Variables and secrets).
+for (const name of ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"]) {
+  if (!process.env[name]?.trim()) {
+    throw new Error(`Falta la variable ${name}: cargala en el panel del hosting (o en .env.local) y volvé a construir.`);
+  }
+}
+const SUPABASE_URL = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!.trim());
+const SUPABASE = SUPABASE_URL.origin;
 const DEV = process.env.NODE_ENV !== "production";
 
 // Content-Security-Policy: la lista de lugares de donde la página puede
@@ -85,7 +94,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname,
+        hostname: SUPABASE_URL.hostname,
         pathname: "/storage/v1/object/public/**",
       },
     ],
