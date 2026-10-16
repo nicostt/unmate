@@ -1,0 +1,45 @@
+// Configuración de Cloudflare Workers (el hosting). La lee `wrangler`, la
+// herramienta de Cloudflare, al probar en la compu y al publicar.
+// Guía del adaptador: https://opennext.js.org/cloudflare
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Nombre del "Worker" en Cloudflare: la dirección gratis queda
+  // unmate.<tu-subdominio>.workers.dev
+  "name": "unmate",
+  // Lo que arma `opennextjs-cloudflare build` a partir de la web de Next.
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    "nodejs_compat", // Next necesita partes de Node.js
+    "global_fetch_strictly_public", // la web solo puede pedir datos a direcciones públicas
+  ],
+  // Archivos fijos (public/ y lo que arma Next): se sirven sin pasar por el
+  // Worker y no cuentan como visitas en el plan gratis.
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  // El Worker se llama a sí mismo para regenerar páginas en segundo plano.
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "unmate" }],
+
+  // ------------------------------------------------------------ caché
+  // Dónde se guarda el catálogo ya armado ("use cache" en src/lib/catalog.ts),
+  // para no consultar Supabase ni rearmar la página en cada visita.
+  //  - R2: el "disco" con las páginas y datos guardados.
+  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "unmate-cache" }],
+  //  - Durable Objects: la fila de regeneraciones pendientes y la lista de
+  //    "etiquetas" vencidas (cuando el panel llama a refreshCatalog).
+  "durable_objects": {
+    "bindings": [
+      { "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" },
+      { "name": "NEXT_TAG_CACHE_DO_SHARDED", "class_name": "DOShardedTagCache" },
+    ],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"] }],
+
+  // Achicar y convertir las fotos de productos (lo que hace <Image> de Next).
+  "images": { "binding": "IMAGES" },
+
+  // Registro de errores y visitas en el panel de Cloudflare.
+  "observability": { "enabled": true },
+}

@@ -123,6 +123,30 @@ Se trabaja en la rama `dev`. Netlify publica lo que llega a `main`, y cada publi
 
 `netlify.toml` declara el plugin `@netlify/plugin-nextjs`. Sin eso el sitio se publica pero todo da "Page not found".
 
+### Cloudflare (mudanza en prueba, rama `cloudflare`)
+
+En Netlify las visitas también gastan créditos (el video de la portada pesa); en Cloudflare los archivos fijos se sirven gratis y sin tope. La base de datos sigue en Supabase: mudar el hosting no la toca.
+
+Next no corre "tal cual" en Cloudflare: lo adapta [OpenNext](https://opennext.js.org/cloudflare). Las piezas:
+
+| Archivo | Para qué |
+|---|---|
+| `wrangler.jsonc` | Configuración del Worker: nombre (`unmate`), caché, fotos |
+| `open-next.config.ts` | Dónde guarda la caché de Next (R2 + Durable Objects) |
+| `public/_headers` | Cabeceras de seguridad y caché para los archivos fijos |
+
+Probarla en tu compu igual que en Cloudflare (arma todo y la sirve en http://localhost:8787):
+
+```bash
+npm run preview
+```
+
+En Cloudflare se publica sola con cada `git push` a la rama configurada (Workers Builds, conectado a GitHub). Lo que hay que tener cargado en Cloudflare:
+- El bucket de R2 llamado `unmate-cache` (R2 > Create bucket).
+- En el Worker, Settings > Build: comando de construcción `npx opennextjs-cloudflare build`, comando de publicación `npx opennextjs-cloudflare deploy`, y las variables `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (las mismas de `.env.local`; son públicas). La clave secreta de Supabase NO va.
+
+Para que la caché del catálogo funcione, Cloudflare usa tres cosas gratis: R2 (el "disco" con las páginas armadas), Durable Objects (la fila de regeneraciones y las etiquetas que vence el panel) y el servicio de fotos (`IMAGES`, achica las fotos de Supabase).
+
 ## Etapas
 
 - [x] 1. Base: catálogo en la base, panel con login, fotos
