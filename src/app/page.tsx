@@ -12,6 +12,11 @@ import { Reviews } from "@/components/site/Reviews";
 import { getCatalog } from "@/lib/catalog";
 import { getEndImage, getHeroMedia } from "@/lib/hero";
 
+// La página armada se guarda y se rearma sola a la hora como mucho (lo mismo
+// que el catálogo, ver src/lib/catalog.ts); el panel la refresca al instante.
+// El número va escrito así, sin cuentas, porque Next lo lee sin ejecutar el código.
+export const revalidate = 3600;
+
 // Página de inicio. Se arma en el servidor: busca el catálogo y se lo pasa a
 // ShopProvider, que lo comparte con el carrito y las secciones interactivas.
 export default async function Home() {

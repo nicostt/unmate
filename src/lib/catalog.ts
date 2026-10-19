@@ -1,4 +1,4 @@
-import { cacheLife, cacheTag } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { photoUrl, supabase } from "./supabase";
 import { weightTiers, type Catalog, type KitDiscount, type Review, type Shape } from "./types";
 
@@ -45,18 +45,9 @@ function readKit(value: unknown): KitDiscount | null {
 // Solo llegan los productos y reseñas visibles, porque así lo deciden las
 // reglas de la base.
 //
-// "use cache" guarda el resultado para no consultar la base en cada visita.
-// Se renueva al instante cuando se cambia algo desde el panel (ver
-// refreshCatalog en src/lib/admin-actions.ts; también al cambiar el estado de
-// un pedido, que mueve el stock) y, por las dudas, solo una vez por hora: lo
-// que se edite directo en Supabase, sin pasar por el panel, tarda hasta eso.
-// Una hora y no minutos porque en Cloudflare cada renovación es una escritura
-// en KV, y el plan gratis permite 1000 por día.
-export async function getCatalog(): Promise<Catalog> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("catalog");
-
+// La web no la llama directo: usa getCatalog (al final del archivo), que
+// guarda el resultado.
+async function readCatalog(): Promise<Catalog> {
   const [categories, products, reviews, kit] = await Promise.all([
     supabase.from("categories").select("slug, name").order("sort_order"),
     supabase
@@ -115,3 +106,18 @@ export async function getCatalog(): Promise<Catalog> {
     }),
   };
 }
+
+// Lo que usa la web: el catálogo guardado, para no consultar la base en cada
+// visita. Se renueva al instante cuando se cambia algo desde el panel (ver
+// refreshCatalog en src/lib/admin-actions.ts; también al cambiar el estado de
+// un pedido, que mueve el stock) y, por las dudas, solo una vez por hora: lo
+// que se edite directo en Supabase, sin pasar por el panel, tarda hasta eso.
+// Una hora y no minutos porque en Cloudflare cada renovación es una escritura
+// en KV, y el plan gratis permite 1000 por día.
+//
+// Usa unstable_cache (la caché "clásica" de Next) y no "use cache": con
+// "use cache" (Cache Components) la página se cuelga en Cloudflare cuando
+// tiene que rearmarse. Es un error conocido de Next + OpenNext
+// (vercel/next.js#94880, opennextjs/opennextjs-cloudflare#1450). Cuando lo
+// arreglen se puede volver a "use cache".
+export const getCatalog = unstable_cache(readCatalog, ["catalog"], { tags: ["catalog"], revalidate: 3600 });

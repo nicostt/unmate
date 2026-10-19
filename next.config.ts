@@ -81,8 +81,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
-  cacheComponents: true,
-  partialPrefetching: true,
+  // cacheComponents y partialPrefetching quedan apagados: con ellos la
+  // página se cuelga en Cloudflare (ver la nota en src/lib/catalog.ts).
   env: {
     HERO_VIDEOS: JSON.stringify(heroVideos),
     END_IMAGE: endImage ? `/${endImage}` : "",

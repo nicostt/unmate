@@ -1,6 +1,6 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { supabaseAs } from "./supabase";
 
 // Le avisa a la web pública que el catálogo cambió, para que deje de mostrar
@@ -10,5 +10,6 @@ import { supabaseAs } from "./supabase";
 export async function refreshCatalog(accessToken: string) {
   const { data: isAdmin } = await supabaseAs(accessToken).rpc("is_admin");
   if (isAdmin !== true) throw new Error("No autorizado");
-  updateTag("catalog");
+  updateTag("catalog"); // los datos guardados
+  revalidatePath("/"); // y la página de inicio ya armada
 }
