@@ -2,7 +2,7 @@
 
 Tienda online de mates, bombillas, yerba y termos. El cliente arma el carrito y manda el pedido por WhatsApp; el pedido queda registrado y se maneja desde un panel de administración.
 
-Hecha con [Next.js](https://nextjs.org/docs) (la web) y [Supabase](https://supabase.com/docs) (base de datos, login y fotos). Publicada en Netlify: https://unmatees.netlify.app
+Hecha con [Next.js](https://nextjs.org/docs) (la web) y [Supabase](https://supabase.com/docs) (base de datos, login y fotos). Publicada en Cloudflare: https://unmatees.com.ar
 
 ## Cómo correrla en tu compu
 

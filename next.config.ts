@@ -81,6 +81,18 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
+  // Una sola dirección oficial: quien entra por www.unmatees.com.ar va a
+  // unmatees.com.ar (mismo camino), así Google no ve dos webs iguales.
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.unmatees.com.ar" }],
+        destination: "https://unmatees.com.ar/:path*",
+        permanent: true,
+      },
+    ];
+  },
   // cacheComponents y partialPrefetching quedan apagados: con ellos la
   // página se cuelga en Cloudflare (ver la nota en src/lib/catalog.ts).
   env: {

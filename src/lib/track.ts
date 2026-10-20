@@ -41,7 +41,7 @@ export function visitorId(): string | null {
 }
 
 // De dónde llegó el visitante. Primero se mira ?utm_source= (sirve para
-// links propios: unmatees.lat/?utm_source=instagram) y si no, la página anterior.
+// links propios: unmatees.com.ar/?utm_source=instagram) y si no, la página anterior.
 function source(): string {
   const utm = new URLSearchParams(location.search).get("utm_source");
   if (utm) return utm.toLowerCase().slice(0, 30);
