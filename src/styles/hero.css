@@ -9,6 +9,14 @@
 .hero-layer{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease}
 .hero-layer.is-on{opacity:1}
 .hero-layer video,.hero-layer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* En pantallas verticales (celulares) se ve solo una franja angosta del
+   video. Por defecto sería la del medio; se corre a donde está el mate, que
+   en el video actual (public/hero/1.mp4) queda a un 30 % desde la izquierda.
+   Si se cambia el video, revisar este número: 0% muestra el borde izquierdo,
+   50% el centro, 100% el borde derecho. */
+@media(orientation:portrait){
+  .hero-layer video{object-position:22% 50%}
+}
 /* las fotos se acercan muy despacio, para que el fondo no quede quieto */
 @media(prefers-reduced-motion:no-preference){
   .hero-layer img{animation:acercar 16s ease-in-out infinite alternate}
