@@ -99,6 +99,14 @@ El orden importa: si dos reglas pisan lo mismo, gana la que está más abajo.
   ```
 
   Con `-crf` más alto pesa menos y se ve peor (23 es buena calidad; 28 ya se nota).
+
+  Si el video viene chico (por ejemplo, de WhatsApp, que lo achica), este comando lo agranda a 1280 de ancho con un método mejor que el del navegador, le limpia el ruido de la compresión y le da nitidez. Así se preparó el video actual:
+
+  ```bash
+  ffmpeg -i original.mp4 -an -vf "fps=30,hqdn3d=2:2:4:4,scale=1280:-2:flags=lanczos,unsharp=5:5:0.6:5:5:0,eq=contrast=1.04:saturation=1.06" -c:v libx264 -preset veryslow -tune film -crf 26 -pix_fmt yuv420p -movflags +faststart public/hero/1.mp4
+  ```
+
+  Agrandar no inventa detalle: para que se vea nítido de verdad, conviene pasar el archivo original del celular (cable, Drive o mail) en vez de mandarlo por WhatsApp.
 - **Foto del final de la página:** guardarla como `public/final.jpg` (o `.webp` / `.png`). Mientras no esté, va la foto de un producto.
 - Después de agregar o quitar esos archivos hay que reiniciar `npm run dev`: la lista se arma al arrancar (`next.config.ts`).
 - **"Quién soy":** el texto está en `src/components/site/About.tsx`; la foto se guarda como `public/quien-soy.jpg`. Mientras `ready` esté en `false` la sección no aparece en la web publicada.

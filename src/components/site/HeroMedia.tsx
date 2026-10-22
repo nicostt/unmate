@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Cada cuánto se pasa al fondo siguiente.
 const SWITCH_MS = 7000;
@@ -14,8 +14,27 @@ const isVideo = (src: string) => VIDEO.test(src);
 // los demás se vuelven transparentes, y la transición es CSS.
 // Los videos van sin sonido y en bucle, que es lo único que los navegadores
 // dejan reproducir solos.
+// Cada vez que se entra a la página, el video arranca desde el principio.
 export function HeroMedia({ media }: { media: string[] }) {
   const [current, setCurrent] = useState(0);
+  const videos = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // El video que se está viendo vuelve al segundo 0 y se reproduce: al entrar
+  // a la página y también cuando el navegador la trae de su memoria (al volver
+  // atrás o al regresar a la pestaña en el celular), que si no la muestra
+  // donde había quedado.
+  useEffect(() => {
+    const restart = () => {
+      const video = videos.current[current];
+      if (!video) return;
+      video.currentTime = 0;
+      void video.play().catch(() => {});
+    };
+    restart();
+    const onShow = (e: PageTransitionEvent) => e.persisted && restart();
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, [current]);
 
   useEffect(() => {
     if (media.length < 2) return;
@@ -29,6 +48,9 @@ export function HeroMedia({ media }: { media: string[] }) {
         <div key={src} className={i === current ? "hero-layer is-on" : "hero-layer"}>
           {isVideo(src) ? (
             <video
+              ref={(el) => {
+                videos.current[i] = el;
+              }}
               src={src}
               // foto fija que se ve mientras el video carga: mismo nombre, terminado en .jpg
               poster={src.replace(VIDEO, ".jpg")}
