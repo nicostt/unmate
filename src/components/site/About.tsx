@@ -14,7 +14,7 @@ import { getAboutPhoto } from "@/lib/hero";
 //    en false la sección se ve en la compu (npm run dev) pero NO en la web
 //    publicada: así nunca sale a la calle con el texto de relleno.
 const ABOUT = {
-  ready: false,
+  ready: true, // publicada con relleno a pedido de Nicolás (24/10/2026): la web todavía no se lanzó
   title: "Hola, soy Nicolás",
   paragraphs: [
     "[Acá va tu texto. Primer párrafo: quién sos y cómo arrancó unmate.es.]",
