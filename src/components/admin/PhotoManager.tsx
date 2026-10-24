@@ -5,11 +5,15 @@ import { useState } from "react";
 import { PHOTOS_BUCKET, photoUrl, supabase } from "@/lib/supabase";
 import { DropZone } from "./DropZone";
 import { HoldButton } from "./HoldButton";
-import { uploadPhoto } from "./photos";
+import { useCropper } from "./PhotoCropper";
+import { downloadPhoto, replacePhoto, uploadPhoto } from "./photos";
 import { photosOf, type AdminMedia, type AdminProduct } from "./types";
 
 // Fotos de un producto, o de uno de sus diseños si se pasa designId:
-// subir, ordenar y borrar. La primera es la principal.
+// subir, recortar, ordenar y borrar. La primera es la principal.
+// Al subir, cada foto pasa por el recortador (PhotoCropper.tsx) para
+// encuadrarla con la forma de la tarjeta de la tienda; "Recortar" vuelve a
+// encuadrar una que ya está subida.
 export function PhotoManager({
   product,
   designId = null,
@@ -23,6 +27,7 @@ export function PhotoManager({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const { askCrop, cropper } = useCropper();
   const photos = photosOf(product, designId);
   const room = limit === undefined ? Infinity : limit - photos.length;
 
@@ -43,8 +48,17 @@ export function PhotoManager({
     return work(async () => {
       let order = Math.max(0, ...photos.map((m) => m.sort_order));
       for (const file of files.slice(0, room)) {
-        await uploadPhoto(file, product.id, designId, ++order);
+        const photo = await askCrop(file);
+        if (!photo) continue; // tocó "Cancelar": esa foto no se sube
+        await uploadPhoto(photo, product.id, designId, ++order, true);
       }
+    });
+  }
+
+  function recrop(media: AdminMedia) {
+    return work(async () => {
+      const photo = await askCrop(await downloadPhoto(media.path));
+      if (photo) await replacePhoto(media.id, media.path, photo);
     });
   }
 
@@ -90,6 +104,9 @@ export function PhotoManager({
               >
                 →
               </button>
+              <button type="button" disabled={busy} onClick={() => recrop(photo)} title="Volver a encuadrar esta foto">
+                Recortar
+              </button>
               <HoldButton className="" disabled={busy} onConfirm={() => remove(photo)} title="Mantené apretado para borrar la foto">
                 Borrar
               </HoldButton>
@@ -97,6 +114,7 @@ export function PhotoManager({
           </div>
         ))}
       </div>
+      {cropper}
 
       {room > 0 && (
         <DropZone label={designId ? "+ Sumar otro ángulo de este diseño" : "+ Subir fotos"} busy={busy} onFiles={upload} />

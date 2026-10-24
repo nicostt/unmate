@@ -5,6 +5,7 @@ import { PHOTOS_BUCKET, supabase } from "@/lib/supabase";
 import { DropZone } from "./DropZone";
 import { HoldButton } from "./HoldButton";
 import { PhotoManager } from "./PhotoManager";
+import { useCropper } from "./PhotoCropper";
 import { uploadPhoto } from "./photos";
 import { designsOf, photosOf, type AdminDesign, type AdminProduct } from "./types";
 
@@ -22,6 +23,7 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
   const designs = designsOf(product);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const { askCrop, cropper } = useCropper();
   // diseño -> números de los pedidos (no cancelados) que lo incluyen
   const [requested, setRequested] = useState<Record<number, number[]>>({});
 
@@ -52,18 +54,21 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
     setBusy(false);
   }
 
-  // Un diseño nuevo nace de su foto: se crea con el número siguiente y se le sube la imagen.
+  // Un diseño nuevo nace de su foto: primero se encuadra (recortador), después
+  // se crea con el número siguiente y se le sube la imagen.
   function addDesigns(files: File[]) {
     return work(async () => {
       let number = Math.max(0, ...designs.map((d) => d.number));
       for (const file of files) {
+        const photo = await askCrop(file);
+        if (!photo) continue; // tocó "Cancelar": ese diseño no se crea
         const created = await supabase
           .from("product_designs")
           .insert({ product_id: product.id, number: ++number })
           .select("id")
           .single();
         if (created.error) throw new Error(created.error.message);
-        await uploadPhoto(file, product.id, created.data.id, 1);
+        await uploadPhoto(photo, product.id, created.data.id, 1, true);
       }
     });
   }
@@ -113,6 +118,7 @@ export function DesignManager({ product, onChanged }: { product: AdminProduct; o
       ))}
 
       <DropZone label="+ Nuevos diseños: una foto por cada mate" busy={busy} onFiles={addDesigns} />
+      {cropper}
       {error && <p className="admin-error">{error}</p>}
     </section>
   );
