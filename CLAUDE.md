@@ -4,6 +4,8 @@
 Tienda online de mates, bombillas, yerba y termos. El cliente arma un carrito y el pedido se manda por WhatsApp, quedando registrado en la base. El dueño del proyecto es Nicolás y es su primer proyecto web real. Idioma de trabajo: español rioplatense informal.
 
 ## Cómo trabajar con Nicolás
+- OJO: el dueño de la tienda y quien firma "Quién soy" es **Emanuel Soto** (Villa Constitución). "Nicolás" es como figura la cuenta de esta compu.
+- Textos que escribe Emanuel (tipos de mate, curado, Quién soy): se usan con SUS palabras. Solo se permiten tildes, mayúscula inicial y puntos; nunca reescribir ni cambiar palabras (pedido del 24/10/2026).
 - Quiere una web profesional, escalable y que pueda mantener sin depender de una IA. Explicá cada pieza, mantené el README al día y usá herramientas estándar y bien documentadas.
 - Todas las cuentas (GitHub, Supabase, hosting) van a su nombre. No crees cuentas ni manejes sus contraseñas.
 - Ofrecele escribir partes él mismo y revisalas.

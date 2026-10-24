@@ -5,21 +5,48 @@ import { ProductArt } from "@/components/shop/ProductArt";
 import type { Shape } from "@/lib/types";
 
 // Tipos de mate de la guía. Para sumar o cambiar uno, se edita esta lista.
-// `shape` es el dibujo que se muestra mientras no haya una foto real.
-// PENDIENTE: Nicolás pasa los textos definitivos y las fotos de cada tipo.
+// Los textos son de Emanuel (24/10/2026): van con sus palabras, solo con
+// tildes y puntos. `shape` es el dibujo que se muestra mientras no haya una
+// foto real (no hay dibujo propio para el acero ni para la bombilla común).
 const TYPES: { name: string; text: string; shape: Shape }[] = [
   {
-    name: "Camionero",
-    text: "De forma robusta y práctica, pensado para el uso de todos los días y para llevar.",
+    name: "Calabaza",
+    text: "Si buscás amargor, tradición y mejor sabor en el tiempo. Necesita más atención y cuidado. Necesita curado.",
+    shape: "criollo",
+  },
+  {
+    name: "Algarrobo",
+    text: "Si buscás un sabor más neutro/dulce en cada cebada. Menor cuidado en relación a la calabaza. Necesita curado.",
+    shape: "ranchero",
+  },
+  {
+    name: "Acero",
+    text: "Fácil limpieza, no necesita cuidado. No modifica el sabor de la Yerba Mate.",
     shape: "camionero",
   },
-  { name: "Torpedo", text: "De forma alargada y más angosta hacia la base.", shape: "torpedo" },
-  { name: "Imperial", text: "El clásico de boca ancha y cuerpo redondeado.", shape: "imperial" },
-  { name: "Calabaza", text: "Material natural. Antes de usarlo hay que curarlo.", shape: "criollo" },
-  { name: "Algarrobo", text: "Madera. También se cura antes del primer mate.", shape: "ranchero" },
+  {
+    name: "Camionero",
+    text: "Capacidad mediana a grande, cuerpo alargado con boca ancha. El mate tradicional.",
+    shape: "camionero",
+  },
+  {
+    name: "Torpedo",
+    text: "Capacidad chica a mediana, las bocas varían en estilo, cuerpo con forma de bala o torpedo.",
+    shape: "torpedo",
+  },
+  {
+    name: "Imperial",
+    text: "Capacidad mediana a grande, es el modelo de lujo con boca ancha.",
+    shape: "imperial",
+  },
+  {
+    name: "Bombilla",
+    text: "Es el sorbete clásico fino y alargado comúnmente de acero inoxidable.",
+    shape: "loro",
+  },
   {
     name: "Bombillón",
-    text: "Versión más grande de la bombilla, para acompañar mates de más volumen.",
+    text: "Es la versión premium de la bombilla, en su mayoría de alpaca y bronce, mejor sensación y materiales más nobles.",
     shape: "bombillon",
   },
 ];

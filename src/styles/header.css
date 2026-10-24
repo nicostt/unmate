@@ -56,7 +56,9 @@
    claros, también en tema claro: por eso se redefinen las variables acá. */
 .end{position:relative;isolation:isolate;overflow:hidden;min-height:100svh;display:grid;margin-top:clamp(44px,7vw,84px);background:#160a06;color:#f6efe9;--fg:#f6efe9;--muted:#d9cbbf;--line:rgba(246,239,233,.24);--accent:#aac56b}
 .end-media{position:absolute;inset:0;z-index:-2}
-.end-media img{object-fit:cover}
+/* la foto actual (public/final.jpg) es vertical: en pantallas anchas se ve una
+   franja; se corre hacia abajo para que entren la mesa con los mates */
+.end-media img{object-fit:cover;object-position:50% 62%}
 /* velo oscuro, y encima el grano */
 .end::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(22,10,6,.86),rgba(22,10,6,.5) 45%,rgba(22,10,6,.92))}
 .end::after{content:"";position:absolute;inset:0;z-index:-1;background-image:var(--noise);mix-blend-mode:overlay;opacity:.5;pointer-events:none}

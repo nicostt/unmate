@@ -2,95 +2,48 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { createPortal } from "react-dom";
-import { useOverlay } from "@/components/shop/useOverlay";
-import { usePresence } from "@/components/shop/usePresence";
 
-// Fotos de la comparación: el mismo mate antes y después de curarlo, sacadas
-// desde el mismo ángulo para que la línea coincida (public/curado/).
+// Fotos de la comparación: el mismo mate de calabaza antes y después de
+// curarlo, sacadas desde el mismo ángulo para que la línea coincida
+// (public/curado/).
 const BEFORE = "/curado/sin-curar.jpg";
 const AFTER = "/curado/curado.jpg";
 
-// Cuánto dura la salida de la ventana: igual que .modal.is-closing (overlays.css).
-const EXIT_MS = 260;
-
-// Pasos del curado. Los de calabaza los escribió Emanuel (24/10/2026).
+// Pasos del curado. Los textos son de Emanuel (24/10/2026): van con sus
+// palabras, solo con mayúscula inicial, tildes y puntos. No reescribirlos.
 const STEPS = {
   calabaza: [
-    "Llenalo con agua a temperatura de mate para humedecer la calabaza, y fijate que no filtre.",
-    "Tirá el agua y cargalo con yerba nueva o usada, un poco más de la mitad del mate.",
-    "Humedecé la yerba con agua a temperatura de mate y asegurate de que se moje toda. Si tiene virola, cebá por debajo de ella.",
-    "Dejalo reposar de 12 a 15 horas: una noche.",
-    "Al día siguiente sacá la yerba, raspá el hollejo (la pielcita de adentro) y dejalo secar al sol o a la sombra.",
-    "¡Listo para usar! Repetí este uso y secado siempre: la calabaza es natural y su sabor mejora con cada cebada y con el tiempo.",
+    "Agua temperatura mate en el interior, preparamos humedeciendo la calabaza y asegurándonos que no filtra.",
+    "Retiramos el agua y echamos yerba nueva o usada en poco más de la mitad del mate.",
+    "Humedecemos la yerba con agua a temperatura mate y nos aseguramos que toda la yerba se infusione (lo cebamos por debajo de la virola en caso de tener).",
+    "Dejamos reposar de 12-15 hs / una noche.",
+    "Al día siguiente, retiramos la yerba, raspamos el hollejo y dejamos secar al sol o la sombra.",
+    "Tu mate está listo para usarse, se recomienda repetir este proceso de uso y secado toda la vida, la calabaza es un elemento natural que va mejorando su sabor con el paso de las cebadas y el uso en el tiempo.",
   ],
   algarrobo: [
-    "Revisá que esté limpio y seco por dentro.",
-    "Untá el interior con aceite o manteca.",
-    "Dejalo reposar entre 12 y 24 horas. Si es grande, más tiempo.",
+    "Untar el interior del mate con manteca, esto ayuda a sellar los poros de la madera.",
+    "2 a 3 horas, se coloca yerba nueva o usada poco más de la mitad y lo cebamos con agua a temperatura mate.",
+    "Se deja reposar de 12-14 hs.",
+    "Pasadas las horas, retiramos la yerba, limpiamos el mate (podés utilizar un poco de agua y papel de cocina para quitar excedentes de la manteca) y dejamos secar.",
+    "Una vez seco, el mate ya está listo para su uso.",
   ],
 };
 
-// "Cómo curarlo": en la página es una tarjeta chica con la comparación de
-// portada. Al tocarla se abre una ventana con la comparación grande (una línea
-// que se arrastra para ver el mate sin curar y curado) y el paso a paso.
-// Más adelante va también el video (Emanuel lo sube a YouTube).
+// "Cómo curarlo": a la izquierda el mate de calabaza (con la comparación sin
+// curar / curado arriba) y a la derecha el de algarrobo, cada uno con su paso
+// a paso. Más adelante va también el video (Emanuel lo sube a YouTube).
 export function CureGuide() {
-  const [open, setOpen] = useState(false);
-
   return (
     <section className="wrap block" id="curado" data-reveal>
       <div className="feature feature-cure grain">
         <div className="feature-head">
           <h2>Cómo curarlo</h2>
-          <p className="lead">
-            Un mate bien curado dura más y ceba mejor. Mirá la diferencia y seguí el paso a paso.
-          </p>
-          <button className="btn primary" type="button" onClick={() => setOpen(true)}>
-            Ver cómo se cura
-          </button>
+          <p className="lead">Un mate bien curado dura más y ceba mejor.</p>
         </div>
-        <button className="cure-cover" type="button" onClick={() => setOpen(true)} aria-label="Ver cómo se cura un mate">
-          <span className="cure-cover-half">
-            <Image src={BEFORE} alt="" fill sizes="(max-width: 820px) 50vw, 240px" />
-            <em>Sin curar</em>
-          </span>
-          <span className="cure-cover-half">
-            <Image src={AFTER} alt="" fill sizes="(max-width: 820px) 50vw, 240px" />
-            <em>Curado</em>
-          </span>
-          <span className="cure-cover-hint">Tocá para ver</span>
-        </button>
-      </div>
-      <CureWindow open={open} onClose={() => setOpen(false)} />
-    </section>
-  );
-}
-
-function CureWindow({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { shown, closing } = usePresence(open, EXIT_MS);
-  useOverlay(open, onClose);
-  if (!shown) return null;
-
-  // va directo al <body>: adentro de la sección quedaría encerrada por la
-  // animación de aparecer al bajar (data-reveal), que la recorta
-  return createPortal(
-    <div
-      className={closing ? "modal is-closing" : "modal"}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="cure-title"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="modal-card cure-card">
-        <button className="icon-btn" type="button" onClick={onClose} aria-label="Cerrar" autoFocus>
-          ×
-        </button>
-        <h3 id="cure-title">Cómo curar tu mate</h3>
-        <Compare />
         <div className="cure">
           <article>
-            <h4>Mate de calabaza</h4>
+            <h3>Mate de calabaza</h3>
+            <Compare />
             <ol>
               {STEPS.calabaza.map((step) => (
                 <li key={step}>{step}</li>
@@ -98,7 +51,7 @@ function CureWindow({ open, onClose }: { open: boolean; onClose: () => void }) {
             </ol>
           </article>
           <article>
-            <h4>Mate de algarrobo</h4>
+            <h3>Mate de algarrobo</h3>
             <ol>
               {STEPS.algarrobo.map((step) => (
                 <li key={step}>{step}</li>
@@ -111,8 +64,7 @@ function CureWindow({ open, onClose }: { open: boolean; onClose: () => void }) {
           bombilla, usá agua caliente con bicarbonato y secala sobre un paño.
         </p>
       </div>
-    </div>,
-    document.body,
+    </section>
   );
 }
 
@@ -125,9 +77,9 @@ function Compare() {
 
   return (
     <div className="compare" style={{ "--pos": `${pos}%` } as React.CSSProperties}>
-      <Image src={AFTER} alt="El mate curado: adentro queda oscuro, verde de la yerba" fill sizes="(max-width: 820px) 92vw, 720px" />
+      <Image src={AFTER} alt="El mate curado: adentro queda oscuro, verde de la yerba" fill sizes="(max-width: 820px) 92vw, 420px" />
       <div className="compare-before">
-        <Image src={BEFORE} alt="El mismo mate sin curar: adentro está claro" fill sizes="(max-width: 820px) 92vw, 720px" />
+        <Image src={BEFORE} alt="El mismo mate sin curar: adentro está claro" fill sizes="(max-width: 820px) 92vw, 420px" />
       </div>
       <span className="compare-line" aria-hidden="true" />
       <em className="compare-tag is-before">Sin curar</em>
@@ -140,6 +92,9 @@ function Compare() {
         onChange={(e) => setPos(Number(e.target.value))}
         aria-label="Mover la línea entre el mate sin curar y el curado"
       />
+      <span className="compare-hint" aria-hidden="true">
+        Deslizá para comparar
+      </span>
     </div>
   );
 }
