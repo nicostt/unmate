@@ -17,6 +17,9 @@ const COVER_MAX = 6;
 // coincidir con .review y .reviews en src/styles/sections.css.
 const CARD_MIN = 240;
 const GAP = 14;
+// Como mucho 3 por fila (.review en sections.css), para que las 6 de la
+// portada queden siempre en filas completas.
+const MAX_PER_ROW = 3;
 
 // Nombre que comparten la miniatura y la foto ampliada mientras una se
 // transforma en la otra (ver .zoom-photo en src/styles/sections.css).
@@ -46,7 +49,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   useEffect(() => {
     const el = list.current;
     if (!el) return;
-    const measure = () => setPerRow(Math.max(1, Math.floor((el.clientWidth + GAP) / (CARD_MIN + GAP))));
+    const measure = () => setPerRow(Math.min(MAX_PER_ROW, Math.max(1, Math.floor((el.clientWidth + GAP) / (CARD_MIN + GAP)))));
     const watcher = new ResizeObserver(measure);
     watcher.observe(el);
     return () => watcher.disconnect();
