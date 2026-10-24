@@ -7,7 +7,7 @@ import { reducedMotion, viewTransition } from "@/lib/motion";
 import { matches, searchWords, similar } from "@/lib/search";
 import { whatsappLink } from "@/lib/site";
 import { track } from "@/lib/track";
-import type { Design, Product } from "@/lib/types";
+import { YERBA_CATEGORY, type Design, type Product } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { ProductCard } from "./ProductCard";
 import { ProductModal } from "./ProductModal";
@@ -57,6 +57,11 @@ export function Catalog() {
   if (sort === "asc") visible.sort((a, b) => a.price - b.price);
   if (sort === "desc") visible.sort((a, b) => b.price - a.price);
   if (sort === "az") visible.sort((a, b) => a.name.localeCompare(b.name, "es"));
+  // Las yerbas (sueltas y en paquete) siempre al final, a pedido de Nicolás:
+  // primero mates, bombillas y termos. Con un orden elegido, cada grupo queda
+  // ordenado por su cuenta (sort de JS respeta el orden previo en los empates).
+  const isYerba = (p: Product) => p.category === YERBA_CATEGORY;
+  visible.sort((a, b) => Number(isYerba(a)) - Number(isYerba(b)));
 
   // ¿La persona ya terminó de escribir?
   const [settled, setSettled] = useState("");

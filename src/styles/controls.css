@@ -26,6 +26,11 @@
    en el mismo lugar (el texto, un circulito girando y un tilde) y según el
    momento (data-state) se ve uno solo. Al terminar se pone del color de marca. */
 .btn.state{display:inline-grid;place-items:center}
+/* agotado: "Lo quiero" (WantButton.tsx). Borde punteado y texto apagado para que se
+   note que no hay stock, pero se puede tocar; una vez anotado, en verde */
+.btn.want{border-style:dashed;color:var(--muted)}
+.btn.want:hover{color:var(--fg)}
+.btn.want[data-state="ok"]{border-style:solid;border-color:var(--accent);color:var(--accent);cursor:default}
 .state>span:not(.sr){grid-area:1/1;display:inline-flex;align-items:center;gap:8px;transition:opacity .25s,transform .25s}
 .state .s-load,.state .s-ok{opacity:0;transform:scale(.6)}
 .state[data-state="load"] .s-idle,.state[data-state="ok"] .s-idle{opacity:0;transform:scale(.6)}

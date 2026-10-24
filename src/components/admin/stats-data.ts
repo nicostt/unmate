@@ -7,7 +7,7 @@ import type { AdminProduct } from "./types";
 type EventRow = {
   created_at: string;
   visitor: string;
-  type: "visit" | "view" | "add" | "search" | "order";
+  type: "visit" | "view" | "add" | "search" | "order" | "want";
   product_id: number | null;
   design_id: number | null;
   detail: string | null;
@@ -99,6 +99,7 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
   const views = of("view");
   const adds = of("add");
   const ordered = of("order");
+  const wants = of("want"); // tocaron "Lo quiero" en un agotado (la base ya anota una vez por persona)
   // Un evento de búsqueda con value -1 no es una búsqueda: marca que la
   // persona tocó "Preguntanos por WhatsApp" en el cartel de sin resultados.
   const searches = of("search").filter((e) => e.value !== -1);
@@ -138,6 +139,17 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
     }))
     .filter((r) => r.viewers || r.adders || r.buyers)
     .sort((a, b) => b.adders - a.adders || b.viewers - a.viewers);
+
+  // --- "Lo quiero" en agotados: cuántas personas pidieron cada producto
+  const byId = new Map(products.map((p) => [p.id, p]));
+  const askedSoldOut: Bar[] = [...peopleBy(wants, (e) => e.product_id)]
+    .map(([id, value]) => {
+      const product = byId.get(id);
+      const back = product && !(product.by_design ? product.product_designs.length === 0 : product.stock === 0);
+      return { label: product ? product.name : "Producto ya eliminado", value, note: back ? "ya hay stock" : "" };
+    })
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
 
   // --- diseños más elegidos (personas que agregaron ese diseño puntual)
   const designLabel = new Map<number, string>();
@@ -203,6 +215,7 @@ export function compute({ events, orders, carts }: Raw, products: AdminProduct[]
       .map((r) => ({ label: r.name, value: r.adders - r.buyers }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8),
+    askedSoldOut,
     // agotados que la gente sigue mirando: candidatos a reponer
     soldOutWanted: productRows
       .filter((r) => r.soldOut && r.viewers > 0)

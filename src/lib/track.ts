@@ -77,8 +77,9 @@ type EventData = {
 };
 
 // Anota algo que pasó: "view" (abrió un producto), "add" (lo agregó al
-// carrito) o "search" (buscó).
-export function track(type: "view" | "add" | "search", data: EventData = {}) {
+// carrito), "search" (buscó) o "want" (tocó "Lo quiero" en un agotado; la base
+// lo cuenta una vez por persona y producto).
+export function track(type: "view" | "add" | "search" | "want", data: EventData = {}) {
   try {
     if (shouldSkip()) return;
     const visitor = visitorId();

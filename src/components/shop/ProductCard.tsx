@@ -22,6 +22,7 @@ import { Gallery } from "./Gallery";
 import { ProductArt } from "./ProductArt";
 import { useShop } from "./ShopProvider";
 import { StateButton } from "./StateButton";
+import { WantButton } from "./WantButton";
 
 // Precio grande + precio anterior tachado + badge de descuento.
 export function PriceRow({ price, compareAtPrice }: { price: number; compareAtPrice: number | null }) {
@@ -67,15 +68,17 @@ export function BuyBox({
   const soldOut = isSoldOut(product);
   const deal = product.byWeight ? betterDeal(product, grams) : null;
 
-  const button = (
+  // agotado: en vez de un botón apagado, "Lo quiero" (anota que alguien lo pidió)
+  const button = soldOut ? (
+    <WantButton slug={product.slug} small={small} />
+  ) : (
     <StateButton
       className={small ? "btn primary small" : "btn primary"}
-      disabled={soldOut}
       done="Sumado"
       onAct={() => onAdd(cartKey(product, design), product.byWeight ? grams : 1)}
       onDone={onAdded}
     >
-      {soldOut ? "Agotado" : "Sumar al carrito"}
+      Sumar al carrito
     </StateButton>
   );
 

@@ -139,6 +139,9 @@ export function StatsView({ s, days }: { s: Computed; days: number }) {
         <Block title="Diseños más elegidos" help="Los diseños puntuales que más personas agregaron al carrito. Te dice qué estilos gustan.">
           <BarList bars={s.designs} unit="personas" empty="Todavía nadie eligió un diseño." />
         </Block>
+        <Block title="Lo piden sin stock" help="Cuántas personas tocaron “Agotado · Lo quiero” en cada producto. Cada persona cuenta una sola vez. Si dice “ya hay stock”, lo repusiste después.">
+          <BarList bars={s.askedSoldOut} unit="personas" empty="Nadie pidió un agotado todavía." />
+        </Block>
         <Block title="Agotados que siguen mirando" help="Productos sin stock que la gente igual abre. Candidatos a reponer.">
           <BarList bars={s.soldOutWanted} unit="personas" empty="Ningún agotado con visitas." />
         </Block>
