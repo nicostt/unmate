@@ -5,7 +5,8 @@ import { getAboutPhoto } from "@/lib/hero";
 // "Quién soy": la persona detrás de la tienda, con su foto. Va después de
 // las reseñas (el orden de la página está en src/app/page.tsx).
 //
-// Texto y foto los pasó Emanuel (24/10/2026).
+// Texto y foto los pasó Emanuel (24/10/2026). El texto va con SUS palabras
+// (solo tildes y mayúsculas): no reescribirlo.
 //  - El texto se cambia acá abajo: el título, un párrafo por renglón y la firma.
 //  - La foto es public/quien-soy.jpg (o .webp / .png) y aparece sola;
 //    conviene que sea vertical. Si no está, se ve un recuadro que marca dónde va.
@@ -15,9 +16,9 @@ const ABOUT = {
   ready: true,
   title: "Hola, soy Emanuel",
   paragraphs: [
-    "Mi nombre es Emanuel Soto, soy de Villa Constitución y creé unmate.es, un emprendimiento que arrancó como hobby el 26/08/2026 y que hasta el día de hoy lo sigue siendo.",
-    "Me gusta la historia que puede haber detrás de cada mate, lo que puede significar para cada uno: algo tan simple que, sin darte cuenta, te acompaña todos los días y a todos lados. Mi idea es acercarles la posibilidad de elegir algo tan simple pero especial como un mate, seleccionando lo mejor, cuidando la calidad y estando a disposición ante el primer problema que pueda surgir.",
-    "Sin más que decir, gracias a todos los que me ayudan a seguir creciendo. Por cualquier duda, tienen mi contacto acá abajo.",
+    "Mi nombre es Emanuel Soto, oriundo de Villa Constitución y creador de unmate.es, emprendimiento que arrancó como hobby.",
+    "Me gusta la historia que puede existir detrás de cada mate, con lo que puede significar para cada uno, algo tan simple que sin darte cuenta te acompaña todos los días, a todos lados. Mi idea está en acercarle a cada uno de ustedes poder elegir algo tan simple pero especial como un mate, buscando seleccionar lo mejor, cuidando la calidad y estando a disposición al primer problema que pueda ocurrir.",
+    "Gracias a todos los que ayudan a seguir creciendo y por cualquier duda tienen mi contacto en la página, gracias.",
   ],
   signature: "Emanuel",
 };

@@ -8,12 +8,10 @@ import { reducedMotion, viewTransition } from "@/lib/motion";
 import type { Review } from "@/lib/types";
 import { PhotoZoom, type ZoomPhoto } from "./PhotoZoom";
 
-// Cuántas reseñas se ven de entrada, como máximo. Si el admin marcó más que
-// esto "en portada", las que sobran pasan abajo con el resto.
-const COVER_MAX = 5;
-
-// Cuántas se ven de entrada si el admin no marcó ninguna.
-const COVER_DEFAULT = 3;
+// Cuántas reseñas se ven de entrada, como máximo (pedido de Emanuel: 6).
+// Primero van las que el admin marcó "en portada" y, si son menos, se
+// completa con las demás en su orden. Las que sobran pasan a "Ver todas".
+const COVER_MAX = 6;
 
 // Ancho mínimo de una tarjeta y separación entre tarjetas, en px. Tienen que
 // coincidir con .review y .reviews en src/styles/sections.css.
@@ -84,9 +82,9 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   }
 
   const featured = reviews.filter((r) => r.featured);
-  const wanted = featured.length ? featured.slice(0, COVER_MAX) : reviews.slice(0, COVER_DEFAULT);
-  // De la portada se muestran filas enteras: con 5 elegidas y 4 por fila, van
-  // 4 y la quinta pasa a "Ver todas". (En una sola columna van todas.)
+  const wanted = [...featured, ...reviews.filter((r) => !r.featured)].slice(0, COVER_MAX);
+  // De la portada se muestran filas enteras: con 6 elegidas y 4 por fila, van
+  // 4 y las otras dos pasan a "Ver todas". (En una sola columna van todas.)
   const full = perRow && perRow > 1 && wanted.length > perRow ? Math.floor(wanted.length / perRow) * perRow : wanted.length;
   const cover = wanted.slice(0, full);
   const rest = reviews.filter((r) => !cover.includes(r));
