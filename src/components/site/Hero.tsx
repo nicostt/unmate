@@ -33,10 +33,6 @@ export function Hero({ media }: { media: string[] }) {
             Un mate para
             <RotatingWord words={FOR} />
           </h1>
-          <p className="lead">
-            Calabaza y algarrobo, bombillas de acero, alpaca y bronce. Elegí lo que te gusta, armá tu pedido y
-            cerralo por WhatsApp.
-          </p>
           <div className="cta-row">
             <a className="btn accent" href="#catalogo">
               Ver catálogo

@@ -37,6 +37,28 @@
 /* yerba: aviso de que llevando más sale más barato */
 .deal{font-size:.84rem;font-weight:600;color:var(--accent)}
 
+/* ---------- celulares: dos productos por fila (pedido de Emanuel, 26/10/2026) ----------
+   Con una sola columna cada producto ocupaba toda la pantalla. Todo se achica
+   para que entren dos: textos, precio, botones; y en la yerba suelta quedan
+   solo el − / + (las cantidades rápidas siguen en la ficha). */
+@media(max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}
+  .card{border-radius:12px}
+  .card-body{gap:6px;padding:10px}
+  .tags{gap:4px 8px;min-height:0}
+  .tag{font-size:.62rem;letter-spacing:.06em}
+  .card h3{font-size:.95rem}
+  .card .price{font-size:1.2rem}
+  .card .was{font-size:.8rem}
+  .card .off{font-size:.68rem}
+  .card .deal{font-size:.74rem}
+  .card .btn{min-height:38px;padding:.4rem .5rem;font-size:.8rem;width:100%;white-space:normal;text-align:center;line-height:1.15}
+  .card .opts{display:none}
+  .card .qty button{width:30px;height:30px}
+  .card .qty span{font-size:.85rem;padding-inline:2px}
+  .card-count{top:6px;right:6px;font-size:.66rem}
+}
+
 /* aviso que ocupa todo el ancho de la grilla ("Capaz buscabas esto:") */
 .grid-note{grid-column:1/-1;font-size:1.05rem}
 
