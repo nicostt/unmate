@@ -64,7 +64,9 @@ Mapa de carpetas y de estilos: ver `README.md`. Lo que no se ve leyendo el códi
 - **Solo local:** `src/app/stats-preview/page.tsx` muestra las estadísticas con datos inventados. Está excluida en `.git/info/exclude`; NO commitear ni publicar.
 
 ## Base de datos
-- Migraciones en `supabase/migrations/`. De 0001 a 0008: ejecutadas por Nicolás y verificadas (la 0008, refuerzos de seguridad, el 12/10/2026). El descuento arranca apagado (0 %): lo prende Nicolás desde el panel. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
+- Migraciones en `supabase/migrations/`. De 0001 a 0010: ejecutadas y verificadas (0009 "Lo quiero" en agotados y 0010 tipos de producto, el 28/10/2026; la 0010 marcó sola los tipos que se deducían del material, el nombre y la categoría).
+- Tipos de producto (`products.types`, lista `PRODUCT_TYPES` en src/lib/types.ts): casillas en el panel; los usa "Ver en catálogo" en MateTypes.tsx. Datos a corregir por Emanuel: "Termo media manija 1L Gris" está en la categoría Mates (debería ser Termos), "Criollo Coco" sin tipo, "Camionero Imperial" con dos formas.
+- "Comprar ya" (BuyNow.tsx, 28/10/2026): ventana para pedir un solo producto por WhatsApp sin tocar el carrito; registra el pedido con create_order como el carrito. El descuento arranca apagado (0 %): lo prende Nicolás desde el panel. Claude no puede ejecutar SQL: cada cambio de esquema es un archivo nuevo que corre Nicolás en el SQL Editor.
 - Sin uso: tabla `product_variants` (0002; Nicolás descartó las "presentaciones" por engorrosas) y la fila `yerba_tiers` de `settings` (0004).
 - Datos de prueba que dejó Claude y Nicolás tiene que borrar: Pedido #14 "PRUEBA estadisticas Claude (borrar)", quizá "PRUEBA de Claude (borrar)", y en estadísticas el visitante `prueba-claude-0001`, orígenes `prueba`/`prueba-claude` y la búsqueda "prueba claude".
 
