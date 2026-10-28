@@ -30,7 +30,7 @@ const PHOTO = "ficha-foto";
 
 // Catálogo con filtro por categoría, buscador y orden.
 export function Catalog() {
-  const { products, categories } = useShop();
+  const { products, categories, registerFicha } = useShop();
   const [category, setCategory] = useState("todos");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("rel");
@@ -99,6 +99,12 @@ export function Catalog() {
       flushSync(() => setOpen({ slug, design }));
     });
   }
+
+  // Otras secciones (los tipos de mate) abren fichas a través de ShopProvider.
+  useEffect(() => {
+    registerFicha((slug) => openFicha(slug, null));
+    return () => registerFicha(null);
+  });
 
   function closeFicha() {
     const photo = open ? photoOf(open.slug) : null;

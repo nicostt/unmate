@@ -34,6 +34,20 @@
 .price{font:700 1.65rem var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .was{color:var(--muted);text-decoration:line-through;font-variant-numeric:tabular-nums;font-size:.95rem}
 .off{background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.76rem;padding:.12rem .45rem;border-radius:4px}
+/* botones de compra (BuyBox en ProductCard.tsx): "Comprar ya" y el del carrito.
+   En la ficha van los dos con texto; en las tarjetas, el del carrito es un
+   ícono solo (no entran dos textos), con su nombre para lectores de pantalla. */
+.buy-row{display:flex;gap:8px}
+.buy-go{flex:1 1 auto}
+.buy-cart{flex:1 1 auto}
+.buy-cart-in{display:inline-flex;align-items:center;gap:7px}
+.buy-cart svg{width:19px;height:19px;flex:none}
+.card .buy-cart{flex:0 0 46px;padding:0}
+.card .buy-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.card .buy-cart .s-ok{font-size:0}
+.card .buy-cart .s-ok svg{width:19px;height:19px}
+.m-info .buy-row .btn{min-height:50px}
+
 /* yerba: aviso de que llevando más sale más barato */
 .deal{font-size:.84rem;font-weight:600;color:var(--accent)}
 
@@ -53,6 +67,8 @@
   .card .off{font-size:.68rem}
   .card .deal{font-size:.74rem}
   .card .btn{min-height:38px;padding:.4rem .5rem;font-size:.8rem;width:100%;white-space:normal;text-align:center;line-height:1.15}
+  .card .buy-row{gap:6px}
+  .card .buy-cart{flex:0 0 38px;width:38px}
   .card .opts{display:none}
   .card .qty button{width:30px;height:30px}
   .card .qty span{font-size:.85rem;padding-inline:2px}

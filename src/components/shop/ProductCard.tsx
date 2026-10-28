@@ -42,7 +42,20 @@ export function PriceRow({ price, compareAtPrice }: { price: number; compareAtPr
 // Cantidades de yerba que se ofrecen con un toque; con + y − se sigue de a 250 g.
 const QUICK_WEIGHTS = [250, 500, 750, 1000];
 
-// Zona de compra de un producto: precio y botón "Sumar al carrito".
+// Ícono del carrito (el mismo del encabezado, CartButton.tsx).
+function CartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8z" />
+      <path d="M9 8V6.5a3 3 0 0 1 6 0V8" />
+    </svg>
+  );
+}
+
+// Zona de compra de un producto: precio y dos botones, "Comprar ya" (pide
+// solo esto por WhatsApp, ventana BuyNow.tsx) y "Agregar al carrito".
+// En las tarjetas, en celulares, el del carrito queda como un ícono solo
+// (catalog.css) para que entren dos productos por fila.
 //  - Si va por peso (yerba), antes del botón se elige cuánto llevar y el
 //    precio se calcula para esa cantidad.
 //  - Si va por diseños, el botón agrega el diseño que se está mirando.
@@ -53,6 +66,7 @@ export function BuyBox({
   showUnitPrice,
   onAdd,
   onAdded,
+  beforeBuy,
 }: {
   product: Product;
   design?: Design | null; // diseño elegido, si el producto va por diseños
@@ -60,7 +74,9 @@ export function BuyBox({
   showUnitPrice?: boolean; // mostrar el precio de los productos por unidad
   onAdd: (key: string, amount: number) => boolean; // amount: unidades, o gramos si va por peso. Devuelve si se pudo sumar
   onAdded?: () => void; // qué hacer después de mostrar que se sumó
+  beforeBuy?: () => void; // qué hacer antes de abrir "Comprar ya" (la ficha se cierra)
 }) {
+  const { buyNow } = useShop();
   const max = maxQty(product);
   const [chosen, setChosen] = useState(500);
   // si el stock bajó, la cantidad elegida no puede superarlo
@@ -68,18 +84,32 @@ export function BuyBox({
   const soldOut = isSoldOut(product);
   const deal = product.byWeight ? betterDeal(product, grams) : null;
 
-  // agotado: en vez de un botón apagado, "Lo quiero" (anota que alguien lo pidió)
+  const key = cartKey(product, design);
+  const amount = product.byWeight ? grams : 1;
+  const size = small ? " small" : "";
+
+  // agotado: en vez de los botones, "Lo quiero" (anota que alguien lo pidió)
   const button = soldOut ? (
     <WantButton slug={product.slug} small={small} />
   ) : (
-    <StateButton
-      className={small ? "btn primary small" : "btn primary"}
-      done="Sumado"
-      onAct={() => onAdd(cartKey(product, design), product.byWeight ? grams : 1)}
-      onDone={onAdded}
-    >
-      Sumar al carrito
-    </StateButton>
+    <div className="buy-row">
+      <button
+        className={`btn primary buy-go${size}`}
+        type="button"
+        onClick={() => {
+          beforeBuy?.();
+          buyNow(key, amount);
+        }}
+      >
+        Comprar ya
+      </button>
+      <StateButton className={`btn ghost buy-cart${size}`} done="Sumado" onAct={() => onAdd(key, amount)} onDone={onAdded}>
+        <span className="buy-cart-in" title="Agregar al carrito">
+          <CartIcon />
+          <span className="buy-label">Agregar al carrito</span>
+        </span>
+      </StateButton>
+    </div>
   );
 
   if (!product.byWeight) {

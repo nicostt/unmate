@@ -127,7 +127,7 @@ export function ProductModal({
             )}
           </dl>
           <div className="m-actions">
-            <BuyBox product={product} design={design} onAdd={add} onAdded={goToCart} />
+            <BuyBox product={product} design={design} onAdd={add} onAdded={goToCart} beforeBuy={onClose} />
             <a
               className="btn wa outline"
               target="_blank"

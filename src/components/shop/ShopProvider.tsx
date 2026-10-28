@@ -20,6 +20,7 @@ import {
   type KitPart,
   type Product,
 } from "@/lib/types";
+import { BuyNow } from "./BuyNow";
 import { CartDrawer } from "./CartDrawer";
 
 // "Contexto" de la tienda: comparte el catálogo y el carrito con cualquier
@@ -48,6 +49,12 @@ type Shop = {
   openCart: () => void;
   closeCart: () => void;
   notify: (message: string) => void; // cartelito que aparece abajo
+  buyNow: (key: string, amount: number) => void; // "Comprar ya": abre la ventana para pedir solo eso (BuyNow.tsx)
+  // Abrir la ficha de un producto desde cualquier sección (por ejemplo, desde
+  // "Ver en catálogo" de los tipos de mate). La ficha vive en Catalog.tsx,
+  // que registra acá cómo abrirla.
+  showProduct: (slug: string) => void;
+  registerFicha: (open: ((slug: string) => void) | null) => void;
 };
 
 const ShopContext = createContext<Shop | null>(null);
@@ -65,6 +72,8 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
   const cart = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState({ text: "", show: false });
+  const [buying, setBuying] = useState<CartLine | null>(null);
+  const fichaOpener = useRef<((slug: string) => void) | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Índice para encontrar producto y diseño a partir de una key del carrito.
@@ -210,12 +219,22 @@ export function ShopProvider({ catalog, children }: { catalog: Catalog; children
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
     notify,
+    buyNow(key, amount) {
+      const found = byKey.get(key);
+      if (!found || isSoldOut(found.product)) return;
+      setBuying({ key, ...found, qty: Math.min(amount, maxQty(found.product, found.design)) });
+    },
+    showProduct: (slug) => fichaOpener.current?.(slug),
+    registerFicha: (open) => {
+      fichaOpener.current = open;
+    },
   };
 
   return (
     <ShopContext.Provider value={shop}>
       {children}
       <CartDrawer />
+      <BuyNow line={buying} onClose={() => setBuying(null)} notify={notify} />
       {/* con el carrito abierto el aviso sale arriba, para no tapar el total ni el botón de pedir */}
       <div
         className={`toast${toast.show ? " show" : ""}${cartOpen ? " at-top" : ""}`}
