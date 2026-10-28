@@ -112,8 +112,8 @@ export function MateTypes() {
               <p>{type.text}</p>
               {/* si todavía no hay productos de este tipo, no aparece */}
               {ofType(type.name).length > 0 && (
-                <button className="btn ghost small types-see" type="button" onClick={() => setBrowsing(type.name)}>
-                  Ver en catálogo →
+                <button className="btn accent small types-see" type="button" onClick={() => setBrowsing(type.name)}>
+                  Ver en catálogo <b>{ofType(type.name).length}</b> <i aria-hidden="true">→</i>
                 </button>
               )}
             </div>

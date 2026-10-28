@@ -15,16 +15,21 @@
    Solo el nombre; el resto se abre al pasar el mouse o al elegirlo. */
 .types{list-style:none;margin:0;padding:0}
 .types li{border-top:1px solid var(--line)}
-.types button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 0;background:none;border:0;cursor:pointer;text-align:left;font:600 1.35rem var(--f-display);color:var(--muted);transition:color .25s,padding .25s}
-.types button::after{content:"+";font-weight:400;color:var(--muted);transition:transform .25s,color .25s}
-.types li.is-open button{color:var(--fg);padding-left:12px}
-.types li.is-open button::after{transform:rotate(45deg);color:var(--accent)}
-.types button[aria-pressed="true"]{color:var(--accent)}
+.types li>button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 0;background:none;border:0;cursor:pointer;text-align:left;font:600 1.35rem var(--f-display);color:var(--muted);transition:color .25s,padding .25s}
+.types li>button::after{content:"+";font-weight:400;color:var(--muted);transition:transform .25s,color .25s}
+.types li.is-open>button{color:var(--fg);padding-left:12px}
+.types li.is-open>button::after{transform:rotate(45deg);color:var(--accent)}
+.types li>button[aria-pressed="true"]{color:var(--accent)}
 .types-body{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:center;max-height:0;opacity:0;overflow:hidden;padding-left:12px;transition:max-height .35s ease,opacity .3s,padding-bottom .35s}
-.types li.is-open .types-body{max-height:240px;opacity:1;padding-bottom:18px}
+.types li.is-open .types-body{max-height:300px;opacity:1;padding-bottom:18px}
 .types-art{aspect-ratio:1;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--fg)}
 .types-art svg{width:78%;height:auto}
 .types-body p{color:var(--muted)}
+/* "Ver en catálogo": relleno del color de marca para que se note, debajo del texto */
+.types-see{grid-column:2;justify-self:start;gap:10px}
+.types-see b{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:6px;background:var(--accent-fg);color:var(--accent);font-size:.78rem}
+.types-see i{font-style:normal;transition:transform .2s}
+.types-see:hover i{transform:translateX(3px)}
 
 /* ---------- armá tu equipo (src/components/shop/KitBuilder.tsx) ---------- */
 /* el recuadro: borde y resplandor del color de marca, para que se note */
