@@ -1,6 +1,8 @@
 import { unstable_cache } from "next/cache";
 import { photoUrl, supabase } from "./supabase";
-import { weightTiers, type Catalog, type KitDiscount, type Review, type Shape } from "./types";
+import { PRODUCT_TYPES, weightTiers, type Catalog, type KitDiscount, type ProductType, type Review, type Shape } from "./types";
+
+const TYPE_KEYS = new Set<string>(PRODUCT_TYPES.map((t) => t.key));
 
 // Forma en que llega cada producto de la base.
 type ProductRow = {
@@ -17,6 +19,7 @@ type ProductRow = {
   weight_extra: number;
   weight_discount: number;
   categories: { slug: string };
+  types?: string[]; // no viene si todavía no se corrió la migración 0010
   product_designs: { id: number; number: number }[];
   product_media: { kind: string; path: string; sort_order: number; design_id: number | null }[];
 };
@@ -45,20 +48,31 @@ function readKit(value: unknown): KitDiscount | null {
 // Solo llegan los productos y reseñas visibles, porque así lo deciden las
 // reglas de la base.
 //
+// Columnas de cada producto que lee la tienda.
+const PRODUCT_COLUMNS =
+  "slug, name, shape, material, description, price, compare_at_price, stock, by_design, " +
+  "by_weight, weight_extra, weight_discount, categories(slug), " +
+  "product_designs(id, number), product_media(kind, path, sort_order, design_id)";
+
+// Lee los productos con sus tipos. Si la base todavía no tiene la columna
+// `types` (falta correr la migración 0010), los lee sin ella: la tienda sigue
+// andando y simplemente no hay "Ver en catálogo".
+async function readProducts() {
+  const withTypes = await supabase
+    .from("products")
+    .select(`${PRODUCT_COLUMNS}, types`)
+    .order("sort_order")
+    .overrideTypes<ProductRow[]>();
+  if (!withTypes.error || withTypes.error.code !== "42703") return withTypes;
+  return supabase.from("products").select(PRODUCT_COLUMNS).order("sort_order").overrideTypes<ProductRow[]>();
+}
+
 // La web no la llama directo: usa getCatalog (al final del archivo), que
 // guarda el resultado.
 async function readCatalog(): Promise<Catalog> {
   const [categories, products, reviews, kit] = await Promise.all([
     supabase.from("categories").select("slug, name").order("sort_order"),
-    supabase
-      .from("products")
-      .select(
-        "slug, name, shape, material, description, price, compare_at_price, stock, by_design, " +
-          "by_weight, weight_extra, weight_discount, categories(slug), " +
-          "product_designs(id, number), product_media(kind, path, sort_order, design_id)",
-      )
-      .order("sort_order")
-      .overrideTypes<ProductRow[]>(),
+    readProducts(),
     supabase.from("reviews").select("id, name, text, photos, avatar, featured").order("sort_order"),
     supabase.from("settings").select("value").eq("key", "kit_discount").maybeSingle(),
   ]);
@@ -86,6 +100,7 @@ async function readCatalog(): Promise<Catalog> {
       return {
         slug: p.slug,
         name: p.name,
+        types: (p.types ?? []).filter((t): t is ProductType => TYPE_KEYS.has(t)),
         category: p.categories.slug,
         byWeight: p.by_weight,
         tiers: p.by_weight ? weightTiers(p.weight_extra, p.weight_discount) : [],

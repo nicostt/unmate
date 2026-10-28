@@ -59,6 +59,12 @@
 .admin-form label.admin-check{display:flex;align-items:center;gap:10px;color:var(--fg);cursor:pointer}
 .admin-check input{width:20px;height:20px;accent-color:var(--accent)}
 .admin-check span small{color:var(--muted);font-weight:400}
+/* tipos del producto (ProductForm.tsx): casillas agrupadas por material, forma y bombilla */
+.admin-types{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0;display:grid;gap:10px}
+.admin-types legend{padding:0 6px;font-weight:600}
+.admin-types legend small{color:var(--muted);font-weight:400}
+.admin-types-group{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.admin-types-group>span{min-width:76px;color:var(--muted);font-size:.9rem}
 .admin-submit{display:flex;align-items:center;gap:14px}
 @media(max-width:600px){.admin-form{grid-template-columns:1fr}}
 

@@ -28,6 +28,7 @@ export type AdminProduct = {
   weight_extra: number; // % más caro el kilo llevando menos de 1 kg
   weight_discount: number; // % más barato el kilo llevando 2 kg o más
   sort_order: number;
+  types?: string[]; // tipos (PRODUCT_TYPES en src/lib/types.ts); no viene sin la migración 0010
   product_media: AdminMedia[];
   product_designs: AdminDesign[];
 };

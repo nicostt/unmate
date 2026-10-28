@@ -80,7 +80,24 @@ export type Product = {
   byDesign: boolean;
   designs: Design[]; // vacío si el producto no va por diseños
   images: string[]; // fotos generales, en el orden en que se muestran
+  types: ProductType[]; // material, forma o tipo de bombilla (pueden ser varios)
 };
+
+// Tipos de producto. Se marcan en el panel (pueden ser varios: un mate puede
+// ser de calabaza Y camionero) y los usa "¿Cuál es tu tipo de mate?"
+// (MateTypes.tsx) para el botón "Ver en catálogo". La base acepta solo estos
+// (migración 0010, columna products.types).
+export const PRODUCT_TYPES = [
+  { key: "calabaza", label: "Calabaza", group: "Material" },
+  { key: "algarrobo", label: "Algarrobo", group: "Material" },
+  { key: "acero", label: "Acero", group: "Material" },
+  { key: "camionero", label: "Camionero", group: "Forma" },
+  { key: "torpedo", label: "Torpedo", group: "Forma" },
+  { key: "imperial", label: "Imperial", group: "Forma" },
+  { key: "bombilla", label: "Bombilla", group: "Bombilla" },
+  { key: "bombillon", label: "Bombillón", group: "Bombilla" },
+] as const;
+export type ProductType = (typeof PRODUCT_TYPES)[number]["key"];
 
 // Descuento por armar equipo. Lo define el admin en el panel (pestaña
 // Productos): un `percent` % cuando el carrito trae productos de `min`

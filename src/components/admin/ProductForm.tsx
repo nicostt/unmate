@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { PRODUCT_TYPES } from "@/lib/types";
 import { DesignManager } from "./DesignManager";
 import { PhotoManager } from "./PhotoManager";
 import {
@@ -79,6 +80,8 @@ export function ProductForm({
     weight_extra: String(product?.weight_extra ?? 0),
     weight_discount: String(product?.weight_discount ?? 0),
   });
+  // tipos del producto (material, forma, bombilla): casillas, pueden ser varios
+  const [types, setTypes] = useState<string[]>(product?.types ?? []);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -134,18 +137,28 @@ export function ProductForm({
     };
 
     setBusy(true);
-    const result = product
-      ? await supabase
-          .from("products")
-          .update({ ...values, updated_at: new Date().toISOString() })
-          .eq("id", product.id)
-          .select("id")
-          .single()
-      : await supabase
-          .from("products")
-          .insert({ ...values, slug: slugify(values.name), sort_order: nextSortOrder })
-          .select("id")
-          .single();
+    const save = (row: Record<string, unknown>) =>
+      product
+        ? supabase
+            .from("products")
+            .update({ ...row, updated_at: new Date().toISOString() })
+            .eq("id", product.id)
+            .select("id")
+            .single()
+        : supabase
+            .from("products")
+            .insert({ ...row, slug: slugify(values.name), sort_order: nextSortOrder })
+            .select("id")
+            .single();
+    // los tipos solo van en productos comunes (la yerba suelta no tiene)
+    let result = await save({ ...values, types: common ? types : [] });
+    // Si la base todavía no tiene la columna de tipos (falta la migración
+    // 0010), se guarda igual todo lo demás.
+    let typesPending = false;
+    if (result.error && /types/.test(result.error.message) && /column/i.test(result.error.message)) {
+      result = await save(values);
+      typesPending = true;
+    }
 
     if (result.error) {
       // 23505 = valor repetido en una columna única (acá, el slug que sale del nombre)
@@ -154,7 +167,7 @@ export function ProductForm({
       );
     } else {
       await onSaved(result.data.id);
-      setNote("Guardado.");
+      setNote(typesPending ? "Guardado. Los tipos se van a guardar cuando corras la migración 0010 en Supabase." : "Guardado.");
     }
     setBusy(false);
   }
@@ -229,6 +242,30 @@ export function ProductForm({
               Material <small>(opcional)</small>
               <input className="field-in" placeholder="Calabaza, algarrobo, bronce…" {...field("material")} />
             </label>
+            {common && (
+            <fieldset className="admin-types">
+              <legend>
+                Tipo <small>(podés marcar varios; se usa en “Ver en catálogo” de los tipos de mate)</small>
+              </legend>
+              {["Material", "Forma", "Bombilla"].map((group) => (
+                <div key={group} className="admin-types-group">
+                  <span>{group}</span>
+                  {PRODUCT_TYPES.filter((t) => t.group === group).map((t) => (
+                    <label key={t.key} className="admin-check">
+                      <input
+                        type="checkbox"
+                        checked={types.includes(t.key)}
+                        onChange={(e) =>
+                          setTypes(e.target.checked ? [...types, t.key] : types.filter((k) => k !== t.key))
+                        }
+                      />
+                      {t.label}
+                    </label>
+                  ))}
+                </div>
+              ))}
+            </fieldset>
+            )}
             <label>
               Precio
               <input className="field-in" inputMode="numeric" placeholder="34900" required {...field("price")} />
